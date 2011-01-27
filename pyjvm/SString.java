@@ -54,13 +54,13 @@ public final class SString extends SObject {
 			return this.interned;
 		
 		int h = 0;
-        byte val[] = bytes;
-        int len = bytes.length;
-
-        for (int i = 0; i < len; i++) {
-            h = 31*h + val[i];
-        }
-        return h;
+		byte val[] = bytes;
+		int len = bytes.length;
+		
+		for (int i = 0; i < len; i++) {
+		    h = 31*h + val[i];
+		}
+		return h;
 	}
 	
 	public SBool isEqual(SObject other) {
