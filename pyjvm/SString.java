@@ -2,7 +2,7 @@ package pyjvm;
 
 import java.io.UnsupportedEncodingException;
 
-public final class SString extends SObject {
+public final class SString extends Obj {
 	public final byte[] bytes;
 	public int interned = -1;
 	
@@ -22,7 +22,7 @@ public final class SString extends SObject {
 		return new String(bytes);
 	}
 	
-	public SObject repr() {
+	public Obj repr() {
 		SStringBuilder builder = new SStringBuilder(this.length() * 15 / 10);
 		
 		builder.append('"');
@@ -63,7 +63,7 @@ public final class SString extends SObject {
 		return h;
 	}
 	
-	public SBool isEqual(SObject other) {
+	public SBool isEqual(Obj other) {
 		if(other == this)
 			return SBool.True;
 		if(other instanceof SString) {
@@ -102,7 +102,7 @@ public final class SString extends SObject {
 		if(this.interned != -1)
 			return this.interned;
 		synchronized(internTable) {
-			SObject val = internTable.getOrNull(this);
+			Obj val = internTable.getOrNull(this);
 			if(val == null) {
 				int key = nextIdent++;
 				internTable.put(this, SInt.get(key));

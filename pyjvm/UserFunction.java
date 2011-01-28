@@ -1,6 +1,6 @@
 package pyjvm;
 
-public final class UserFunction extends SObject {
+public final class UserFunction extends Obj {
 
 	private final boolean varargs;
 	private final boolean kwargs;
@@ -20,10 +20,10 @@ public final class UserFunction extends SObject {
 		this.expectedCount = this.argnames.length;
 	}
 
-	public Instr callInFrame(Frame frame, SObject[] args) {
-		SObject[] finalArgs = args;
+	public Instr callInFrame(Frame frame, Obj[] args) {
+		Obj[] finalArgs = args;
 		if(args.length != expectedCount) {
-			finalArgs = new SObject[expectedCount];
+			finalArgs = new Obj[expectedCount];
 			
 			throw new ScriptError(ScriptError.NotImplementedError, "Bad number of arguments (not supported)");
 		}

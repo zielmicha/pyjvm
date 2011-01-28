@@ -1,14 +1,14 @@
 package pyjvm;
 
-public final class Dict extends SObject {
+public final class Dict extends Obj {
 	public final class Entry {
-		public Entry(SObject key, SObject val) {
+		public Entry(Obj key, Obj val) {
 			this.key = key;
 			this.val = val;
 		}
 		
-		public SObject key;
-		public SObject val;
+		public Obj key;
+		public Obj val;
 		Entry next;
 	}
 	
@@ -23,7 +23,7 @@ public final class Dict extends SObject {
 		resizeAt = initalCapacity;
 	}
 	
-	public final void put(SObject key, SObject val) {
+	public final void put(Obj key, Obj val) {
 		int hash = Math.abs(key == null?0: key.hashCode());
 		int index = hash % entries.length;
 		Entry e = entries[index];
@@ -57,7 +57,7 @@ public final class Dict extends SObject {
 		}
 	}
 	
-	public final SObject getOrNull(SObject key) {
+	public final Obj getOrNull(Obj key) {
 		int hash = Math.abs(key == null?0: key.hashCode());
 		int index = hash % entries.length;
 		Entry e = entries[index];
@@ -69,7 +69,7 @@ public final class Dict extends SObject {
 		return null;
 	}
 	
-	public final SObject get(SObject key) {
+	public final Obj get(Obj key) {
 		int hash = Math.abs(key == null?0: key.hashCode());
 		int index = hash % entries.length;
 		Entry e = entries[index];
@@ -120,14 +120,14 @@ public final class Dict extends SObject {
 		private int entryIndex = 0;
 		private Entry entry = null;
 		
-		public SObject next() {
+		public Obj next() {
 			if(entry == null) {
 				entry = entries[entryIndex];
 				entryIndex ++;
 				if(entryIndex == entries.length)
 					return null;
 			}
-			SObject key = entry.key;
+			Obj key = entry.key;
 			entry = entry.next;
 			return key;
 		}

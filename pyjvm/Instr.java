@@ -1,6 +1,6 @@
 package pyjvm;
 
-public abstract class Instr extends SObject {
+public abstract class Instr extends Obj {
 	public Instr next;
 	public int lineno;
 	
@@ -20,7 +20,7 @@ public abstract class Instr extends SObject {
 			outreg0 = outreg[0];
 	}
 	
-	public void init(STuple args) {
+	public void init(Tuple args) {
 		if(args.length() == 0)
 			init0();
 		else if(args.length() == 1)
@@ -35,11 +35,11 @@ public abstract class Instr extends SObject {
 		throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (0)");
 	}
 	
-	public void init1(SObject arg) {
+	public void init1(Obj arg) {
 		throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (1)");
 	}
 
-	public void init2(SObject arg0, SObject arg1) {
+	public void init2(Obj arg0, Obj arg1) {
 		throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (2)");
 	}
 	
@@ -47,10 +47,10 @@ public abstract class Instr extends SObject {
 		throw new ScriptError(ScriptError.TypeError, "Setting next2 on non-JumpIf like instr");
 	}
 
-	public void setupInstr(int id, Instr[] instrs, STuple data) {
-		STuple args = (STuple)data.get(0);
-		STuple inreg = (STuple)data.get(1);
-		STuple outreg = (STuple)data.get(2);
+	public void setupInstr(int id, Instr[] instrs, Tuple data) {
+		Tuple args = (Tuple)data.get(0);
+		Tuple inreg = (Tuple)data.get(1);
+		Tuple outreg = (Tuple)data.get(2);
 		
 		int next1offset = data.getInt(3);
 		int next2offset = data.getInt(4);
@@ -74,7 +74,7 @@ public abstract class Instr extends SObject {
 		return "<Instr name=" + getClass().getSimpleName() + " lineno=" + lineno + ">";
 	}
 	
-	public static Instr create(int type, STuple args) {
+	public static Instr create(int type, Tuple args) {
 		switch(type) {
 			case INSTR_BINOP:
 				return GenericInstrs.BinOp.createBinOp(args);
@@ -110,6 +110,8 @@ public abstract class Instr extends SObject {
 				return new GenericInstrs.MakeFunction();
 			case INSTR_CALL:
 				return new GenericInstrs.Call();
+			case INSTR_BINOPIP:
+				return GenericInstrs.BinOp.createBinOp(args);
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}

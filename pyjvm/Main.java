@@ -4,7 +4,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		Unserializer unserializer = new Unserializer(System.in);
-		SObject read = unserializer.read();
+		Obj read = unserializer.read();
 		Instr main = (Instr)read;
 		
 		Frame frame = new Frame(null);

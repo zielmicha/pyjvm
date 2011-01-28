@@ -1,8 +1,8 @@
 package pyjvm;
 
-public class Module extends SObject {
+public class Module extends Obj {
 
-	public Module(SObject dict, SObject doc) {
+	public Module(Obj dict, Obj doc) {
 		// TODO: implement
 	}
 

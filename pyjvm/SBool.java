@@ -1,6 +1,6 @@
 package pyjvm;
 
-public final class SBool extends SObject {
+public final class SBool extends Obj {
 	public final boolean value;
 
 	private SBool(boolean val) {

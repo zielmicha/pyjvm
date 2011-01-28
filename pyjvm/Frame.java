@@ -2,7 +2,7 @@ package pyjvm;
 
 public final class Frame {
 	public StringDict globals = null;
-	public SObject[] reg = new SObject[128];
+	public Obj[] reg = new Obj[128];
 	public Frame parent = null;
 	public Instr counter;
 	
@@ -44,7 +44,7 @@ public final class Frame {
 		throw new ScriptError(ScriptError.Error, e);
 	}
 
-	public final void loadRegisters(int[] inregs, SObject[] args) {
+	public final void loadRegisters(int[] inregs, Obj[] args) {
 		int length = inregs.length;
 		for(int i=0; i<length; i++) {
 			args[i] = reg[inregs[i]];

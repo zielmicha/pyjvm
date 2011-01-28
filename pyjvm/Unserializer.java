@@ -21,7 +21,7 @@ public class Unserializer {
 		return (byte) val;
 	}
 	
-	public SObject read() {
+	public Obj read() {
 		byte type;
 		try {
 			type = readByte();
@@ -55,9 +55,10 @@ public class Unserializer {
 		}
 	}
 
-	private SObject readFunction() throws IOException {
+	private Obj readFunction() throws IOException {
 		int argcount = readUInt();
-		int loadargs = readUInt();
+		int loadargsCount = readUInt();
+		int[] loadargs = readSizedIntTuple(loadargsCount).toIntArray();
 		int varcount = readUInt();
 		Instr body = (Instr)read();
 		return new FunctionConst(argcount, loadargs, varcount, body);
@@ -86,7 +87,7 @@ public class Unserializer {
 		
 		for(int i=0; i<length; i++) {
 			SString key = readString();
-			SObject val = read();
+			Obj val = read();
 			dict.put(key, val);
 		}
 		
@@ -103,11 +104,11 @@ public class Unserializer {
 			throw new IOException("Bad boolean value");
 	}
 
-	private SUnicode readUnicode() throws IOException {
+	private Unicode readUnicode() throws IOException {
 		int length = readUInt();
 		byte[] bytes = new byte[length];
 		this.readToArray(bytes);
-		return SUnicode.createFromUtf8(bytes);
+		return Unicode.createFromUtf8(bytes);
 	}
 
 	private SString readString() throws IOException {
@@ -151,7 +152,7 @@ public class Unserializer {
 		readByte();
 		int length = readUInt();
 		Instr[] instrs = new Instr[length];
-		STuple[] data = new STuple[length];
+		Tuple[] data = new Tuple[length];
 		
 		for(int i=0; i<length; i++) {
 			readInstr(i, instrs, data);
@@ -164,23 +165,23 @@ public class Unserializer {
 		return instrs[0];
 	}
 	
-	private STuple readSizedIntTuple(int size) throws IOException {
-		SObject[] values = new SObject[size];
+	private Tuple readSizedIntTuple(int size) throws IOException {
+		Obj[] values = new Obj[size];
 		for(int i=0; i<size; i++) {
 			values[i] = SInt.get(readInt());
 		}
-		return new STuple(values);
+		return new Tuple(values);
 	}
 	
-	private STuple readSizedTuple(int size) throws IOException {
-		SObject[] values = new SObject[size];
+	private Tuple readSizedTuple(int size) throws IOException {
+		Obj[] values = new Obj[size];
 		for(int i=0; i<size; i++) {
 			values[i] = read();
 		}
-		return new STuple(values);
+		return new Tuple(values);
 	}
 	
-	private void readInstr(int i, Instr[] instrs, STuple[] data) throws IOException {
+	private void readInstr(int i, Instr[] instrs, Tuple[] data) throws IOException {
 		int type = readUInt();
 		
 		int argsCount = readUInt();
@@ -190,14 +191,14 @@ public class Unserializer {
 		int next1offset = readInt();
 		int next2offset = readInt();
 	
-		STuple args = readSizedTuple(argsCount);
-		STuple inreg = readSizedIntTuple(inCount);
-		STuple outreg = readSizedIntTuple(outCount);
+		Tuple args = readSizedTuple(argsCount);
+		Tuple inreg = readSizedIntTuple(inCount);
+		Tuple outreg = readSizedIntTuple(outCount);
 		int lineno = readUInt();
 	
 		instrs[i] = Instr.create(type, args);
 		
-		data[i] = new STuple(new SObject[]{
+		data[i] = new Tuple(new Obj[]{
 			args, inreg, outreg,
 			SInt.get(next1offset), SInt.get(next2offset), SInt.get(lineno)
 		});

@@ -113,7 +113,7 @@ def serialize_instrs(main):
 	return 'i' + pack_int(id(main)) + '-' + pack_uint(len(instrs)) + result_s
 
 def serialize_function(func):
-	return 'f' + pack_uint(func.argcount) + pack_uint(len(func.loadargs)) + \
+	return 'f' + pack_uint(func.argcount) + pack_uint(len(func.loadargs)) + pack_uint_list(func.loadargs) + \
 		pack_uint(func.varcount) + serialize(func.body)
 
 def serialize(obj):

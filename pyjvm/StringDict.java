@@ -1,14 +1,14 @@
 package pyjvm;
 
-public final class StringDict extends SObject {
+public final class StringDict extends Obj {
 	public final class Entry {
-		public Entry(int key, SObject val) {
+		public Entry(int key, Obj val) {
 			this.key = key;
 			this.val = val;
 		}
 		
 		public int key;
-		public SObject val;
+		public Obj val;
 		Entry next;
 	}
 	
@@ -23,7 +23,7 @@ public final class StringDict extends SObject {
 		resizeAt = initalCapacity;
 	}
 	
-	public final void put(int key, SObject val) {
+	public final void put(int key, Obj val) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
 		Entry e = entries[index];
@@ -43,11 +43,11 @@ public final class StringDict extends SObject {
 		if(length >= resizeAt) this.resize();
 	}
 	
-	public final void put(SString key, SObject val) {
+	public final void put(SString key, Obj val) {
 		put(key.intern(), val);
 	}
 	
-	public final void put(String string, SObject val) {
+	public final void put(String string, Obj val) {
 		put(SString.fromJavaString(string), val);
 	}
 	
@@ -66,7 +66,7 @@ public final class StringDict extends SObject {
 		}
 	}
 	
-	public final SObject getOrNull(int key) {
+	public final Obj getOrNull(int key) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
 		Entry e = entries[index];
@@ -78,7 +78,7 @@ public final class StringDict extends SObject {
 		return null;
 	}
 	
-	public final SObject get(int key) {
+	public final Obj get(int key) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
 		Entry e = entries[index];
@@ -91,7 +91,7 @@ public final class StringDict extends SObject {
 		throw new ScriptError(ScriptError.KeyError, "not found: " + keyString);
 	}
 	
-	public final SObject get(String s) {
+	public final Obj get(String s) {
 		return get(SString.intern(s));
 	}
 	

@@ -1,7 +1,7 @@
 package pyjvm;
 
-public class List extends SObject {
-	private SObject[] array;
+public class List extends Obj {
+	private Obj[] array;
 	private int length;
 	
 	public List() {
@@ -9,7 +9,7 @@ public class List extends SObject {
 	}
 	
 	public List(int initialCapacity) {
-		this.array = new SObject[initialCapacity];
+		this.array = new Obj[initialCapacity];
 		this.length = 0;
 	}
 	
@@ -17,7 +17,7 @@ public class List extends SObject {
 		return this.length;
 	}
 	
-	public final void append(SObject obj) {
+	public final void append(Obj obj) {
 		if(length + 1 == array.length)
 			reallocate();
 		array[length] = obj;
@@ -25,8 +25,8 @@ public class List extends SObject {
 	}
 
 	private void reallocate() {
-		SObject[] src = array;
-		SObject[] dst = new SObject[src.length * 2];
+		Obj[] src = array;
+		Obj[] dst = new Obj[src.length * 2];
 		System.arraycopy(src, 0, dst, 0, src.length);
 		this.array = dst;
 	}

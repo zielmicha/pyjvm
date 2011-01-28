@@ -1,6 +1,6 @@
 package pyjvm;
 
-public final class None extends SObject {
+public final class None extends Obj {
 	private None() {}
 	
 	public static final None None = new None(); 

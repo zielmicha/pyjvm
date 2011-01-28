@@ -21,7 +21,7 @@ public class ScriptError extends RuntimeException {
 	
 	private String message;
 	private int kind;
-	private SObject sender;
+	private Obj sender;
 	
 	public ScriptError(int kind, String message) {
 		super(message);
@@ -39,7 +39,7 @@ public class ScriptError extends RuntimeException {
 		this.message = message;
 	}
 	
-	public ScriptError(int kind, String message, SObject sender) {
+	public ScriptError(int kind, String message, Obj sender) {
 		super(message);
 		this.kind = kind;
 		this.message = message;

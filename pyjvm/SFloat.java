@@ -1,6 +1,6 @@
 package pyjvm;
 
-public final class SFloat extends SObject {
+public final class SFloat extends Obj {
 	public double value;
 	
 	public SFloat(double val) {

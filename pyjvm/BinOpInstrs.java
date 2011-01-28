@@ -4,9 +4,9 @@ public final class BinOpInstrs {
 
 	public static final class Add extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			SObject a = frame.reg[inreg0];
-			SObject b = frame.reg[inreg1];
-			SObject result = a.add(frame, b);
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.add(frame, b);
 			if(result == NotImplemented) {
 				result = b.radd(frame, a);
 				if(result == NotImplemented)
@@ -19,9 +19,9 @@ public final class BinOpInstrs {
 
 	public static final class Sub extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			SObject a = frame.reg[inreg0];
-			SObject b = frame.reg[inreg1];
-			SObject result = a.sub(frame, b);
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.sub(frame, b);
 			if(result == NotImplemented) {
 				result = b.rsub(frame, a);
 				if(result == NotImplemented)
@@ -34,9 +34,9 @@ public final class BinOpInstrs {
 
 	public static final class Mul extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			SObject a = frame.reg[inreg0];
-			SObject b = frame.reg[inreg1];
-			SObject result = a.mul(frame, b);
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.mul(frame, b);
 			if(result == NotImplemented) {
 				result = b.rmul(frame, a);
 				if(result == NotImplemented)
@@ -49,9 +49,9 @@ public final class BinOpInstrs {
 
 	public static final class Floordiv extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			SObject a = frame.reg[inreg0];
-			SObject b = frame.reg[inreg1];
-			SObject result = a.floordiv(frame, b);
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.floordiv(frame, b);
 			if(result == NotImplemented) {
 				result = b.rfloordiv(frame, a);
 				if(result == NotImplemented)
@@ -64,9 +64,9 @@ public final class BinOpInstrs {
 
 	public static final class IsEqual extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			SObject a = frame.reg[inreg0];
-			SObject b = frame.reg[inreg1];
-			SObject result = a.isEqual(frame, b);
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.isEqual(frame, b);
 			if(result == null) {
 				result = b.isEqual(frame, a);
 				if(result == null)
@@ -77,7 +77,37 @@ public final class BinOpInstrs {
 		}
 	}
 
-	public static abstract class BinOpFactory extends SObject {
+	public static final class Iadd extends GenericInstrs.BinOp {
+		public Instr run(Frame frame) {
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.iadd(frame, b);
+			if(result == NotImplemented) {
+				result = b.radd(frame, a);
+				if(result == NotImplemented)
+					this.operatorFailed(a, b, "+=");
+			}
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+
+	public static final class Isub extends GenericInstrs.BinOp {
+		public Instr run(Frame frame) {
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.isub(frame, b);
+			if(result == NotImplemented) {
+				result = b.rsub(frame, a);
+				if(result == NotImplemented)
+					this.operatorFailed(a, b, "-=");
+			}
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+
+	public static abstract class BinOpFactory extends Obj {
 		public abstract GenericInstrs.BinOp create();
 	}
 	
@@ -112,6 +142,18 @@ public final class BinOpInstrs {
 		binOpTypes.put("==", new BinOpFactory(){
 			public GenericInstrs.BinOp create() {
 				return new IsEqual();
+			}
+		});
+
+		binOpTypes.put("+=", new BinOpFactory(){
+			public GenericInstrs.BinOp create() {
+				return new Iadd();
+			}
+		});
+
+		binOpTypes.put("-=", new BinOpFactory(){
+			public GenericInstrs.BinOp create() {
+				return new Isub();
 			}
 		});
 

@@ -1,6 +1,6 @@
 package pyjvm;
 
-public final class SInt extends SObject {
+public final class SInt extends Obj {
 	public int value;
 
 	private SInt(int i) {
@@ -15,7 +15,7 @@ public final class SInt extends SObject {
 		return this.value;
 	}
 	
-	public SBool isEqual(SObject other) {
+	public SBool isEqual(Obj other) {
 		if(other == this)
 			return SBool.True;
 		if(other instanceof SInt)
@@ -35,7 +35,7 @@ public final class SInt extends SObject {
 		return this.value != 0;
 	}
 	
-	public SObject add(SObject other) {
+	public Obj add(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(value + otherValue);
@@ -44,7 +44,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject radd(SObject other) {
+	public Obj radd(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(otherValue + value);
@@ -53,7 +53,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject sub(SObject other) {
+	public Obj sub(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(otherValue - value);
@@ -62,7 +62,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject rsub(SObject other) {
+	public Obj rsub(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(value - otherValue);
@@ -71,7 +71,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject mul(SObject other) {
+	public Obj mul(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(otherValue * value);
@@ -80,7 +80,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject rmul(SObject other) {
+	public Obj rmul(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(value * otherValue);
@@ -89,7 +89,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject floordiv(SObject other) {
+	public Obj floordiv(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(otherValue / value);
@@ -98,7 +98,7 @@ public final class SInt extends SObject {
 		}
 	}
 	
-	public SObject rfloordiv(SObject other) {
+	public Obj rfloordiv(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(value / otherValue);
