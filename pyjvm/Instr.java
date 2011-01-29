@@ -1,13 +1,16 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 public abstract class Instr extends Obj {
-	public Instr next;
+	protected Instr next;
 	public int lineno;
+	public SString filename;
 	
-	public int inreg0;
-	public int inreg1;
+	protected int inreg0;
+	protected int inreg1;
 	
-	public int outreg0; 
+	protected int outreg0; 
 	
 	public void initReg(int[] inreg, int[] outreg) {
 		if(outreg.length > 1 || inreg.length > 2)
@@ -71,7 +74,7 @@ public abstract class Instr extends Obj {
 	}
 	
 	public String toString() {
-		return "<Instr name=" + getClass().getSimpleName() + " lineno=" + lineno + ">";
+		return "<Instr name=" + getClass().getSimpleName() + " lineno=" + lineno + " filename=" + filename + ">";
 	}
 	
 	public static Instr create(int type, Tuple args) {
@@ -112,6 +115,10 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.Call();
 			case INSTR_BINOPIP:
 				return GenericInstrs.BinOp.createBinOp(args);
+			case INSTR_MAKELIST:
+				return new GenericInstrs.MakeList();
+			case INSTR_GETITEM:
+				return new GenericInstrs.GetItem();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}

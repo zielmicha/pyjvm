@@ -1,3 +1,5 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 import pyjvm.BinOpInstrs.BinOpFactory;
@@ -79,7 +81,9 @@ public final class GenericInstrs {
 		}
 		
 		public Instr run(Frame frame) {
-			Obj val = frame.globals.get(name);
+			Obj val = frame.globals.getOrNull(name);
+			if(val == null)
+				val = frame.builtins.get(name);
 			frame.reg[outreg0] = val;
 			return next;
 		}
@@ -134,6 +138,36 @@ public final class GenericInstrs {
 		
 	}
 	
+	public static final class MakeList extends Instr {
+		private int length;
+		private int[] inreg;
+		
+		public void initReg(int[] inreg, int[] outreg) {
+			this.inreg = inreg;
+			if(outreg.length != 1)
+				throw new ScriptError(ScriptError.TypeError, "Expected 1 outreg");
+			this.outreg0 = outreg[0];
+		}
+		
+		public void init1(Obj length) {
+			this.length = length.intValue();
+		}
+		
+		public Instr run(Frame frame) {
+			List tuple;
+			Obj[] arr = new Obj[length];
+			for(int i=0; i<length; i++) {
+				arr[i] = frame.reg[inreg[i]];
+			}
+			tuple = List.fromArrayUnsafe(arr);
+			
+			frame.reg[outreg0] = tuple;
+			
+			return next;
+		}
+		
+	}
+	
 	public static final class Print extends Instr {
 		private boolean hasLF;
 		
@@ -178,6 +212,7 @@ public final class GenericInstrs {
 			} else {
 				frame.setFrame = frame.parent;
 				frame.setInstr = frame.parent.counter;
+				frame.parent.reg[frame.parent.returnValueTo] = value;
 			}
 			return null;
 		}
@@ -214,6 +249,7 @@ public final class GenericInstrs {
 				Instr newInstr = func.callInFrame(newFrame, args);
 				frame.setFrame = newFrame;
 				frame.setInstr = newInstr;
+				frame.returnValueTo = outreg0;
 				return null;
 			} else {
 				frame.reg[outreg0] = funcObj.call(args);
@@ -222,7 +258,20 @@ public final class GenericInstrs {
 		}
 
 	}
+	
+	public static final class GetItem extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			Obj seq = frame.reg[inreg1];
+			Obj key = frame.reg[inreg0];
+			Obj result = seq.getItem(frame, key);
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
 
+	
 	public static class FunctionInstr extends Instr {
 		private FunctionConst functionConst;
 

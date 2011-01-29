@@ -1,7 +1,10 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 public final class Frame {
 	public StringDict globals = null;
+	public StringDict builtins;
 	public Obj[] reg = new Obj[128];
 	public Frame parent = null;
 	public Instr counter;
@@ -28,6 +31,7 @@ public final class Frame {
 					instr = instr.run(frame);
 				}
 			} catch(Throwable e) {
+				frame.counter = instr;
 				Frame.causeException(frame, e);
 			}
 			if(frame.setFrame != null) {
@@ -41,6 +45,14 @@ public final class Frame {
 
 	private static void causeException(Frame frame, Throwable e) {
 		// TODO Implement
+		System.out.println("Traceback (most recent call last):");
+		Frame current = frame;
+		while(current != null) {
+			Instr instr = frame.counter;
+			System.out.println("  File " + instr.filename.repr() + ", line " + instr.lineno + ", in ?");
+			current = current.parent;
+		}
+		System.out.println();
 		throw new ScriptError(ScriptError.Error, e);
 	}
 

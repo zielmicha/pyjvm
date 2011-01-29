@@ -1,3 +1,5 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 public final class SInt extends Obj {
@@ -56,7 +58,7 @@ public final class SInt extends Obj {
 	public Obj sub(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
-			return SInt.get(otherValue - value);
+			return SInt.get(value - otherValue);
 		} else {
 			return NotImplemented;
 		}
@@ -65,7 +67,7 @@ public final class SInt extends Obj {
 	public Obj rsub(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
-			return SInt.get(value - otherValue);
+			return SInt.get(otherValue - value);
 		} else {
 			return NotImplemented;
 		}

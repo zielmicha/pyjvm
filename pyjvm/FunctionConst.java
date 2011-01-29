@@ -1,3 +1,5 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 public class FunctionConst extends Obj {
@@ -15,7 +17,7 @@ public class FunctionConst extends Obj {
 	}
 	
 	public Function createInstance(Frame frame) {
-		return new Function(loadArgs, pushArgsStart, pushArgsCount, body, frame.globals);
+		return new Function(loadArgs, pushArgsStart, pushArgsCount, body, frame.globals, frame.builtins);
 	}
 	
 }

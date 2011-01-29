@@ -1,3 +1,5 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 public class Obj {
@@ -167,5 +169,13 @@ public class Obj {
 
 	public Obj call(Obj[] args) {
 		throw new ScriptError(ScriptError.TypeError, "Object not callable", this);
+	}
+
+	public Obj getItem(Frame frame, Obj key) {
+		return getItem(key);
+	}
+	
+	public Obj getItem(Obj key) {
+		throw new ScriptError(ScriptError.TypeError, "Object not subscriptable", this);
 	}
 }

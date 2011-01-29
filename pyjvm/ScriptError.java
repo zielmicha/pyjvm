@@ -1,3 +1,5 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 import java.io.PrintStream;
@@ -13,10 +15,12 @@ public class ScriptError extends RuntimeException {
 	public static final int NotImplementedError = 5;
 	public static final int LookupError = 6;
 	public static final int AssertionError = 7;
+	public static final int IndexError = 8;
 	
 	public static String[] names = new String[] {
 		"Error", "KeyError", "ValueError", "TypeError", "IOError",
-		"NotImplementedError", "LookupError", "AssertionError"
+		"NotImplementedError", "LookupError", "AssertionError",
+		"IndexError"
 	};
 	
 	private String message;

@@ -1,3 +1,5 @@
+// Copyright 2011 Michal Zielinski
+// for license see LICENSE file
 package pyjvm;
 
 import java.io.EOFException;
@@ -7,6 +9,7 @@ import java.io.InputStream;
 public class Unserializer {
 	private InputStream in;
 	private int pos;
+	private SString filename = SString.fromJavaString("<unknown>");
 
 	public Unserializer(InputStream in) {
 		this.in = in;
@@ -46,6 +49,9 @@ public class Unserializer {
 					return readInstrs();
 				case 'f':
 					return readFunction();
+				case 'm':
+					filename = (SString)read();
+					return read();
 				case 'l':
 					return null; // remaining of process done by transformer.py, skip
 			}
@@ -197,6 +203,7 @@ public class Unserializer {
 		int lineno = readUInt();
 	
 		instrs[i] = Instr.create(type, args);
+		instrs[i].filename = filename;
 		
 		data[i] = new Tuple(new Obj[]{
 			args, inreg, outreg,

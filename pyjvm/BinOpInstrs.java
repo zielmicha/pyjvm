@@ -4,8 +4,8 @@ public final class BinOpInstrs {
 
 	public static final class Add extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.add(frame, b);
 			if(result == NotImplemented) {
 				result = b.radd(frame, a);
@@ -19,8 +19,8 @@ public final class BinOpInstrs {
 
 	public static final class Sub extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.sub(frame, b);
 			if(result == NotImplemented) {
 				result = b.rsub(frame, a);
@@ -34,8 +34,8 @@ public final class BinOpInstrs {
 
 	public static final class Mul extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.mul(frame, b);
 			if(result == NotImplemented) {
 				result = b.rmul(frame, a);
@@ -49,8 +49,8 @@ public final class BinOpInstrs {
 
 	public static final class Floordiv extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.floordiv(frame, b);
 			if(result == NotImplemented) {
 				result = b.rfloordiv(frame, a);
@@ -64,8 +64,8 @@ public final class BinOpInstrs {
 
 	public static final class IsEqual extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.isEqual(frame, b);
 			if(result == null) {
 				result = b.isEqual(frame, a);
@@ -79,8 +79,8 @@ public final class BinOpInstrs {
 
 	public static final class Iadd extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.iadd(frame, b);
 			if(result == NotImplemented) {
 				result = b.radd(frame, a);
@@ -94,8 +94,8 @@ public final class BinOpInstrs {
 
 	public static final class Isub extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg0];
-			Obj b = frame.reg[inreg1];
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
 			Obj result = a.isub(frame, b);
 			if(result == NotImplemented) {
 				result = b.rsub(frame, a);
