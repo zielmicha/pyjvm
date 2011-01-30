@@ -128,7 +128,11 @@ class Visitor(object):
 		self.emit('getslice')
 	
 	def visitName(self, node):
-		self.emit('name', node.name)
+		if node.name in ('True', 'False', 'None'):
+			val = {'True': True, 'False': False, 'None': None}[node.name]
+			self.visit(ast.Const(val))
+		else:
+			self.emit('name', node.name)
 	
 	def visitCallFunc(self, node):
 		def hastrueattr(obj, name):
@@ -196,13 +200,20 @@ class Visitor(object):
 	
 	def visitTuple(self, node):
 		elems = node.nodes
-		for elem in elems:
+		for elem in reversed(elems):
 			self.visit(elem)
 		self.emit('maketuple', len(elems))
 	
+	def visitDict(self, node):
+		elems = node.items
+		for key, val in reversed(elems):
+			self.visit(key)
+			self.visit(val)
+		self.emit('makedict', len(elems))
+	
 	def visitList(self, node):
 		elems = node.nodes
-		for elem in elems:
+		for elem in reversed(elems):
 			self.visit(elem)
 		self.emit('makelist', len(elems))
 	
@@ -431,7 +442,7 @@ class Visitor(object):
 		visitor.visit(code)
 		visitor.classEnd()
 		visitor.close()
-		return Function(0, visitor.cmds, None)
+		return Function(0, visitor.cmds, None, None)
 	
 	def visitClass(self, node):
 		self.emit('function', Visitor.createClass(node.code))

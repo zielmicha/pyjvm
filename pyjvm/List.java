@@ -2,7 +2,7 @@
 // for license see LICENSE file
 package pyjvm;
 
-public final class List extends Obj {
+public final class List extends NativeObj { //!export List
 	private Obj[] array;
 	private int length;
 	
@@ -29,8 +29,8 @@ public final class List extends Obj {
 		return this.length;
 	}
 	
-	public final void append(Obj obj) {
-		if(length + 1 == array.length)
+	public final void append(Obj obj) { //!export
+		if(length == array.length)
 			reallocate();
 		array[length] = obj;
 		length++;
@@ -70,6 +70,24 @@ public final class List extends Obj {
 		}
 		b.append("]");
 		return b.toString();
+	}
+	
+	public Obj getIter() {
+		return new ListIterator();
+	}
+	
+	public class ListIterator extends Obj {
+		private int index = 0;
+		
+		public Obj next() {
+			if(index == length)
+				return null;
+			return array[index++];
+		}
+	}
+
+	public SClass getSClass() {
+		return ListClass.instance;
 	}
 	
 	// TODO: hashCode

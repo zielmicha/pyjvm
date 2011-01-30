@@ -14,7 +14,7 @@ basic_instr = {
 	(0, 3): 'raise3 setitem', # pop3
 	(1, 3): 'getslice', # pop3 push 1
 }
-ex_instr = set(['unpacktuple', 'maketuple', 'makelist', 'call', 'call1', 'call2', 'call3'])
+ex_instr = set(['unpacktuple', 'maketuple', 'makelist', 'makedict', 'call', 'call1', 'call2', 'call3'])
 jump_ex = ('jumpifnot', 'jumpif', 'setupexc', 'foriter')
 
 basic_instr_inv = {}
@@ -90,22 +90,29 @@ class Instr(utils.Struct):
 		self._sibiligs(sibiligs)
 		return frozenset(sibiligs)
 	
-	def walk(self, func, _walked=None):
-		if _walked is None:
-			_walked = {}
+	def walk(self, func):
+		to_be_processed = [self]
+		processed = {}
 		
-		if self in _walked:
-			return _walked[self]
+		while to_be_processed:
+			item = to_be_processed.pop()
+			
+			if item in processed:
+				continue
+			
+			result = func(item)
+			
+			if result is item:
+				raise RuntimeError('Internal: Function did not modify instruction.')
+			
+			processed[item] = result
+			to_be_processed += result.next
 		
-		result = func(self)
-		_walked[self] = result
+		for item, result in processed.items():
+			result.next = [ processed[code] if code else None for code in result.next ]
 		
-		if result is self:
-			raise RuntimeError('Internal: Function did not modify instruction.')
-		
-		result.next = [ code.walk(func, _walked) if code else None for code in result.next ]
-		return result
-	
+		return processed[self]
+
 	def is_nop(self):
 		if self.name in ('nop', 'jump', 'local'):
 			return True
@@ -188,6 +195,9 @@ class Instr(utils.Struct):
 	def cmd_getstackops_makelist(self, length):
 		return 1, length
 	
+	def cmd_getstackops_makedict(self, length):
+		return 1, length * 2
+
 	def cmd_getstackops_call(self, length, kwargs=[]):
 		return 1, length + 1
 	

@@ -116,7 +116,9 @@ def serialize_function(func):
 	return 'f' + pack_uint(func.argcount) + pack_uint(len(func.loadargs)) + pack_uint_list(func.loadargs) + \
 		pack_uint(func.varcount) + serialize(func.body)
 
-def serialize(obj):
+def serialize(obj, filename=None):
+	if filename:
+		return 'm' + serialize(filename) + serialize(obj)
 	if isinstance(obj, ir.Instr):
 		return serialize_instrs(obj)
 	elif isinstance(obj, ir.Function):
@@ -129,4 +131,5 @@ def serialize(obj):
 if __name__ == '__main__':
 	import ir, sys
 	val = ir.execute(sys.stdin.read())
-	print serialize(val)
+	fn = sys.argv[1] if sys.argv[1:] else '<stdin>'
+	print serialize(val, filename=fn)
