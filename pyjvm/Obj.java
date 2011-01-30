@@ -160,7 +160,7 @@ public class Obj {
 	}
 
 	public int length() {
-		throw new ScriptError(ScriptError.TypeError, "object without length");
+		throw new ScriptError(ScriptError.TypeError, "Object without length");
 	}
 
 	public UserFunction getUserFunction() {
@@ -177,5 +177,33 @@ public class Obj {
 	
 	public Obj getItem(Obj key) {
 		throw new ScriptError(ScriptError.TypeError, "Object not subscriptable", this);
+	}
+
+	public Obj getIter(Frame frame) {
+		return getIter();
+	}
+
+	public Obj getIter() {
+		throw new ScriptError(ScriptError.TypeError, "Object not iterable", this);
+	}
+
+	public Obj next(Frame frame) {
+		return next();
+	}
+	
+	public Obj next() {
+		throw new ScriptError(ScriptError.TypeError, "Object not an iterator", this);
+	}
+
+	public Obj getAttr(int name) {
+		throw new ScriptError(ScriptError.TypeError, "Object without attributes", this);
+	}
+
+	public Obj getObjectAttr(Obj instance) {
+		throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
+	}
+	
+	public Obj getClassAttr() {
+		throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
 	}
 }

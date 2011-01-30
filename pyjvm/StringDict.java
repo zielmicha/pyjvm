@@ -9,9 +9,16 @@ public final class StringDict extends Obj {
 			this.val = val;
 		}
 		
+		public Entry copy() {
+			Entry copied = new Entry(key, val);
+			if(next != null)
+				copied.next = next.copy();
+			return copied;
+		}
+		
 		public int key;
 		public Obj val;
-		Entry next;
+		private Entry next;
 	}
 	
 	private Entry[] entries;
@@ -23,6 +30,15 @@ public final class StringDict extends Obj {
 	public StringDict(int initalCapacity) {
 		entries = new Entry[(int)(initalCapacity * scaleFactor)];
 		resizeAt = initalCapacity;
+	}
+	
+	public StringDict(StringDict original) {
+		Entry[] entries = new Entry[original.entries.length];
+		for(int i=0; i<entries.length; ++i) {
+			Entry old = original.entries[i];
+			entries[i] = (old == null) ? null : old.copy();
+		}
+		this.entries = entries;
 	}
 	
 	public final void put(int key, Obj val) {
@@ -97,10 +113,14 @@ public final class StringDict extends Obj {
 		return get(SString.intern(s));
 	}
 	
+	public final StringDict copy() {
+		return new StringDict(this);
+	}
+	
 	public StringDict() {
 		this(8);
 	}
-	
+
 	public SBool isEqual() {
 		// TODO: isEqual
 		throw new RuntimeException("Not implemented.");

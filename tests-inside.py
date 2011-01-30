@@ -44,3 +44,5 @@ assert number == 3
 
 seq.append(9)
 assert seq[3] == 9
+assert seq.__len__() == 4
+assert len(seq) == 4

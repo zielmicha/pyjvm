@@ -5,7 +5,6 @@ package pyjvm;
 import pyjvm.BinOpInstrs.BinOpFactory;
 
 public final class GenericInstrs {
-
 	/**
 	 * Container class for various instructions.
 	 */
@@ -99,7 +98,19 @@ public final class GenericInstrs {
 		
 		public Instr run(Frame frame) {
 			Obj val = frame.reg[inreg0];
+			if(val == null)
+				throw new ScriptError(ScriptError.InternalError, "Cannot store nulls in globals");
 			frame.globals.put(name, val);
+			return next;
+		}
+	}
+	
+
+	public static final class SetLocal extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			frame.reg[outreg0] = frame.reg[inreg0];
 			return next;
 		}
 	}
@@ -259,6 +270,24 @@ public final class GenericInstrs {
 
 	}
 	
+
+	public static final class GetAttr extends Instr {
+		public int name;
+		
+		public void init1(Obj name) {
+			this.name = name.stringValue().intern();
+		}
+		
+		public Instr run(Frame frame) {
+			Obj obj = frame.reg[inreg0];
+			Obj result = obj.getAttr(name);
+			frame.reg[outreg0] = result;
+			
+			return next;
+		}
+
+	}
+	
 	public static final class GetItem extends Instr {
 		public void init0() {}
 		
@@ -271,6 +300,29 @@ public final class GenericInstrs {
 		}
 	}
 
+	public static final class GetIter extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			Obj seq = frame.reg[inreg0];
+			Obj result = seq.getIter(frame);
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+	
+	public static final class ForIter extends JumpIfLikeInstr {
+		public void init1(Obj arg) {}
+		
+		public Instr run(Frame frame) {
+			Obj iter = frame.reg[inreg0];
+			Obj result = iter.next(frame);
+			if(result == null)
+				return next2;
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
 	
 	public static class FunctionInstr extends Instr {
 		private FunctionConst functionConst;
@@ -318,6 +370,14 @@ public final class GenericInstrs {
 		}
 	}
 	
+	public static final class Nop extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			return next;
+		}
+	}
+	
 	public static abstract class BinOp extends Instr {
 		public void init1(Obj name) {}
 		
@@ -327,7 +387,7 @@ public final class GenericInstrs {
 
 		public static Instr createBinOp(Tuple args) {
 			if(args.length() != 1)
-				throw new ScriptError(ScriptError.TypeError, "Expected 1 argument");
+				throw new ScriptError(ScriptError.TypeError, "Expected 1 argument, got " + args.length());
 			SString name = (SString)args.get(0);
 			BinOpInstrs.BinOpFactory factory = (BinOpFactory) BinOpInstrs.binOpTypes.get(name.intern());
 			return factory.create();

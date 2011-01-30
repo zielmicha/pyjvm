@@ -119,6 +119,16 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.MakeList();
 			case INSTR_GETITEM:
 				return new GenericInstrs.GetItem();
+			case INSTR_GETITER:
+				return new GenericInstrs.GetIter();
+			case INSTR_FORITER:
+				return new GenericInstrs.ForIter();
+			case INSTR_NOP:
+				return new GenericInstrs.Nop();
+			case INSTR_COPY:
+				return new GenericInstrs.SetLocal();
+			case INSTR_GETATTR:
+				return new GenericInstrs.GetAttr();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}

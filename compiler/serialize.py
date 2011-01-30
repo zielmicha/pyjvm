@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import ir
+import StringIO
 
 instr_types = ['assertfail', 'binop', 'binopip', 'call', 'compare', 'const',
 	'copy', 'excmatch', 'foriter', 'function', 'getattr', 'getexc', 'getitem',
@@ -9,127 +10,186 @@ instr_types = ['assertfail', 'binop', 'binopip', 'call', 'compare', 'const',
 	'return', 'setattr', 'setglobal', 'setitem', 'setlocal', 'setupexc',
 	'unaryop', 'unpacktuple', 'useonlyglobals']
 
-xor_with = id(5) ^ id([])
+class Serializer(object):
+	def __init__(self):
+		self.uid = 0
+		self.out = StringIO.StringIO()
 
-def pack_uint(num):
-	assert isinstance(num, (int, long)), 'invalid value %s' % num
-	assert num >= 0
+	def increment_uid(self):
+		self.uid += 1
+		return self.uid
 	
-	data = []
-	while num:
-		data.append(0b1111111 & num)
-		num >>= 7
-	return ''.join(chr(0b10000000 | d) for d in data[:-1]) + \
-		chr(data[-1] if data else 0)
+	def	write(self, ch):
+		self.out.write(ch)
 
-def pack_int(num):
-	if num == 0:
-		return '\0'
+	def pack_uint(self, num):
+		assert isinstance(num, (int, long)), 'invalid value %s' % num
+		assert num >= 0
+		
+		data = []
+		
+		while num:
+			data.append(0b1111111 & num)
+			num >>= 7
+		
+		for d in data[:-1]:
+			self.out.write(chr(0b10000000 | d))
+		
+		self.out.write(chr(data[-1] if data else 0))
 	
-	unum = abs(num)
-	sign = num // unum
+	def pack_int(self, num):
+		if num == 0:
+			self.write('\0')
+			return
+		
+		unum = abs(num)
+		sign = num // unum
+		
+		first = unum & 0b111111
+		rest = unum >> 6
+		sign_data = 0b10000000 if sign == -1 else 0
+		if rest:
+			self.out.write(chr(first|sign_data|0b1000000))
+			self.pack_uint(rest)
+		else:
+			self.out.write(chr(first|sign_data))
 	
-	first = unum & 0b111111
-	rest = unum >> 6
-	sign_data = 0b10000000 if sign == -1 else 0
-	if rest:
-		return chr(first|sign_data|0b1000000) + pack_uint(rest)
-	else:
-		return chr(first|sign_data)
-
-def serialize_value(value):
-	if isinstance(value, int):
-		return 'I' + pack_int(value)
-	if isinstance(value, float):
-		s = repr(value)
-		return 'F' + pack_uint(len(s)) + s
-	if isinstance(value, str):
-		return 'S' + pack_uint(len(value)) + value
-	if isinstance(value, unicode):
-		encoded = value.encode('utf8')
-		return 'U' + pack_uint(len(encoded)) + encoded
-	if value == None:
-		return 'N'
-	if value == True:
-		return 'B1'
-	if value == False:
-		return 'B0'
-	if isinstance(value, dict):
-		assert all( isinstance(k, str) for k in value.keys() )
-		items = ''.join(
-			pack_uint(len(k)) + k + serialize(v)
-			for k,v in value.items()
-		)
-		return 'D' + pack_uint(len(value)) + items
-	if isinstance(value, list):
-		return 'L' + pack_uint(len(value)) + ''.join(map(serialize, value))
-	raise TypeError('Unserializable type %s' % type(value))
-
-def pack_uint_list(l):
-	return ''.join(map(pack_uint, l))
-
-def serialize_instr(ident, instr, ids):
-	'''
-	Columns: id, name, next1, next2, lineno, inreg, outreg, args
-	'''	
-	assert not any( (n is instr) for n in instr.next )
-	next = [ ids.get(n, ident) for n in instr.next ] 
-	if len(next) == 0: next.append(ident)
-	if len(next) == 1: next.append(ident)
+	def serialize_value(self, value):
+		if isinstance(value, int):
+			self.write('I')
+			self.pack_int(value)
+		elif isinstance(value, float):
+			s = repr(value)
+			self.write('F')
+			self.pack_uint(len(s)) + s
+		elif isinstance(value, str):
+			self.write('S')
+			self.pack_uint(len(value))
+			self.write(value)
+		elif isinstance(value, unicode):
+			encoded = value.encode('utf8')
+			self.write('U')
+			self.pack_uint(len(encoded))
+			self.write(encoded)
+		elif value == None:
+			self.write('N')
+		elif value == True:
+			self.write('B1')
+		elif value == False:
+			self.write('B0')
+		elif isinstance(value, dict):
+			assert all( isinstance(k, str) for k in value.keys() )
+			
+			self.write('D')
+			self.pack_uint(len(value))
+			
+			for k,v in value.items():
+				self.pack_uint(len(k))
+				self.write(k)
+				self.serialize(v)
+		elif isinstance(value, list):
+			self.write('L')
+			self.pack_uint(len(value))
+			for val in value:
+				self.serialize(val)
+		else:
+			raise TypeError('Unserializable type %s' % type(value))
 	
-	if not instr.outreg: instr.outreg = []
-	if not instr.inreg: instr.inreg = []
+	def pack_uint_list(self, l):
+		for v in l:
+			self.pack_uint(v)
 	
-	return ''.join([
-		pack_uint(instr_types.index(instr.name)), pack_uint(len(instr.args)), 
-		pack_uint(len(instr.inreg)), pack_uint(len(instr.outreg)), 
-		pack_int(next[0] - ident), pack_int(next[1] - ident), 
-		''.join(map(serialize, instr.args)), pack_uint_list(instr.inreg), 
-		pack_uint_list(instr.outreg), pack_uint(instr.lineno if instr.lineno >= 0 else 0)
-	])
-
-def serialize_instrs(main):
-	instrs = {}
-	ident = 0
-	to_be_processed = [main]
+	def serialize_instr(self, ident, instr, ids):
+		'''
+		Columns: id, name, next1, next2, lineno, inreg, outreg, args
+		'''
+		assert not any( (n is instr) for n in instr.next )
+		next = [ ids.get(n, ident) for n in instr.next ] 
+		if len(next) == 0: next.append(ident)
+		if len(next) == 1: next.append(ident)
+		
+		if not instr.outreg: instr.outreg = []
+		if not instr.inreg: instr.inreg = []
+		
+		self.pack_uint(instr_types.index(instr.name))
+		self.pack_uint(len(instr.args))
+		self.pack_uint(len(instr.inreg))
+		self.pack_uint(len(instr.outreg))
+		self.pack_int(next[0] - ident)
+		self.pack_int(next[1] - ident)
+		
+		for arg in instr.args:
+			self.serialize(arg)
+		self.pack_uint_list(instr.inreg)
+		self.pack_uint_list(instr.outreg)
+		self.pack_uint(instr.lineno if instr.lineno >= 0 else 0)
 	
-	while to_be_processed:
-		instr = to_be_processed.pop()
-		if not instr:
-			continue
-		if instr in instrs:
-			continue
-		instrs[instr] = ident
-		ident += 1
-		to_be_processed.extend(instr.next)
+	def serialize_instrs(self, main):
+		instrs = {}
+		ident = 0
+		to_be_processed = [main]
+		
+		while to_be_processed:
+			instr = to_be_processed.pop()
+			if not instr:
+				continue
+			if instr in instrs:
+				continue
+			instrs[instr] = ident
+			ident += 1
+			to_be_processed.extend(instr.next)
+		
+		result = []
+		
+		self.write('i')
+		self.pack_uint(self.increment_uid())
+		self.write('-')
+		self.pack_uint(len(instrs))
+		
+		for instr, id_ in sorted(instrs.items(), key=lambda (i,id_): id_):
+			self.serialize_instr(id_, instr, instrs)
+		
+	def serialize_function(self, func):
+		self.write('f')
+		self.pack_uint(func.argcount)
+		self.pack_uint(len(func.loadargs))
+		self.pack_uint_list(func.loadargs)
+		self.pack_uint(func.varcount)
+		self.serialize(func.body)
 	
-	result = []
-	
-	for instr, id_ in sorted(instrs.items(), key=lambda (i,id_): id_):
-		result.append(serialize_instr(id_, instr, instrs))
-	
-	result_s = ''.join( item for item in result )
-	
-	return 'i' + pack_int(id(main)) + '-' + pack_uint(len(instrs)) + result_s
-
-def serialize_function(func):
-	return 'f' + pack_uint(func.argcount) + pack_uint(len(func.loadargs)) + pack_uint_list(func.loadargs) + \
-		pack_uint(func.varcount) + serialize(func.body)
+	def serialize(self, obj, filename=None):
+		if filename:
+			self.write('m')
+			self.serialize(filename)
+			self.serialize(obj)
+		elif isinstance(obj, ir.Instr):
+			self.serialize_instrs(obj)
+		elif isinstance(obj, ir.Function):
+			self.serialize_function(obj)
+		elif isinstance(obj, ir.Label):
+			self.write('l')
+		else:
+			self.serialize_value(obj)
 
 def serialize(obj, filename=None):
-	if filename:
-		return 'm' + serialize(filename) + serialize(obj)
-	if isinstance(obj, ir.Instr):
-		return serialize_instrs(obj)
-	elif isinstance(obj, ir.Function):
-		return serialize_function(obj)
-	elif isinstance(obj, ir.Label):
-		return 'l'
-	else:
-		return serialize_value(obj)
+	serializer = Serializer()
+	serializer.serialize(obj, filename)
+	return serializer.out.getvalue()
+
+def _serialize_uint(u):
+	serializer = Serializer()
+	serializer.pack_uint(u)
+	return serializer.out.getvalue()
+
+def test(obj):
+	import os
+	data = serialize(obj)
+	w = os.popen('cd ..; java pyjvm.Main', 'w')
+	w.write(data)
+	w.close()
 
 if __name__ == '__main__':
 	import ir, sys
 	val = ir.execute(sys.stdin.read())
-	fn = sys.argv[1] if sys.argv[1:] else '<stdin>'
-	print serialize(val, filename=fn)
+	fn = sys.argv[1] if sys.argv[1:] else ''
+	sys.stdout.write(serialize(val, filename=fn))

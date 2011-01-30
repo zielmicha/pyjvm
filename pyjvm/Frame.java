@@ -48,7 +48,7 @@ public final class Frame {
 		System.out.println("Traceback (most recent call last):");
 		Frame current = frame;
 		while(current != null) {
-			Instr instr = frame.counter;
+			Instr instr = current.counter;
 			System.out.println("  File " + instr.filename.repr() + ", line " + instr.lineno + ", in ?");
 			current = current.parent;
 		}

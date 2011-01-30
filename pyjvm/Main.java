@@ -10,6 +10,7 @@ public class Main {
 		Instr main = (Instr)read;
 		
 		Frame frame = new Frame(null);
+		frame.builtins = BuiltinsClass.dict;
 		Frame.execute(frame, main);
 		Module module = (Module)frame.reg[0];
 		module.dump();

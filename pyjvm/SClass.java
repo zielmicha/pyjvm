@@ -3,5 +3,5 @@
 package pyjvm;
 
 public abstract class SClass {
-
+	public abstract Obj getEntry(int name);
 }
