@@ -95,31 +95,48 @@ class Visitor(object):
 	def visitTryExcept(self, node):
 		exc = Label()
 		end = Label()
+		else_ = Label()
 		self.emit('setupexc', exc)
 		
 		self.finaln[-1] += 1
 		self.visit(node.body)
 		self.finaln[-1] -= 1
 		
-		self.emit('jump', end)
+		self.emit('jump', else_)
 		self.emit(exc)
 		self.emit('getexc') 
 		
 		for excclass, excname, handler in node.handlers:
+			# stack: TOS=exc
 			next = Label()
-			self.emit('dup')
 			if excclass:
+				self.emit('dup')
+				# stack: TOS=exc,TOS1=exc
 				self.visit(excclass)
 				self.emit('excmatch')
+				# stack: TOS=bool,TOS1=exc
 				self.emit('jumpifnot', next)
+			
+			self.emit('dup')
+			if excname:
+				self.emit('setname', excname)
+			else:
+				self.emit('pop')
+			
 			self.visit(handler)
+			
+			self.emit('pop')
 			self.emit('jump', end)
 			self.emit(next)
+		
 		self.emit('reraise')
-		self.emit('popexc')
+		
+		self.emit(else_)
 		if node.else_:
 			self.visit(node.else_)
+		
 		self.emit(end)
+		self.emit('popexc', 1)
 	
 	def visitSlice(self, node):
 		self.visit(node.expr)

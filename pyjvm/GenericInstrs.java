@@ -394,5 +394,59 @@ public final class GenericInstrs {
 		}
 	}
 	
+	public static abstract class UnaryOp extends Instr {
+		public void init1(Obj name) {}
+
+		public static Instr createOp(Tuple args) {
+			SString type = args.get(0).stringValue();
+			int interned = type.intern();
+			
+			if(interned == NOT)
+				return new UnaryNot();
+			else
+				throw new ScriptError(ScriptError.TypeError, "unknown unary op: " + type);
+		}
+		public static final int NOT = SString.intern("not");
+		
+		public static class UnaryNot extends UnaryOp {
+			public final Instr run(Frame frame) {
+				Obj a = frame.reg[inreg0];
+				Obj done = a.boolValue()? SBool.False: SBool.True;
+				frame.reg[outreg0] = done;
+				
+				return next;
+			}
+		}
+	}
 	
+	public static final class SetupExc extends JumpIfLikeInstr {
+		public void init1(Obj label) {}
+		
+		public Instr run(Frame frame) {
+			frame.addExcHandler(next2);
+			
+			return next;
+		}
+	}
+	
+	public static final class GetExc extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			frame.reg[outreg0] = frame.getException();
+			return next;
+		}
+	}
+	
+	public static final class PopExc extends Instr {
+		private int num;
+		public void init1(Obj num) {
+			this.num = num.intValue();
+		}
+		
+		public Instr run(Frame frame) {
+			frame.excHandlersCount -= num;
+			return next;
+		}
+	}
 }

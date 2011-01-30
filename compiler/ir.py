@@ -2,6 +2,7 @@
 import utils
 from collections import namedtuple
 import selectvar
+import sys
 
 basic_instr = {
 	# (push, pop): [names]
@@ -252,7 +253,7 @@ class Instr(utils.Struct):
 			text = text.replace('[','\033[01;37m').replace(']', '\033[00m') # white
 			text = text.replace('{','\033[01;36m').replace('}', '\033[00m') # green?
 			text = text.replace('<','\033[01;31m').replace('>', '\033[00m') # red
-			print '\t' * _indent, text % args
+			print >>sys.stderr, '\t' * _indent, text % args
 		
 		if _idents is None:
 			_idents = {}
@@ -274,8 +275,8 @@ class Instr(utils.Struct):
 					pr('{function} [...] inreg=%s outreg=%s <id:%d>', (self.inreg, self.outreg, nextident))
 			else:
 				args = ', '.join([ myrepr(arg) for arg in self.args if not isinstance(arg, Label)])
-				pr('{%s} [%s] inreg=%s outreg=%s %r <id:%d>%s', (
-					self.name, args, self.inreg, self.outreg, self.stack, nextident, mark_s))
+				pr('{%s} [%s] inreg=%s outreg=%s %r %r <id:%d>%s', (
+					self.name, args, self.inreg, self.outreg, self.stack, self._stackafter, nextident, mark_s))
 			
 			nexts = self.next
 			if len(nexts) == 1:

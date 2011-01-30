@@ -5,9 +5,11 @@ package pyjvm;
 public final class Frame {
 	public StringDict globals = null;
 	public StringDict builtins;
-	public Obj[] reg = new Obj[128];
+	public final Obj[] reg = new Obj[128];
 	public Frame parent = null;
 	public Instr counter;
+	public final Instr[] excHandlers = new Instr[16];
+	public int excHandlersCount = 0;
 	
 	public Frame setFrame = null;
 	public Instr setInstr = null;
@@ -32,7 +34,7 @@ public final class Frame {
 				}
 			} catch(Throwable e) {
 				frame.counter = instr;
-				Frame.causeException(frame, e);
+				instr = Frame.causeException(frame, e);
 			}
 			if(frame.setFrame != null) {
 				Frame setFrame = frame.setFrame;
@@ -43,8 +45,17 @@ public final class Frame {
 		}
 	}
 
-	private static void causeException(Frame frame, Throwable e) {
-		// TODO Implement
+	private static Instr causeException(Frame frame, Throwable e) {
+		while(frame.excHandlersCount != 0) {
+			frame.excHandlersCount--;
+			Instr handler = frame.excHandlers[frame.excHandlersCount];
+			return handler;
+		}
+		printExc(frame);
+		throw new ScriptError(ScriptError.Error, e);
+	}
+
+	public static void printExc(Frame frame) {
 		System.out.println("Traceback (most recent call last):");
 		Frame current = frame;
 		while(current != null) {
@@ -53,13 +64,20 @@ public final class Frame {
 			current = current.parent;
 		}
 		System.out.println();
-		throw new ScriptError(ScriptError.Error, e);
 	}
-
+	
 	public final void loadRegisters(int[] inregs, Obj[] args) {
 		int length = inregs.length;
 		for(int i=0; i<length; i++) {
 			args[i] = reg[inregs[i]];
 		}
+	}
+
+	public void addExcHandler(Instr handler) {
+		excHandlers[excHandlersCount++] = handler;
+	}
+
+	public Obj getException() {
+		return Obj.None;
 	}
 }

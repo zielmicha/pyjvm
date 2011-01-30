@@ -50,7 +50,10 @@ public final class StringDict extends Obj {
 				e.val = val;
 				return;
 			}
-			e = e.next;
+			if(e.next == null)
+				break;
+			else
+				e = e.next;
 		}
 		Entry entry = new Entry(key, val);
 		if(e != null)

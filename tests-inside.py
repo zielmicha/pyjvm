@@ -46,3 +46,14 @@ seq.append(9)
 assert seq[3] == 9
 assert seq.__len__() == 4
 assert len(seq) == 4
+
+try:
+	non_existing
+except:
+	pass
+else:
+	assert False
+
+assert True or False
+assert True and True
+assert not False
