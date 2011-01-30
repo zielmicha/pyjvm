@@ -147,14 +147,14 @@ public class Unserializer {
 		while(true) {
 			byte b = readByte();
 			val += (b & 127) << shift;
-			shift += 8;
+			shift += 7;
 			if((b & 128) == 0) break;
 		}
 		return val;
 	}
 	
 	private Instr readInstrs() throws IOException {
-		readInt(); // int id=
+		readUInt(); // int id=
 		readByte();
 		int length = readUInt();
 		Instr[] instrs = new Instr[length];

@@ -30,3 +30,17 @@ def f2():
 assert f2() == 4
 
 assert int(5) == 5
+
+for i in seq:
+	assert i == 1
+	break
+
+number = 0
+
+for i in xrange(3):
+	number += 1
+
+assert number == 3
+
+seq.append(9)
+assert seq[3] == 9
