@@ -34,7 +34,7 @@ public final class Frame {
 				}
 			} catch(Throwable e) {
 				frame.counter = instr;
-				instr = Frame.causeException(frame, e);
+				Frame.causeException(frame, e);
 			}
 			if(frame.setFrame != null) {
 				Frame setFrame = frame.setFrame;
@@ -45,11 +45,17 @@ public final class Frame {
 		}
 	}
 
-	private static Instr causeException(Frame frame, Throwable e) {
-		while(frame.excHandlersCount != 0) {
-			frame.excHandlersCount--;
-			Instr handler = frame.excHandlers[frame.excHandlersCount];
-			return handler;
+	private static void causeException(Frame frame, Throwable e) {
+		Frame current = frame;
+		while(current != null) {
+			while(current.excHandlersCount > 0) {
+				current.excHandlersCount--;
+				Instr handler = current.excHandlers[current.excHandlersCount];
+				frame.setFrame = current;
+				frame.setInstr = handler;
+				return;
+			}
+			current = current.parent;
 		}
 		printExc(frame);
 		throw new ScriptError(ScriptError.Error, e);

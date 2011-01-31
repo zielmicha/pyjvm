@@ -130,13 +130,14 @@ class Visitor(object):
 			self.emit(next)
 		
 		self.emit('reraise')
-		
+			
 		self.emit(else_)
+		self.emit('popexc', 1)
+		
 		if node.else_:
 			self.visit(node.else_)
 		
 		self.emit(end)
-		self.emit('popexc', 1)
 	
 	def visitSlice(self, node):
 		self.visit(node.expr)

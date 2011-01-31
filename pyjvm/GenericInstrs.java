@@ -423,6 +423,8 @@ public final class GenericInstrs {
 		public void init1(Obj label) {}
 		
 		public Instr run(Frame frame) {
+			if(next2 == null)
+				throw new ScriptError(ScriptError.InternalError, "next2 is null");
 			frame.addExcHandler(next2);
 			
 			return next;

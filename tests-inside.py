@@ -57,3 +57,13 @@ else:
 assert True or False
 assert True and True
 assert not False
+
+def f3():
+	non_existing
+
+try:
+	f3()
+except:
+	pass
+else:
+	assert False
