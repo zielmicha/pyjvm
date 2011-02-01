@@ -43,7 +43,7 @@ public final class GenericInstrs {
 		
 		public Instr run(Frame frame) {
 			Obj err = frame.reg[this.inreg0];
-			throw new ScriptError(ScriptError.AssertionError, err.toString());
+			throw new ScriptError(ScriptError.AssertionError, err == Obj.None? null: err.toString());
 		}
 	}
 	
@@ -253,13 +253,9 @@ public final class GenericInstrs {
 			frame.loadRegisters(inArgs, args);
 			Obj funcObj = frame.reg[inFunc];
 			
-			UserFunction func = funcObj.getUserFunction();
-			if(func != null) {
-				frame.counter = next;
-				Frame newFrame = new Frame(frame);
-				Instr newInstr = func.callInFrame(newFrame, args);
-				frame.setFrame = newFrame;
-				frame.setInstr = newInstr;
+			frame.counter = next;
+			boolean wasCalled = funcObj.callInFrame(frame, args);
+			if(wasCalled) {
 				frame.returnValueTo = outreg0;
 				return null;
 			} else {
@@ -270,7 +266,6 @@ public final class GenericInstrs {
 
 	}
 	
-
 	public static final class GetAttr extends Instr {
 		public int name;
 		
@@ -282,6 +277,23 @@ public final class GenericInstrs {
 			Obj obj = frame.reg[inreg0];
 			Obj result = obj.getAttr(name);
 			frame.reg[outreg0] = result;
+			
+			return next;
+		}
+
+	}
+	
+	public static final class SetAttr extends Instr {
+		public int name;
+		
+		public void init1(Obj name) {
+			this.name = name.stringValue().intern();
+		}
+		
+		public Instr run(Frame frame) {
+			Obj obj = frame.reg[inreg0];
+			Obj value = frame.reg[inreg1];
+			obj.setAttr(name, value);
 			
 			return next;
 		}
@@ -448,6 +460,41 @@ public final class GenericInstrs {
 		
 		public Instr run(Frame frame) {
 			frame.excHandlersCount -= num;
+			return next;
+		}
+	}
+	
+	public static final class GetLocalsDict extends Instr {
+		private int[] names;
+		public void init1(Obj names) {
+			this.names = ((List)names).toInternedStringArray();
+		}
+		
+		public Instr run(Frame frame) {
+			StringDict dict = new StringDict(names.length);
+			for(int i=0; i<names.length; i++) {
+				dict.put(names[i], frame.reg[i]);
+			}
+			frame.reg[outreg0] = dict;
+			return next;
+		}
+	}
+	
+	public static final class MakeClass extends Instr {
+		private int name;
+		private Obj doc;
+		public void init1(Obj argsObj) {
+			StringDict args = (StringDict)argsObj;
+			this.name = args.get("name").stringValue().intern();
+			this.doc = args.get("doc");
+		}
+		
+		public Instr run(Frame frame) {
+			StringDict dict = (StringDict)frame.reg[inreg1];
+			Tuple bases = (Tuple)frame.reg[inreg0];
+			
+			frame.reg[outreg0] = UserType.create(name, bases, dict);
+			
 			return next;
 		}
 	}

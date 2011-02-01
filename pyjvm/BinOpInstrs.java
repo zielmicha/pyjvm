@@ -62,6 +62,36 @@ public final class BinOpInstrs {
 		}
 	}
 
+	public static final class Div extends GenericInstrs.BinOp {
+		public Instr run(Frame frame) {
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
+			Obj result = a.div(frame, b);
+			if(result == NotImplemented) {
+				result = b.rdiv(frame, a);
+				if(result == NotImplemented)
+					this.operatorFailed(a, b, "div");
+			}
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+
+	public static final class Truediv extends GenericInstrs.BinOp {
+		public Instr run(Frame frame) {
+			Obj a = frame.reg[inreg1];
+			Obj b = frame.reg[inreg0];
+			Obj result = a.truediv(frame, b);
+			if(result == NotImplemented) {
+				result = b.rtruediv(frame, a);
+				if(result == NotImplemented)
+					this.operatorFailed(a, b, "truediv");
+			}
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+
 	public static final class IsEqual extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
 			Obj a = frame.reg[inreg1];
@@ -136,6 +166,18 @@ public final class BinOpInstrs {
 		binOpTypes.put("floordiv", new BinOpFactory(){
 			public GenericInstrs.BinOp create() {
 				return new Floordiv();
+			}
+		});
+
+		binOpTypes.put("div", new BinOpFactory(){
+			public GenericInstrs.BinOp create() {
+				return new Div();
+			}
+		});
+
+		binOpTypes.put("truediv", new BinOpFactory(){
+			public GenericInstrs.BinOp create() {
+				return new Truediv();
 			}
 		});
 

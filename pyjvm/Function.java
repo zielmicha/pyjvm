@@ -31,4 +31,12 @@ public final class Function extends Obj {
 			frame.reg[i] = args[i + pushArgsStart];
 	}
 	
+	public boolean callInFrame(Frame parentFrame, Obj[] args) {
+		Frame frame = new Frame(parentFrame);
+		parentFrame.setFrame = frame;
+		
+		prepareFrame(frame, args);
+		parentFrame.setInstr = body;
+		return true;
+	}
 }

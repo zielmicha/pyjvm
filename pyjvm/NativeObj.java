@@ -3,10 +3,10 @@
 package pyjvm;
 
 public abstract class NativeObj extends Obj { //!export NativeObj
-	public abstract SClass getSClass();
+	public abstract Type getSClass();
 	
 	public Obj getAttr(int name) {
-		SClass clazz = getSClass();
+		Type clazz = getSClass();
 		Obj entry = clazz.getEntry(name);
 		return entry.getObjectAttr(this);
 	}

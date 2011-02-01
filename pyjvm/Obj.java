@@ -154,6 +154,38 @@ public class Obj {
 	public Obj rfloordiv(Obj b) {
 		return NotImplemented;
 	}
+	//
+	public Obj div(Frame frame, Obj b) {
+		return div(b);
+	}
+	
+	public Obj div(Obj b) {
+		return NotImplemented;
+	}
+	
+	public Obj rdiv(Frame frame, Obj b) {
+		return rdiv(b);
+	}
+	
+	public Obj rdiv(Obj b) {
+		return NotImplemented;
+	}
+	//
+	public Obj truediv(Frame frame, Obj b) {
+		return truediv(b);
+	}
+	
+	public Obj truediv(Obj b) {
+		return NotImplemented;
+	}
+	
+	public Obj rtruediv(Frame frame, Obj b) {
+		return rtruediv(b);
+	}
+	
+	public Obj rtruediv(Obj b) {
+		return NotImplemented;
+	}
 
 	public Obj isEqual(Frame frame, Obj b) {
 		return isEqual(b);
@@ -200,10 +232,20 @@ public class Obj {
 	}
 
 	public Obj getObjectAttr(Obj instance) {
-		throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
+		// throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
+		return this;
 	}
 	
 	public Obj getClassAttr() {
-		throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
+		// throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
+		return this;
+	}
+
+	public boolean callInFrame(Frame frame, Obj[] args) {
+		return false;
+	}
+
+	public void setAttr(int name, Obj value) {
+		throw new ScriptError(ScriptError.TypeError, "Object without writeable attributes", this);		
 	}
 }

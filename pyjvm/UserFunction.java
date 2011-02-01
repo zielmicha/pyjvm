@@ -2,7 +2,7 @@
 // for license see LICENSE file
 package pyjvm;
 
-public final class UserFunction extends Obj {
+public final class UserFunction extends Obj implements CallInExistingFrame {
 
 	private final boolean varargs;
 	private final boolean kwargs;
@@ -21,19 +21,65 @@ public final class UserFunction extends Obj {
 		
 		this.expectedCount = this.argnames.length;
 	}
-
-	public Instr callInFrame(Frame frame, Obj[] args) {
+	
+	public boolean callInFrame(Frame parentFrame, Obj[] args) {
+		Frame frame = new Frame(parentFrame);
+		parentFrame.setFrame = frame;
+		
+		callInExistingFrame(frame, args);
+		
+		parentFrame.setInstr = func.body;
+		return true;
+	}
+	
+	public void callInExistingFrame(Frame frame, Obj[] args) {
 		Obj[] finalArgs = args;
 		if(args.length != expectedCount) {
+			// TODO: implement defaults
 			finalArgs = new Obj[expectedCount];
 			
 			throw new ScriptError(ScriptError.NotImplementedError, "Bad number of arguments (not supported)");
 		}
 		func.prepareFrame(frame, finalArgs);
-		return func.body;
 	}
 	
-	public UserFunction getUserFunction() {
-		return this;
+	public Obj call(Obj[] args) {
+		return Frame.call(this, args);
+	}
+
+	public Obj getObjectAttr(Obj instance) {
+		return new BoundMethod(instance);
+	}
+	
+	private class BoundMethod extends Obj {
+		private final Obj instance;
+		public BoundMethod(Obj instance) {
+			this.instance = instance;
+		}
+
+		public Obj call(Obj[] args) {
+			Obj[] allArgs = new Obj[args.length + 1];
+			allArgs[0] = instance;
+			System.arraycopy(args, 0, allArgs, 1, args.length);
+			return call(allArgs);
+		}
+		
+		public boolean callInFrame(Frame parentFrame, Obj[] args) {
+			Frame frame = new Frame(parentFrame);
+			parentFrame.setFrame = frame;
+			
+			callInExistingFrame(frame, args);
+			
+			parentFrame.setInstr = func.body;
+			return true;
+		}
+		
+		public void callInExistingFrame(Frame frame, Obj[] args) {
+			Obj[] allArgs = new Obj[args.length + 1];
+			allArgs[0] = this.instance;
+			System.arraycopy(args, 0, allArgs, 1, args.length);
+			
+			func.prepareFrame(frame, allArgs);
+		}
 	}
 }

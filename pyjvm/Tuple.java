@@ -25,6 +25,14 @@ public class Tuple extends Obj {
 		return array;
 	}
 	
+	public final int[] toInternedStringArray() {
+		int[] array = new int[this.length()];
+		for(int i=0; i<this.length(); i++) {
+			array[i] = items[i].stringValue().intern();
+		}
+		return array;
+	}
+	
 	public final int length() {
 		return this.items.length;
 	}

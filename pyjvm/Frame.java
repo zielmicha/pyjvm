@@ -57,19 +57,20 @@ public final class Frame {
 			}
 			current = current.parent;
 		}
-		printExc(frame);
+		printExc(frame, e);
 		throw new ScriptError(ScriptError.Error, e);
 	}
 
-	public static void printExc(Frame frame) {
-		System.out.println("Traceback (most recent call last):");
+	public static void printExc(Frame frame, Throwable e) {
+		System.err.println("Traceback (most recent call last):");
 		Frame current = frame;
 		while(current != null) {
 			Instr instr = current.counter;
-			System.out.println("  File " + instr.filename.repr() + ", line " + instr.lineno + ", in ?");
+			System.err.println("  File " + instr.filename.repr() + ", line " + instr.lineno + ", in ?");
 			current = current.parent;
 		}
-		System.out.println();
+		System.err.println(e);
+		System.err.println();
 	}
 	
 	public final void loadRegisters(int[] inregs, Obj[] args) {
@@ -85,5 +86,18 @@ public final class Frame {
 
 	public Obj getException() {
 		return Obj.None;
+	}
+
+	public static Obj call(CallInExistingFrame func, Obj[] args) {
+		Frame frame = new Frame(null);
+		frame.builtins = BuiltinsClass.dict;
+		
+		func.callInExistingFrame(frame, args);
+		
+		Instr instr = frame.setInstr;
+		frame.setInstr = null;
+		Frame.execute(frame, instr);
+		
+		return frame.reg[0];
 	}
 }

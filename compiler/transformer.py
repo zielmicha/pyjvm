@@ -29,6 +29,8 @@ class Visitor(object):
 		self.loops = []
 		self.finaln = [0]
 		self.lineno = -1
+		
+		self.futureDivision = False
 	
 	def emit(self, *args):
 		self.cmds.append((self.lineno,) + args)
@@ -240,6 +242,8 @@ class Visitor(object):
 			self.emit('makeglobal', name)
 	
 	def visitFrom(self, node):
+		if node.modname == '__future__':
+			self.applyFutures( name for name, varname in node.names)
 		self.emit('import', node.modname)
 		for name, varname in node.names:
 			if not varname:
@@ -248,6 +252,13 @@ class Visitor(object):
 			self.emit('getattr', name)
 			self.emit('setname', varname)
 		self.emit('pop')
+	
+	def applyFutures(self, names):
+		for name in names:
+			if name == 'division':
+				self.futureDivision = True
+			else:
+				raise CodeError('unknow future %s' % name)
 	
 	def visitRaise(self, node):
 		NoneConst = ast.Const(None)
@@ -361,9 +372,13 @@ class Visitor(object):
 		self.emit('jump', start)
 	
 	def visitBinop(self, node):
+		name = nodename(node)
+		if name == 'div' and self.futureDivision:
+			name = 'truediv'
+		
 		self.visit(node.left)
 		self.visit(node.right)
-		self.emit('binop', nodename(node))
+		self.emit('binop', name)
 	dupvisit(visitBinop, 'Add Div FloorDiv Mul Sub Mod LeftShift RightShift')
 	
 	def visitConst(self, node):
@@ -464,12 +479,12 @@ class Visitor(object):
 	
 	def visitClass(self, node):
 		self.emit('function', Visitor.createClass(node.code))
+		self.emit('call', 0, [])
 		for base in node.bases:
 			self.visit(base)
 		self.emit('maketuple', len(node.bases))
 		self.emit('makeclass', dict(
 				name=node.name,
-				basescount=len(node.bases),
 				doc=node.doc
 			))
 		self.emit('setname', node.name)
@@ -603,14 +618,14 @@ class Visitor(object):
 	
 	def visitPrintnl(self, node):
 		self.visit(node.dest or ast.Const(None))
-		for expr in node.nodes:
+		for expr in reversed(node.nodes):
 			self.visit(expr)
 		self.emit('maketuple', len(node.nodes))
 		self.emit('print', True)
 	
 	def visitPrint(self, node):
 		self.visit(node.dest or ast.Const(None))
-		for expr in node.nodes:
+		for expr in reversed(node.nodes):
 			self.visit(expr)
 		self.emit('maketuple', len(node.nodes))
 		self.emit('print', False)

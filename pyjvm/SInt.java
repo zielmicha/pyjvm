@@ -91,7 +91,7 @@ public final class SInt extends Obj {
 		}
 	}
 	
-	public Obj floordiv(Obj other) {
+	public Obj rfloordiv(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(otherValue / value);
@@ -100,10 +100,46 @@ public final class SInt extends Obj {
 		}
 	}
 	
-	public Obj rfloordiv(Obj other) {
+	public Obj floordiv(Obj other) {
 		if(other instanceof SInt) {
 			int otherValue = ((SInt)other).value;
 			return SInt.get(value / otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rdiv(Obj other) {
+		if(other instanceof SInt) {
+			int otherValue = ((SInt)other).value;
+			return SInt.get(otherValue / value);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj div(Obj other) {
+		if(other instanceof SInt) {
+			int otherValue = ((SInt)other).value;
+			return SInt.get(value / otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj truediv(Obj other) {
+		if(other instanceof SInt) {
+			int otherValue = ((SInt)other).value;
+			return SFloat.get((double)otherValue / value);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rtruediv(Obj other) {
+		if(other instanceof SInt) {
+			int otherValue = ((SInt)other).value;
+			return SFloat.get((double)value / otherValue);
 		} else {
 			return NotImplemented;
 		}

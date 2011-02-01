@@ -52,14 +52,19 @@ public class ScriptError extends RuntimeException {
 	}
 
 	public String getName() {
-		if(this.kind >= ScriptError.names.length)
+		if(this.kind >= ScriptError.names.length || this.kind < 0)
 			return "ScriptError(kind=" + this.kind + ")";
 		else
 			return ScriptError.names[this.kind];
 	}
 	
 	public String toString() {
-		String str = getName() + ": " + message;
+		String rest;
+		if(message != null && !message.equals(""))
+			rest = ": " + message;
+		else
+			rest = "";
+		String str = getName() + rest;
 		if(sender != null)
 			str += " (" + sender + ")";
 		return str;

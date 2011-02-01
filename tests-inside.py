@@ -1,7 +1,8 @@
 
 assert 1+2 == 3
 assert 2*3 == 6
-#assert 10/2 == 5
+assert 10/2 == 5
+assert 10//2 == 5
 assert 5-2 == 3
 
 def f1(a, b, c):
@@ -67,3 +68,22 @@ except:
 	pass
 else:
 	assert False
+
+class F:
+	f = 4
+
+assert F.f == 4
+F.g = 5
+assert F.g == 5
+
+instance = F()
+assert instance.f == 4
+assert instance.g == 5
+
+class D:
+	def m1(self):
+		return self
+
+d = D()
+assert d.m1() == d
+

@@ -19,4 +19,8 @@ public final class SFloat extends Obj {
 					" (http://bit.ly/decimalEq). Use decimal module instead.");
 		return null;
 	}
+
+	public static SFloat get(double d) {
+		return new SFloat(d);
+	}
 }

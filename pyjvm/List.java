@@ -86,7 +86,7 @@ public final class List extends NativeObj { //!export List
 		}
 	}
 
-	public SClass getSClass() {
+	public Type getSClass() {
 		return ListClass.instance;
 	}
 	
