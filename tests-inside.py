@@ -87,3 +87,5 @@ class D:
 d = D()
 assert d.m1() == d
 
+import test_import
+assert test-inside.value == 5

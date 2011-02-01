@@ -114,6 +114,21 @@ class Instr(utils.Struct):
 		
 		return processed[self]
 
+	def walk_readonly(self, func):
+		to_be_processed = [self]
+		processed = set()
+		
+		while to_be_processed:
+			item = to_be_processed.pop()
+			
+			if item in processed:
+				continue
+			
+			func(item)
+			
+			processed.add(item)
+			to_be_processed += item.next
+	
 	def is_nop(self):
 		if self.name in ('nop', 'jump', 'local'):
 			return True
