@@ -566,7 +566,7 @@ class Visitor(object):
 		visitor = Visitor()
 		visitor.genexpBody(body, assign, ifs)
 		visitor.close()
-		return Function(1, visitor.cmds, None)
+		return Function(1, visitor.cmds, None, None)
 	
 	# === ListComp ===
 	

@@ -2,11 +2,9 @@
 // for license see LICENSE file
 package pyjvm;
 
-public abstract class NativeObj extends Obj { //!export NativeObj
-	public abstract Type getSClass();
-	
+public abstract class NativeObj extends Obj { //!export NativeObj	
 	public Obj getAttr(int name) {
-		Type clazz = getSClass();
+		Type clazz = getType();
 		Obj entry = clazz.getEntry(name);
 		return entry.getObjectAttr(this);
 	}

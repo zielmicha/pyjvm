@@ -67,7 +67,7 @@ public class Obj {
 		Obj repr = object.repr();
 		if(repr == NotImplemented)
 			return object.toString();
-		return repr.toString();
+		return repr.stringValue().toString();
 	}
 	
 	public static final NotImplemented NotImplemented = pyjvm.NotImplemented.NotImplemented; 
@@ -224,7 +224,7 @@ public class Obj {
 	}
 	
 	public Obj next() {
-		throw new ScriptError(ScriptError.TypeError, "Object not an iterator", this);
+		throw new ScriptError(ScriptError.TypeError, "Object is not an iterator", this);
 	}
 
 	public Obj getAttr(int name) {
@@ -247,5 +247,9 @@ public class Obj {
 
 	public void setAttr(int name, Obj value) {
 		throw new ScriptError(ScriptError.TypeError, "Object without writeable attributes", this);		
+	}
+	
+	public Type getType() {
+		throw new ScriptError(ScriptError.TypeError, "Object without type (???)", this);
 	}
 }
