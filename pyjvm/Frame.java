@@ -5,6 +5,7 @@ package pyjvm;
 public final class Frame {
 	public StringDict globals = null;
 	public StringDict builtins;
+	public Module module = null;
 	public final Obj[] reg = new Obj[128];
 	public Frame parent = null;
 	public Instr counter;

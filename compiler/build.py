@@ -1,5 +1,6 @@
 import ir
 import os
+import serialize
 
 class Builder(object):
 	def __init__(self, path):
@@ -12,14 +13,20 @@ class Builder(object):
 		self.compile(script, '__main__', '__main__')
 	
 	def compile(self, path, module_name, output=None):
-		print 'compile', path, module_name, output
+		print 'M', module_name
 		
 		if output == None:
 			output = module_name
 		data = open(path, 'r').read()
 		compiled = ir.execute(data)
+		
 		self.scan_imports(module_name, compiled)
+		
+		serialized = serialize.serialize(compiled, filename=path)
+		
 		output = open(os.path.join(self.destdir, output + '.bc'), 'w')
+		output.write(serialized)
+		output.close()
 	
 	def get_imports(self, main_instr):
 		imports = set()

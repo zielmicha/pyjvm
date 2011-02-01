@@ -64,8 +64,7 @@ public final class GenericInstrs {
 		public void init0() {}
 
 		public Instr run(Frame frame) {
-			if(frame.globals == null)
-				frame.globals = new StringDict();
+			// TODO: this instruction is now useless
 			frame.reg[outreg0] = frame.globals;
 			return next;
 		}
@@ -99,7 +98,7 @@ public final class GenericInstrs {
 		public Instr run(Frame frame) {
 			Obj val = frame.reg[inreg0];
 			if(val == null)
-				throw new ScriptError(ScriptError.InternalError, "Cannot store nulls in globals");
+				throw new ScriptError(ScriptError.InternalError, "Cannot store nulls in globals (error is in previous instruction)");
 			frame.globals.put(name, val);
 			return next;
 		}
@@ -207,7 +206,8 @@ public final class GenericInstrs {
 		}
 		
 		public Instr run(Frame frame) {
-			frame.reg[outreg0] = new Module(frame.reg[inreg0],doc);
+			frame.module.done(doc);
+			frame.reg[outreg0] = frame.module;
 			return next;
 		}
 		
@@ -494,6 +494,19 @@ public final class GenericInstrs {
 			Tuple bases = (Tuple)frame.reg[inreg0];
 			
 			frame.reg[outreg0] = UserType.create(name, bases, dict);
+			
+			return next;
+		}
+	}
+	
+	public static final class Import extends Instr {
+		private SString name;
+		public void init1(Obj name) {
+			this.name = name.stringValue();
+		}
+		
+		public Instr run(Frame frame) {
+			frame.reg[outreg0] = Importer.importModule(name);
 			
 			return next;
 		}

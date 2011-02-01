@@ -88,4 +88,4 @@ d = D()
 assert d.m1() == d
 
 import test_import
-assert test-inside.value == 5
+assert test_import.value == 5

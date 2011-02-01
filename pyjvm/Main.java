@@ -4,17 +4,16 @@ package pyjvm;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) {;
+		Importer.path.append(SString.fromJavaString(args[0]));
+		
 		Unserializer unserializer = new Unserializer(System.in);
 		Obj read = unserializer.read();
 		Instr main = (Instr)read;
 		
-		Frame frame = new Frame(null);
-		frame.builtins = BuiltinsClass.dict;
-		Frame.execute(frame, main);
-		Module module = (Module)frame.reg[0];
+		Module module = Module.create(main);
+
 		module.dump();
-		frame.globals.dump();
 	}
 
 }

@@ -17,11 +17,12 @@ public class ScriptError extends RuntimeException {
 	public static final int AssertionError = 7;
 	public static final int IndexError = 8;
 	public static final int InternalError = 9;
+	public static final int ImportError = 10;
 	
 	public static String[] names = new String[] {
 		"Error", "KeyError", "ValueError", "TypeError", "IOError",
 		"NotImplementedError", "LookupError", "AssertionError",
-		"IndexError", "InternalError"
+		"IndexError", "InternalError", "ImportError"
 	};
 	
 	private String message;

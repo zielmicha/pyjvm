@@ -210,4 +210,10 @@ public class Unserializer {
 			SInt.get(next1offset), SInt.get(next2offset), SInt.get(lineno)
 		});
 	}
+
+	public static Obj unserialize(InputStream in) {
+		Unserializer instance = new Unserializer(in);
+		Obj obj = instance.read();
+		return obj;
+	}
 }

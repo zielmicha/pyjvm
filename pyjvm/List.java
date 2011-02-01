@@ -65,7 +65,7 @@ public final class List extends NativeObj { //!export List
 		StringBuilder b = new StringBuilder();
 		b.append("[");
 		for(int i=0; i<length; i++) {
-			b.append(array[i]);
+			b.append(Obj.repr(array[i]));
 			b.append(", ");
 		}
 		b.append("]");
