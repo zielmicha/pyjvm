@@ -10,13 +10,24 @@ class Builder(object):
 		self.destdir = '.'
 	
 	def build(self, script):
-		self.compile(script, '__main__', '__main__')
+		self.compile(script, '__main__', '__main__', allow_caching=False)
 	
-	def compile(self, path, module_name, output=None):
-		print 'M', module_name
+	def compile(self, path, module_name, output=None, allow_caching=True):
 		
 		if output == None:
 			output = module_name
+		
+		output_path = os.path.join(self.destdir, output + '.bc')
+		
+		if allow_caching:
+			output_modified = os.path.getmtime(output_path)
+			input_modified = os.path.getmtime(path)
+			
+			if input_modified <= output_modified:
+				return
+			
+		print 'M', module_name
+		
 		data = open(path, 'r').read()
 		compiled = ir.execute(data)
 		
@@ -24,7 +35,7 @@ class Builder(object):
 		
 		serialized = serialize.serialize(compiled, filename=path)
 		
-		output = open(os.path.join(self.destdir, output + '.bc'), 'w')
+		output = open(output_path, 'w')
 		output.write(serialized)
 		output.close()
 	

@@ -8,7 +8,7 @@ public final class NativeObjClass extends Type {
 	public static final NativeObjClass instance = new NativeObjClass();
 	
 	static {
-		if("NativeObj".equals("NativeObj"))
+		if("NativeObj".equals("NativeObj") || "NativeObj".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();

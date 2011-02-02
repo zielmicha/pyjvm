@@ -93,9 +93,8 @@ public final class Frame {
 		Frame frame = new Frame(null);
 		frame.builtins = BuiltinsClass.dict;
 		
-		func.callInExistingFrame(frame, args);
+		Instr instr = func.callInExistingFrame(frame, args);
 		
-		Instr instr = frame.setInstr;
 		frame.setInstr = null;
 		Frame.execute(frame, instr);
 		

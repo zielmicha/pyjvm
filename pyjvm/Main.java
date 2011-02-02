@@ -11,9 +11,7 @@ public class Main {
 		Obj read = unserializer.read();
 		Instr main = (Instr)read;
 		
-		Module module = Module.create(main);
-
-		module.dump();
+		Module.create(main);
 	}
 
 }

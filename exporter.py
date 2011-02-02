@@ -16,7 +16,7 @@ public final class %(name)sClass extends Type {
 	public static final %(name)sClass instance = new %(name)sClass();
 	
 	static {
-		if("%(name)s".equals("NativeObj"))
+		if("%(name)s".equals("NativeObj") || "%(name)s".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
@@ -119,7 +119,7 @@ def format_entry(class_name, entry, is_direct, as_name):
 			)
 		)
 	else:
-		return entry_template % dict(
+		return entry_tmpl % dict(
 			name=as_name,
 			check = '// direct',
 			code=convert(

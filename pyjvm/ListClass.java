@@ -8,7 +8,7 @@ public final class ListClass extends Type {
 	public static final ListClass instance = new ListClass();
 	
 	static {
-		if("List".equals("NativeObj"))
+		if("List".equals("NativeObj") || "List".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();

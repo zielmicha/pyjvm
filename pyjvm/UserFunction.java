@@ -22,17 +22,19 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 		this.expectedCount = this.argnames.length;
 	}
 	
+	public String toString() {
+		return "<UserFunction lineno=" + this.func.body.next.lineno + ">";
+	}
+	
 	public boolean callInFrame(Frame parentFrame, Obj[] args) {
 		Frame frame = new Frame(parentFrame);
 		parentFrame.setFrame = frame;
 		
-		callInExistingFrame(frame, args);
-		
-		parentFrame.setInstr = func.body;
+		parentFrame.setInstr = callInExistingFrame(frame, args);
 		return true;
 	}
 	
-	public void callInExistingFrame(Frame frame, Obj[] args) {
+	public Instr callInExistingFrame(Frame frame, Obj[] args) {
 		Obj[] finalArgs = args;
 		if(args.length != expectedCount) {
 			// TODO: implement defaults
@@ -41,6 +43,7 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 			throw new ScriptError(ScriptError.NotImplementedError, "Bad number of arguments (not supported)");
 		}
 		func.prepareFrame(frame, finalArgs);
+		return func.body;
 	}
 	
 	public Obj call(Obj[] args) {
@@ -51,8 +54,8 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 		return new BoundMethod(instance);
 	}
 	
-	private class BoundMethod extends Obj {
-		private final Obj instance;
+	class BoundMethod extends Obj {
+		final Obj instance;
 		public BoundMethod(Obj instance) {
 			this.instance = instance;
 		}
@@ -61,7 +64,7 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 			Obj[] allArgs = new Obj[args.length + 1];
 			allArgs[0] = instance;
 			System.arraycopy(args, 0, allArgs, 1, args.length);
-			return call(allArgs);
+			return UserFunction.this.call(allArgs);
 		}
 		
 		public boolean callInFrame(Frame parentFrame, Obj[] args) {
@@ -80,6 +83,10 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 			System.arraycopy(args, 0, allArgs, 1, args.length);
 			
 			func.prepareFrame(frame, allArgs);
+		}
+		
+		public String toString() {
+			return "<bound method of " + instance + ", function " + UserFunction.this + ">";
 		}
 	}
 }

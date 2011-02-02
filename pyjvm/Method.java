@@ -16,7 +16,8 @@ public abstract class Method extends Obj {
 		}
 
 		public Obj call(Obj[] args) {
-			return callMethod(instance, args);
+			Obj val = callMethod(instance, args);
+			return val;
 		}
 	}
 }

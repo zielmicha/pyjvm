@@ -81,11 +81,15 @@ assert instance.f == 4
 assert instance.g == 5
 
 class D:
+	def __init__(self):
+		self.i = 5
+	
 	def m1(self):
-		return self
+		return 12
 
 d = D()
-assert d.m1() == d
+assert d.i == 5
+assert d.m1() == 12
 
 import test_import
 assert test_import.value == 5

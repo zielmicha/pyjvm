@@ -8,7 +8,7 @@ public final class BuiltinsClass extends Type {
 	public static final BuiltinsClass instance = new BuiltinsClass();
 	
 	static {
-		if("Builtins".equals("NativeObj"))
+		if("Builtins".equals("NativeObj") || "Builtins".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();

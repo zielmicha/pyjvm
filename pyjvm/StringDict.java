@@ -181,4 +181,14 @@ public final class StringDict extends Obj {
 			return thisEntry;
 		}
 	}
+	public void update(StringDict dict) {
+		DictEntryIterator iter = dict.entryIterator();
+		Entry entry;
+		while((entry=iter.next()) != null)
+			put(entry.key, entry.val);
+	}
+
+	public DictEntryIterator entryIterator() {
+		return new DictEntryIterator();
+	}
 }

@@ -236,6 +236,10 @@ public class Obj {
 		return this;
 	}
 	
+	public void setObjectAttr(Obj instance, Obj value) {
+		throw new ScriptError(ScriptError.AttributeError, "Attribute declared in class", this);
+	}
+	
 	public Obj getClassAttr() {
 		// throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
 		return this;
@@ -252,4 +256,5 @@ public class Obj {
 	public Type getType() {
 		throw new ScriptError(ScriptError.TypeError, "Object without type (???)", this);
 	}
+
 }
