@@ -145,6 +145,10 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.SetAttr();
 			case INSTR_IMPORT:
 				return new GenericInstrs.Import();
+			case INSTR_EXCMATCH:
+				return new GenericInstrs.ExcMatch();
+			case INSTR_RERAISE:
+				return new GenericInstrs.Reraise();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}

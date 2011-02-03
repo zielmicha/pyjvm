@@ -10,4 +10,8 @@ public final class None extends Obj {
 	public String toString() {
 		return "None";
 	}
+	
+	public Type getType() {
+		return new Type.EmptyType("NoneType");
+	}
 }

@@ -48,7 +48,7 @@ public class Obj {
 	}
 
 	public boolean boolValue() {
-		throw new ScriptError(ScriptError.TypeError, "Object unconvertable to bool", this);
+		return false;
 	}
 	
 	public String toString() {
@@ -254,7 +254,22 @@ public class Obj {
 	}
 	
 	public Type getType() {
-		throw new ScriptError(ScriptError.TypeError, "Object without type (???)", this);
+		throw new ScriptError(ScriptError.InternalError, "Object without type (???)", this);
+	}
+
+	public static boolean isInstance(Obj type, Obj object) {
+		Type t = (Type)type;
+		Type objectType = object.getType();
+
+		if(t == objectType)
+			return true;
+
+		Type[] bases = t.getBases();
+		for(int i=0; i<bases.length; i++) {
+			if(isInstance(bases[i], object))
+				return true;
+		}
+		return false;
 	}
 
 }

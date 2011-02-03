@@ -93,3 +93,17 @@ assert d.m1() == 12
 
 import test_import
 assert test_import.value == 5
+
+try:
+	non_exising
+except KeyError:
+	pass
+else:
+	assert False
+
+try:
+	non_exising
+except TypeError:
+	assert False
+except KeyError:
+	pass

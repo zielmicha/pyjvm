@@ -35,7 +35,7 @@ public final class Unicode extends Obj {
 		try {
 			s = new String(bytes, "utf-8");
 		} catch (UnsupportedEncodingException e) {
-			throw new Error(e);
+			throw new ScriptError(ScriptError.InternalError, "utf-8 encoding is not present", e);
 		}
 		return new Unicode(s.toCharArray());
 	}

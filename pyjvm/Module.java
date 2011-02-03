@@ -11,7 +11,7 @@ public final class Module extends Obj {
 	
 	public static Module create(Instr mainInstr) {
 		Frame frame = new Frame(null);
-		frame.builtins = BuiltinsClass.dict;
+		frame.builtins = Builtins.dict;
 		frame.module = new Module();
 		frame.globals = frame.module.dict;
 		

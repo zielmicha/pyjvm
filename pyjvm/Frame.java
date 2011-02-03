@@ -15,6 +15,8 @@ public final class Frame {
 	public Frame setFrame = null;
 	public Instr setInstr = null;
 	public int returnValueTo = -1;
+	private Throwable throwable;
+	private Obj exceptionObject;
 	
 	public Frame(Frame parent) {
 		this.parent = parent;
@@ -47,6 +49,7 @@ public final class Frame {
 	}
 
 	private static void causeException(Frame frame, Throwable e) {
+		frame.throwable = e;
 		Frame current = frame;
 		while(current != null) {
 			while(current.excHandlersCount > 0) {
@@ -86,12 +89,20 @@ public final class Frame {
 	}
 
 	public Obj getException() {
-		return Obj.None;
+		if(throwable == null)
+			throw new ScriptError(ScriptError.RuntimeError, "there is no error thrown");
+		if(exceptionObject == null)
+			exceptionObject = ScriptError.createObject(throwable); 
+		return exceptionObject;
 	}
 
+	public Traceback getTraceback() {
+		return null;
+	}
+	
 	public static Obj call(CallInExistingFrame func, Obj[] args) {
 		Frame frame = new Frame(null);
-		frame.builtins = BuiltinsClass.dict;
+		frame.builtins = Builtins.dict;
 		
 		Instr instr = func.callInExistingFrame(frame, args);
 		
@@ -100,4 +111,5 @@ public final class Frame {
 		
 		return frame.reg[0];
 	}
+
 }

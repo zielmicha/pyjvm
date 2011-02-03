@@ -6,6 +6,7 @@ public final class NativeObjClass extends Type {
 
 	public static final StringDict dict;
 	public static final NativeObjClass instance = new NativeObjClass();
+	public static final Obj constructor = null;
 	
 	static {
 		if("NativeObj".equals("NativeObj") || "NativeObj".equals("UserObj"))
@@ -27,5 +28,10 @@ public final class NativeObjClass extends Type {
 	}
 	public final Obj getEntry(int name) {
 		return dict.get(name);
+	}
+	public final Obj call(Obj[] args) {
+		if(constructor == null)
+			throw new ScriptError(ScriptError.TypeError, "Object uninitializable");
+		return constructor.call(args);
 	}
 }

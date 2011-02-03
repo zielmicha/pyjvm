@@ -14,6 +14,7 @@ public final class %(name)sClass extends Type {
 
 	public static final StringDict dict;
 	public static final %(name)sClass instance = new %(name)sClass();
+	public static final Obj constructor%(constructor)s;
 	
 	static {
 		if("%(name)s".equals("NativeObj") || "%(name)s".equals("UserObj"))
@@ -27,6 +28,11 @@ public final class %(name)sClass extends Type {
 	}
 	public final Obj getEntry(int name) {
 		return dict.get(name);
+	}
+	public final Obj call(Obj[] args) {
+		if(constructor == null)
+			throw new ScriptError(ScriptError.TypeError, "Object uninitializable");
+		return constructor.call(args);
 	}
 }
 '''
@@ -46,6 +52,15 @@ method_entry_template = '''
 				%(code)s;
 			}
 		});'''
+
+constructor_template = '''
+		constructor = new Obj() {
+			public Obj call(Obj[] args)  {
+				%(check)s
+				%(code)s;
+			}
+		};
+		'''
 
 call_method_template = '%s.%s(%s)'
 arg_template = "args[%d]"
@@ -97,7 +112,10 @@ def create_name(name):
 	return name
 
 def format_entry(class_name, entry, is_direct, as_name):
-	if entry.static:
+	if as_name == '<new>':
+		object = class_name
+		entry_tmpl = constructor_template
+	elif entry.static:
 		object = class_name
 		entry_tmpl = entry_template
 	else:
@@ -133,7 +151,8 @@ def format(name, data):
 		format_entry(name, entry, is_direct, as_name)
 		for entry, is_direct, as_name in data
 	])
-	return content % dict(name=name, content=entries)
+	has_constructor = any( as_name == '<new>' for entry, is_direct, as_name in data )
+	return content % dict(name=name, content=entries, constructor='' if has_constructor else ' = null')
 
 def parse_method_export(rest, name):
 	rest_split = rest.split()

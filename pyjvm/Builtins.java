@@ -63,5 +63,14 @@ public final class Builtins { //!export Builtins
 			return SInt.get(val);
 		}
 	}
-
+	
+	public static final StringDict dict;
+	
+	static {
+		dict = BuiltinsClass.dict;
+		
+		for(int i=0; i<ScriptError.names.length; i++) {
+			dict.put(ScriptError.names[i], ScriptError.excClasses[i]);
+		}
+	}
 }

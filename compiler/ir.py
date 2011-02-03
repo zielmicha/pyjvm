@@ -10,8 +10,8 @@ basic_instr = {
 	(0, 1): 'return jumpifnot jumpif setlocal setglobal reraise assertfail', # pop 1 
 	(1, 1): 'makefunction getattr getiter foriter makemodule unaryop copy', # push1 pop1
 	(0, 0): 'nop jump setupexc popexc genexpcontinue', # nothing
-	(0, 2): 'setattr delitem listappend print excmatch', # pop2
-	(1, 2): 'makegenexp compare binop getitem makeclass binopip', # pop2 push 1
+	(0, 2): 'setattr delitem listappend print', # pop2
+	(1, 2): 'makegenexp compare binop getitem makeclass binopip excmatch', # pop2 push 1
 	(0, 3): 'raise3 setitem', # pop3
 	(1, 3): 'getslice', # pop3 push 1
 }

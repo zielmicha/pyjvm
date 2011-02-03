@@ -6,6 +6,7 @@ public final class BuiltinsClass extends Type {
 
 	public static final StringDict dict;
 	public static final BuiltinsClass instance = new BuiltinsClass();
+	public static final Obj constructor = null;
 	
 	static {
 		if("Builtins".equals("NativeObj") || "Builtins".equals("UserObj"))
@@ -41,5 +42,10 @@ public final class BuiltinsClass extends Type {
 	}
 	public final Obj getEntry(int name) {
 		return dict.get(name);
+	}
+	public final Obj call(Obj[] args) {
+		if(constructor == null)
+			throw new ScriptError(ScriptError.TypeError, "Object uninitializable");
+		return constructor.call(args);
 	}
 }

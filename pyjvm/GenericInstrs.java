@@ -5,6 +5,7 @@ package pyjvm;
 import pyjvm.BinOpInstrs.BinOpFactory;
 
 public final class GenericInstrs {
+
 	/**
 	 * Container class for various instructions.
 	 */
@@ -510,5 +511,26 @@ public final class GenericInstrs {
 			
 			return next;
 		}
+	}
+	
+	public static final class ExcMatch extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			Obj excClass = frame.reg[inreg0];
+			Obj exception = frame.reg[inreg1];
+			frame.reg[outreg0] = Obj.isInstance(excClass, exception)? SBool.True: SBool.False;
+			return next;
+		}
+	}
+	
+
+	public static final class Reraise extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			throw new ExistingScriptError(frame.getException(), frame.getTraceback());
+		}
+
 	}
 }
