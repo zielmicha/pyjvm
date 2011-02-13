@@ -165,10 +165,10 @@ class Visitor(object):
 		]
 		kwargs_names = [ name for (name, expr) in kwargs ]
 		kwargs_values = [ expr for (name, expr) in kwargs ]
-		for kwarg_value in kwargs_values:
-			self.visit(kwarg_value)
 		for arg in args:
 			self.visit(arg)
+		for kwarg_value in kwargs_values:
+			self.visit(kwarg_value)
 		if hastrueattr(node, 'star_args'):
 			self.visit(node.star_args)
 			if hastrueattr(node, 'dstar_args'):
@@ -220,20 +220,20 @@ class Visitor(object):
 	
 	def visitTuple(self, node):
 		elems = node.nodes
-		for elem in reversed(elems):
+		for elem in elems:
 			self.visit(elem)
 		self.emit('maketuple', len(elems))
 	
 	def visitDict(self, node):
 		elems = node.items
-		for key, val in reversed(elems):
+		for key, val in elems:
 			self.visit(key)
 			self.visit(val)
 		self.emit('makedict', len(elems))
 	
 	def visitList(self, node):
 		elems = node.nodes
-		for elem in reversed(elems):
+		for elem in elems:
 			self.visit(elem)
 		self.emit('makelist', len(elems))
 	
@@ -454,7 +454,7 @@ class Visitor(object):
 		)
 	
 	def functionStart(self, argnames):	
-		for name in reversed(argnames):
+		for name in argnames:
 			self.emit('setname', name)
 	
 	def functionEnd(self):
@@ -619,14 +619,14 @@ class Visitor(object):
 	
 	def visitPrintnl(self, node):
 		self.visit(node.dest or ast.Const(None))
-		for expr in reversed(node.nodes):
+		for expr in node.nodes:
 			self.visit(expr)
 		self.emit('maketuple', len(node.nodes))
 		self.emit('print', True)
 	
 	def visitPrint(self, node):
 		self.visit(node.dest or ast.Const(None))
-		for expr in reversed(node.nodes):
+		for expr in node.nodes:
 			self.visit(expr)
 		self.emit('maketuple', len(node.nodes))
 		self.emit('print', False)

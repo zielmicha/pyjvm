@@ -2,6 +2,8 @@
 // for license see LICENSE file
 package pyjvm;
 
+import java.util.Arrays;
+
 public final class UserFunction extends Obj implements CallInExistingFrame {
 
 	private final boolean varargs;
@@ -34,8 +36,17 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 		return true;
 	}
 	
+	public boolean callInFrame(Frame parentFrame, Obj[] args, int[] kwargs) {
+		Frame frame = new Frame(parentFrame);
+		parentFrame.setFrame = frame;
+		
+		parentFrame.setInstr = callInExistingFrame(frame, args, kwargs);
+		return true;
+	}
+	
 	public Instr callInExistingFrame(Frame frame, Obj[] args) {
 		Obj[] finalArgs = args;
+
 		if(args.length != expectedCount) {
 			// TODO: implement ...
 			finalArgs = new Obj[expectedCount];
@@ -50,6 +61,51 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 
 			System.arraycopy(args, 0, finalArgs, 0, args.length);
 			System.arraycopy(defaults, startDefaults, finalArgs, args.length, defaultsCount);
+		}
+		func.prepareFrame(frame, finalArgs);
+		return func.body;
+	}
+	
+	public Instr callInExistingFrame(Frame frame, Obj[] args, int[] kwargs) {
+		Obj[] finalArgs = args;
+		if(args.length != expectedCount || kwargs.length != 0) {
+			finalArgs = new Obj[expectedCount];
+			boolean[] usedArgs = new boolean[expectedCount];
+			
+			main:
+			for(int i=0; i<kwargs.length; i++) {
+				int kwargName = kwargs[i];
+				for(int j=0; j<argnames.length; j++) {
+					int argName = argnames[j];
+					if(argName == kwargName) {
+						usedArgs[j] = true;
+						finalArgs[j] = args[args.length - kwargs.length + i];
+						continue main;
+					}
+				}
+				throw new ScriptError(ScriptError.TypeError, "got unexpected keyword argument " 
+						+ SString.uninternQuiet(kwargName));
+			}
+			 
+			int normalArgsCount = args.length - kwargs.length;
+			for(int i=0; i<normalArgsCount; i++) {
+				if(usedArgs[i])
+					throw new ScriptError(ScriptError.TypeError, "got multiple values for keyword argument "
+							+ SString.uninternQuiet(argnames[i]));
+				usedArgs[i] = true;
+				finalArgs[i] = args[i];
+			}
+			
+			int firstWithDefault = expectedCount - defaults.length;
+			for(int i=0; i<usedArgs.length; i++) {
+				if(!usedArgs[i]) {
+					if(i >= firstWithDefault)
+						finalArgs[i] = defaults[i - firstWithDefault];
+					else
+						throw new ScriptError(ScriptError.TypeError, "got no value for keyword argument " + SString.uninternQuiet(argnames[i]));
+				}
+			}
+			
 		}
 		func.prepareFrame(frame, finalArgs);
 		return func.body;

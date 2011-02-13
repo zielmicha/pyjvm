@@ -138,9 +138,7 @@ public final class SString extends Obj {
 		try {
 			return unintern(key);
 		} catch(ScriptError err) {
-			System.out.println(internTable);
-			err.printStackTrace();
-			return new SString("<" + key +" is not a key of interned string>");
+			return new SString("<" + key +" is not a key of an interned string>");
 		}
 	}
 }

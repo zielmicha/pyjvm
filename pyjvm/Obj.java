@@ -248,7 +248,11 @@ public class Obj {
 	public boolean callInFrame(Frame frame, Obj[] args) {
 		return false;
 	}
-
+	
+	public boolean callInFrame(Frame frame, Obj[] args, int[] kwargs) {
+		return false;
+	}
+	
 	public void setAttr(int name, Obj value) {
 		throw new ScriptError(ScriptError.TypeError, "Object without writeable attributes", this);		
 	}
@@ -270,6 +274,12 @@ public class Obj {
 				return true;
 		}
 		return false;
+	}
+
+	public Obj call(Obj[] args, int[] kwargs) {
+		if(kwargs.length == 0)
+			return call(args);
+		throw new ScriptError(ScriptError.TypeError, "Object takes no keywords arguments or is not callable");
 	}
 
 }

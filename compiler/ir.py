@@ -173,11 +173,11 @@ class Instr(utils.Struct):
 			else:
 				push, pop = basic_instr_inv[self.name]
 			try:
-				self.inreg = utils.pop_many(stack, pop)
+				self.inreg = list(reversed(utils.pop_many(stack, pop)))
 			except IndexError:
 				raise IRError('Pop from empty stack at %s' % self, self)
 			max_reg = max(stack + [self.varcount - 1])
-			self.outreg = list(reversed(xrange(max_reg + 1, max_reg + 1 + push)))
+			self.outreg = list(xrange(max_reg + 1, max_reg + 1 + push))
 			stack.extend(self.outreg)
 		else:
 			getattr(self, 'cmd_run_' + self.name)(stack)

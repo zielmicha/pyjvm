@@ -24,8 +24,8 @@ for op, name, symmetric in names:
 	s = '''
 	public static final class %(cname)s extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
-			Obj a = frame.reg[inreg1];
-			Obj b = frame.reg[inreg0];
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
 			Obj result = a.%(name)s(frame, b);
 			if(result == NotImplemented) {
 				result = b.%(symmetric)s(frame, a);

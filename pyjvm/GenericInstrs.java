@@ -187,7 +187,8 @@ public final class GenericInstrs {
 		}
 		
 		public Instr run(Frame frame) {
-			Tuple args = (Tuple)frame.reg[this.inreg0];
+			// TODO: dest
+			Tuple args = (Tuple) frame.reg[this.inreg1];
 			for(int i=0; i<args.length(); i++) {
 				System.out.print(args.get(i));
 				System.out.print(" ");
@@ -236,17 +237,21 @@ public final class GenericInstrs {
 		private int[] inArgs;
 		private int inFunc;
 		
+		private int[] kwargs;
+		private boolean hasKwargs;
+		
 		public void init2(Obj count, Obj kwargNames){
-			if(kwargNames.length() != 0)
-				throw new NotImplementedError("kwargs");
+			this.kwargs = ((List)kwargNames).toInternedStringArray();
+			hasKwargs = this.kwargs.length != 0;
 			this.argCount = count.intValue();
 		}
 		
 		public void initReg(int[] inreg, int[] outreg) {
 			this.outreg0 = outreg[0];
 			this.inArgs = new int[inreg.length - 1];
-			System.arraycopy(inreg, 0, inArgs, 0, inreg.length - 1);
-			this.inFunc = inreg[inreg.length - 1];
+			for(int i=1; i<inreg.length; i++)
+				this.inArgs[i - 1] = inreg[i];
+			this.inFunc = inreg[0];
 		}
 		
 		public Instr run(Frame frame) {
@@ -255,12 +260,16 @@ public final class GenericInstrs {
 			Obj funcObj = frame.reg[inFunc];
 			
 			frame.counter = next;
-			boolean wasCalled = funcObj.callInFrame(frame, args);
+			boolean wasCalled;
+			if(!hasKwargs)
+				wasCalled = funcObj.callInFrame(frame, args);
+			else
+				wasCalled = funcObj.callInFrame(frame, args, kwargs);
 			if(wasCalled) {
 				frame.returnValueTo = outreg0;
 				return null;
 			} else {
-				frame.reg[outreg0] = funcObj.call(args);
+				frame.reg[outreg0] = hasKwargs? funcObj.call(args, kwargs) : funcObj.call(args);
 				return next;
 			}
 		}
@@ -292,8 +301,8 @@ public final class GenericInstrs {
 		}
 		
 		public Instr run(Frame frame) {
-			Obj obj = frame.reg[inreg0];
-			Obj value = frame.reg[inreg1];
+			Obj obj = frame.reg[inreg1];
+			Obj value = frame.reg[inreg0];
 			obj.setAttr(name, value);
 			
 			return next;
@@ -305,8 +314,8 @@ public final class GenericInstrs {
 		public void init0() {}
 		
 		public Instr run(Frame frame) {
-			Obj seq = frame.reg[inreg1];
-			Obj key = frame.reg[inreg0];
+			Obj seq = frame.reg[inreg0];
+			Obj key = frame.reg[inreg1];
 			Obj result = seq.getItem(frame, key);
 			frame.reg[outreg0] = result;
 			return next;
@@ -365,8 +374,8 @@ public final class GenericInstrs {
 		}
 		
 		public Instr run(Frame frame) {
-			Function func = (Function) frame.reg[inreg1];
-			Tuple defaults = (Tuple) frame.reg[inreg0];
+			Function func = (Function) frame.reg[inreg0];
+			Tuple defaults = (Tuple) frame.reg[inreg1];
 			frame.reg[outreg0] = new UserFunction(func, defaults, this.varargs, this.kwargs, this.argnames);
 			return next;
 		}
@@ -488,8 +497,8 @@ public final class GenericInstrs {
 		}
 		
 		public Instr run(Frame frame) {
-			StringDict dict = (StringDict)frame.reg[inreg1];
-			Tuple bases = (Tuple)frame.reg[inreg0];
+			StringDict dict = (StringDict)frame.reg[inreg0];
+			Tuple bases = (Tuple)frame.reg[inreg1];
 			
 			frame.reg[outreg0] = UserType.create(name, bases, dict);
 			
@@ -514,8 +523,8 @@ public final class GenericInstrs {
 		public void init0() {}
 		
 		public Instr run(Frame frame) {
-			Obj excClass = frame.reg[inreg0];
-			Obj exception = frame.reg[inreg1];
+			Obj excClass = frame.reg[inreg1];
+			Obj exception = frame.reg[inreg0];
 			frame.reg[outreg0] = Obj.isInstance(excClass, exception)? SBool.True: SBool.False;
 			return next;
 		}

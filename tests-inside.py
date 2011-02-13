@@ -79,7 +79,7 @@ assert F.g == 5
 instance = F()
 assert instance.f == 4
 assert instance.g == 5
-
+alamakota = 0
 class D:
 	def __init__(self):
 		self.i = 5
@@ -107,3 +107,36 @@ except TypeError:
 	assert False
 except KeyError:
 	pass
+
+def f3(a, b=1):
+	assert b == a
+
+f3(1)
+f3(2, 2)
+
+try:
+	f3()
+except TypeError:
+	pass
+else:
+	assert False
+try:
+	f3(2, 2, 2)
+except TypeError:
+	pass
+else:
+	assert False
+
+def f4(a, b):
+	assert a - 1 == b
+
+#f4(b=1, a=2)
+
+def f5(a, b, c, d=4, e=0):
+	assert a == 1
+	assert b == 2
+	assert c == 3
+	assert d == 4
+	assert e == 5
+
+f5(1, 2, c=3, e=5)
