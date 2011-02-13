@@ -140,3 +140,9 @@ def f5(a, b, c, d=4, e=0):
 	assert e == 5
 
 f5(1, 2, c=3, e=5)
+
+s = 'abc'
+s += 'def'
+assert s == 'abcdef'
+
+assert ','.join(['1', '2', '3']) == '1,2,3'

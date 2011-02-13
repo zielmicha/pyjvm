@@ -101,10 +101,10 @@ def backup(fn):
 		pass
 
 def convert(type, val):
-	return converters[type] % val
+	return converters.get(type, 'return %s') % val
 
 def unconvert(type, val):
-	return unconverters[type] % val
+	return unconverters.get(type, '%s') % val
 
 def create_name(name):
 	if name.endswith('_'):

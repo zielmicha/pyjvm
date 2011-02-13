@@ -4,7 +4,7 @@ package pyjvm;
 
 import java.io.UnsupportedEncodingException;
 
-public final class SString extends Obj {
+public final class SString extends NativeObj { //!export SString
 	public final byte[] bytes;
 	public int interned = -1;
 	
@@ -65,6 +65,41 @@ public final class SString extends Obj {
 		return h;
 	}
 	
+	public SString add(SString other) {
+		byte[] newBytes = new byte[this.length() + other.length()];
+		this.copyTo(newBytes, 0);
+		other.copyTo(newBytes, this.length());
+		return new SString(newBytes);
+	}
+	
+	public Obj add(Obj other) {
+		if(other instanceof SString)
+			return this.add((SString)other);
+		return NotImplemented;
+	}
+	
+	public SString join(Obj seq) { //!export 
+		Obj iter = seq.getIter();
+		SStringBuilder builder = new SStringBuilder(16);
+		boolean first = true;
+		Obj item;
+		
+		while((item=iter.next()) != null) {
+			if(!first) {
+				builder.append(this);
+			} else {
+				first = false;
+			}
+			builder.append(item.stringValue());
+		}
+		
+		return builder.getValue();
+	}
+	
+	public static Obj construct(Obj val) { //!export constructor
+		return val.str();
+	}
+	
 	public SBool isEqual(Obj other) {
 		if(other == this)
 			return SBool.True;
@@ -96,6 +131,10 @@ public final class SString extends Obj {
 		} catch (UnsupportedEncodingException ex) {
 			throw new ScriptError(ScriptError.LookupError, ex);
 		}
+	}
+	
+	public Type getType() {
+		return SStringClass.instance;
 	}
 	
 	// intern

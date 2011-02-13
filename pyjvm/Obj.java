@@ -61,6 +61,10 @@ public class Obj {
 		return new SString(toString());
 	}
 	
+	public Obj str() {
+		return new SString(toString());
+	}
+	
 	public static String repr(Obj object) {
 		if(object == null)
 			return "null";
