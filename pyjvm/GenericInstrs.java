@@ -353,24 +353,21 @@ public final class GenericInstrs {
 	}
 
 	public static class MakeFunction extends Instr {
-		private int defaults;
 		private boolean varargs;
 		private boolean kwargs;
 		private int[] argnames;
 
 		public void init1(Obj o) {
 			StringDict args = (StringDict)o;
-			this.defaults = args.get("defaults").intValue();
-			if(defaults != 0)
-				throw new ScriptError(ScriptError.NotImplementedError, "Defaults not implemented");
 			this.varargs = args.get("varargs").boolValue();
 			this.kwargs = args.get("kwargs").boolValue();
 			this.argnames = ((List)args.get("argnames")).toInternedStringArray();
 		}
 		
 		public Instr run(Frame frame) {
-			Function func = (Function) frame.reg[inreg0];
-			frame.reg[outreg0] = new UserFunction(func, this.defaults, this.varargs, this.kwargs, this.argnames);
+			Function func = (Function) frame.reg[inreg1];
+			Tuple defaults = (Tuple) frame.reg[inreg0];
+			frame.reg[outreg0] = new UserFunction(func, defaults, this.varargs, this.kwargs, this.argnames);
 			return next;
 		}
 

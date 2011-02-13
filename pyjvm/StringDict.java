@@ -2,6 +2,8 @@
 // for license see LICENSE file
 package pyjvm;
 
+import java.util.Arrays;
+
 public final class StringDict extends Obj {
 	public final class Entry {
 		public Entry(int key, Obj val) {
@@ -56,6 +58,7 @@ public final class StringDict extends Obj {
 				e = e.next;
 		}
 		Entry entry = new Entry(key, val);
+		Object next__ = e==null? "<null>" : e.next + "";
 		if(e != null)
 			e.next = entry;
 		else
@@ -165,16 +168,16 @@ public final class StringDict extends Obj {
 			return key;
 		}
 	}
-	private final class DictEntryIterator {
+	public final class DictEntryIterator {
 		private int entryIndex = 0;
 		private Entry entry = null;
 		
 		public Entry next() {
 			while(entry == null) {
-				entry = entries[entryIndex];
-				entryIndex ++;
 				if(entryIndex == entries.length)
 					return null;
+				entry = entries[entryIndex];
+				entryIndex ++;
 			}
 			Entry thisEntry = entry;
 			entry = entry.next;

@@ -8,10 +8,10 @@ basic_instr = {
 	# (push, pop): [names]
 	(1, 0): 'const global nested function getexc getlocalsdict useonlyglobals import', # push 1
 	(0, 1): 'return jumpifnot jumpif setlocal setglobal reraise assertfail', # pop 1 
-	(1, 1): 'makefunction getattr getiter foriter makemodule unaryop copy', # push1 pop1
+	(1, 1): 'getattr getiter foriter makemodule unaryop copy', # push1 pop1
 	(0, 0): 'nop jump setupexc popexc genexpcontinue', # nothing
 	(0, 2): 'setattr delitem listappend print', # pop2
-	(1, 2): 'makegenexp compare binop getitem makeclass binopip excmatch', # pop2 push 1
+	(1, 2): 'makefunction makegenexp compare binop getitem makeclass binopip excmatch', # pop2 push 1
 	(0, 3): 'raise3 setitem', # pop3
 	(1, 3): 'getslice', # pop3 push 1
 }

@@ -49,7 +49,8 @@ public final class Dict extends Obj {
 	}
 	
 	private void resize() {
-		Entry[] newEntries = new Entry[entries.length];
+		Entry[] newEntries = new Entry[entries.length * 2];
+		resizeAt *= 2;
 		Entry[] oldEntries = this.entries;
 		this.entries = newEntries;
 		

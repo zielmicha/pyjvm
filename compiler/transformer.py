@@ -497,9 +497,9 @@ class Visitor(object):
 		self.emit('function', Visitor.createFunction(node.argnames, code))
 		for default in node.defaults:
 			self.visit(default)
+		self.emit('maketuple', len(node.defaults))
 		
 		self.emit('makefunction', dict(
-				defaults=len(node.defaults),
 				varargs=bool(node.varargs),
 				kwargs=bool(node.kwargs),
 				argnames=node.argnames
@@ -519,11 +519,12 @@ class Visitor(object):
 		self.emit('function', Visitor.createFunction(node.argnames, node.code))
 		for default in node.defaults:
 			self.visit(default)
+		self.emit('maketuple', len(node.defaults))
+		
 		self.emit('makefunction', dict(
 				name=node.name,
 				doc=node.doc,
 				argnames=list(node.argnames),
-				defaults=len(node.defaults),
 				varargs=bool(node.varargs),
 				kwargs=bool(node.kwargs)
 			))

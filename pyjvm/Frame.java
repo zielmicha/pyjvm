@@ -50,6 +50,7 @@ public final class Frame {
 
 	private static void causeException(Frame frame, Throwable e) {
 		frame.throwable = e;
+		frame.exceptionObject = null;
 		Frame current = frame;
 		while(current != null) {
 			while(current.excHandlersCount > 0) {

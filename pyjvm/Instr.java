@@ -7,8 +7,8 @@ public abstract class Instr extends Obj {
 	public int lineno;
 	public SString filename;
 	
-	protected int inreg0;
-	protected int inreg1;
+	protected int inreg0 = -1;
+	protected int inreg1 = -1;
 	
 	protected int outreg0; 
 	

@@ -6,16 +6,16 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 
 	private final boolean varargs;
 	private final boolean kwargs;
-	private final int defaults;
+	private final Obj[] defaults;
 	private final int[] argnames;
 	private final Function func;
 	private final int expectedCount;
 
-	public UserFunction(Function func, int defaults, boolean varargs, boolean kwargs,
+	public UserFunction(Function func, Tuple defaults, boolean varargs, boolean kwargs,
 			int[] argnames) {
 		this.varargs = varargs;
 		this.kwargs = kwargs;
-		this.defaults = defaults;
+		this.defaults = defaults.items;
 		this.argnames = argnames;
 		this.func = func;
 		
@@ -37,10 +37,19 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 	public Instr callInExistingFrame(Frame frame, Obj[] args) {
 		Obj[] finalArgs = args;
 		if(args.length != expectedCount) {
-			// TODO: implement defaults
+			// TODO: implement ...
 			finalArgs = new Obj[expectedCount];
 			
-			throw new ScriptError(ScriptError.NotImplementedError, "Bad number of arguments (not supported)");
+			int defaultsCount = expectedCount - args.length;
+			int startDefaults = defaults.length - defaultsCount;
+			
+			if(defaultsCount > defaults.length)
+				throw new ScriptError(ScriptError.TypeError, "Too few arguments");
+			if(defaultsCount < 0)
+				throw new ScriptError(ScriptError.TypeError, "Too many arguments");
+
+			System.arraycopy(args, 0, finalArgs, 0, args.length);
+			System.arraycopy(defaults, startDefaults, finalArgs, args.length, defaultsCount);
 		}
 		func.prepareFrame(frame, finalArgs);
 		return func.body;
