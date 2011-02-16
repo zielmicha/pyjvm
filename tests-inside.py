@@ -172,3 +172,14 @@ from test_import import value
 
 assert value == 5
 #s = StringIO()
+
+assert (1 < 2 < 3)
+assert not (3 < 2 < 3)
+assert not (1 < 2 < 1)
+
+assert 1<2
+assert 2>1
+assert 1<=2
+assert 2>=2
+assert 1<=1
+assert 1>=1

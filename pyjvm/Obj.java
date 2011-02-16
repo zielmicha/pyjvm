@@ -304,5 +304,50 @@ public class Obj {
 			return call(args);
 		throw new ScriptError(ScriptError.TypeError, "Object takes no keywords arguments or is not callable");
 	}
+	
+	// comparators
+	
+	public Obj compare(Obj b) {
+		return NotImplemented;
+	}
+	
+	public Obj lessThan(Frame frame, Obj b) {
+		return lessThan(b);
+	}
+	
+	public Obj lessThan(Obj b) {
+		Obj cmp = compare(b);
+		if(cmp == NotImplemented) return NotImplemented;
+		return cmp.intValue() < 0? SBool.True: SBool.False;
+	}
 
+	public Obj lessOrEqual(Frame frame, Obj b) {
+		return lessOrEqual(b);
+	}
+	
+	public Obj lessOrEqual(Obj b) {
+		Obj cmp = compare(b);
+		if(cmp == NotImplemented) return NotImplemented;
+		return cmp.intValue() <= 0? SBool.True: SBool.False;
+	}
+	
+	public Obj greaterThan(Frame frame, Obj b) {
+		return greaterThan(b);
+	}
+	
+	public Obj greaterThan(Obj b) {
+		Obj cmp = compare(b);
+		if(cmp == NotImplemented) return NotImplemented;
+		return cmp.intValue() > 0? SBool.True: SBool.False;
+	}
+	
+	public Obj greaterOrEqual(Frame frame, Obj b) {
+		return greaterOrEqual(b);
+	}
+	
+	public Obj greaterOrEqual(Obj b) {
+		Obj cmp = compare(b);
+		if(cmp == NotImplemented) return NotImplemented;
+		return cmp.intValue() >= 0? SBool.True: SBool.False;
+	}
 }

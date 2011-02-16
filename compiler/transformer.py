@@ -449,11 +449,35 @@ class Visitor(object):
 	visitOr = visitAnd	
 	
 	def visitCompare(self, node):
-		assert len(node.ops) == 1, 'Comparing with many operators not supported'
-		(op, to), = node.ops
+		end = Label()
+		false = Label()
+		
 		self.visit(node.expr)
-		self.visit(to)
-		self.emit('compare', op)
+		for type, expr in node.ops[:-1]:
+			self.visit(expr)
+			self.emit('dup')
+			self.emit('swapn', 3)
+			self.emit('swap2')
+			self.emit('compare', type)
+			self.emit('jumpifnot', false)
+		
+		(last_op, last_to) = node.ops[-1]
+		
+		self.visit(last_to)
+		self.emit('compare', last_op)
+		
+		self.emit('jump', end)
+		
+		self.emit(false)
+		
+		self.emit('pop')
+		self.emit('const', False)
+		
+		self.emit(end)
+		#(op, to), = node.ops
+		#self.visit(node.expr)
+		#self.visit(to)
+		#self.emit('compare', op)
 	
 	def visitGetattr(self, node):
 		self.visit(node.expr)

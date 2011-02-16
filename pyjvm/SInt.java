@@ -22,6 +22,9 @@
 package pyjvm;
 
 public final class SInt extends Obj {
+	public static final SInt ONE = SInt.get(1);
+	public static final SInt MINUS_ONE = SInt.get(-1);
+	public static final SInt ZERO = SInt.get(0);
 	public int value;
 
 	private SInt(int i) {
@@ -162,5 +165,16 @@ public final class SInt extends Obj {
 		} else {
 			return NotImplemented;
 		}
+	}
+	
+	public Obj compare(Obj other) {
+		if(!(other instanceof SInt)) return NotImplemented;
+		int otherVal = other.intValue();
+		if(otherVal == value)
+			return ZERO;
+		else if(value < otherVal)
+			return MINUS_ONE;
+		else
+			return ONE;
 	}
 }

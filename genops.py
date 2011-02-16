@@ -24,7 +24,11 @@ sys.stdout = open('pyjvm/BinOpInstrs.java', 'w')
 names = ['add', 'sub', 'mul', 'floordiv', 'div', 'truediv']
 names = [ (n, n, 'r' + n) for n in names ]
 
-names += [('==', 'isEqual', 'isEqual')]
+names += [('==', 'isEqual', 'isEqual'),
+		('<', 'lessThan', 'greaterOrEqual'),
+		('>', 'greaterThan', 'lessOrEqual'),
+		('>=', 'greaterOrEqual', 'greaterOrEqual'),
+		('<=', 'lessOrEqual', 'greaterThan')]
 names += [
 	(symbol, 'i' + method, 'r' + method)
 	for symbol, method in [
