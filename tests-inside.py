@@ -70,10 +70,8 @@ assert len(seq) == 4
 
 try:
 	non_existing
-except:
-	pass
-else:
-	assert False
+except: pass
+else: assert False
 
 assert True or False
 assert True and True
@@ -84,10 +82,8 @@ def f3():
 
 try:
 	f3()
-except:
-	pass
-else:
-	assert False
+except: pass
+else: assert False
 
 class F:
 	f = 4
@@ -116,17 +112,13 @@ assert test_import.value == 5
 
 try:
 	non_exising
-except AttributeError:
-	pass
-else:
-	assert False
+except AttributeError: pass
+else: assert False
 
 try:
 	non_exising
-except TypeError:
-	assert False
-except AttributeError:
-	pass
+except TypeError: assert False
+except AttributeError: pass
 
 def f3(a, b=1):
 	assert b == a
@@ -136,16 +128,13 @@ f3(2, 2)
 
 try:
 	f3()
-except TypeError:
-	pass
-else:
-	assert False
+except TypeError: pass
+else: assert False
+
 try:
 	f3(2, 2, 2)
-except TypeError:
-	pass
-else:
-	assert False
+except TypeError: pass
+else: assert False
 
 def f4(a, b):
 	assert a - 1 == b
@@ -187,10 +176,8 @@ del f
 
 try:
 	f
-except AttributeError:
-	pass
-else:
-	assert False
+except AttributeError: pass
+else: assert False
 
 class S: pass
 s = S()
@@ -199,7 +186,25 @@ del s.f
 
 try:
 	s.f
-except AttributeError:
-	pass
-else:
-	assert False
+except AttributeError: pass
+else: assert False
+
+try:
+	raise IOError()
+except IOError: pass
+else: assert False
+
+try:
+	raise IOError
+except IOError: pass
+else: assert False
+
+try:
+	raise IOError, 5
+except IOError: pass
+else: assert False
+
+try:
+	raise IOError(), 5
+except TypeError: pass
+else: assert False

@@ -401,14 +401,41 @@ public final class GenericInstrs {
 	}
 	
 	public static final class Raise3 extends Instr {
+		public void init0() {}
+		
+		public int inreg2;
+		
+		public void initReg(int[] inreg, int[] outreg) {
+			inreg0 = inreg[0];
+			inreg1 = inreg[1];
+			inreg2 = inreg[2];
+		}
+		
 		public Instr run(Frame frame) {
-			// TODO Auto-generated method stub
-			return next;
+			Obj exc = frame.reg[inreg0];
+			Obj value = frame.reg[inreg1];
+			Obj traceback = frame.reg[inreg2];
+			
+			// TODO: implement traceback
+			// 'raise' - reraise
+			// 'raise IOError' == 'raise IOError()'
+			// 'raise IOError, 5' == 'raise IOError(5)'
+			
+			if(value != None) {
+				if(exc instanceof ScriptError.ExceptionInstance)
+					throw new ScriptError(ScriptError.TypeError, "instance exception may not have a separate value");
+				exc = exc.call(new Obj[]{ value });
+			} else if(exc instanceof ScriptError.ExceptionType) {
+				exc = exc.call(new Obj[]{ value });
+			}
+			
+			throw new ExistingScriptError(exc, null);
 		}
 	}
 	
 	public static final class Nop extends Instr {
 		public void init0() {}
+		public void init1(Obj useless) {}
 		
 		public Instr run(Frame frame) {
 			return next;

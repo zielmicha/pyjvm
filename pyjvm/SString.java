@@ -115,7 +115,7 @@ public final class SString extends NativeObj { //!export SString
 		return builder.getValue();
 	}
 	
-	public static Obj construct(Obj val) { //!export - constructor
+	public static Obj construct(Obj val) { //!export - <new>
 		return val.str();
 	}
 	
