@@ -46,6 +46,11 @@ public final class UserObj extends Obj { //!export UserObj
 			classAttr.setObjectAttr(this, value);
 	}
 	
+	public void delAttr(int name) {
+		// TODO: delAttr 
+		dict.delete(name);
+	}
+	
 	public String toString() {
 		return "<" + userClass.getName() + " object at " + System.identityHashCode(this) + ">"; 
 	}

@@ -24,7 +24,6 @@ package pyjvm;
 import pyjvm.BinOpInstrs.BinOpFactory;
 
 public final class GenericInstrs {
-
 	/**
 	 * Container class for various instructions.
 	 */
@@ -583,6 +582,35 @@ public final class GenericInstrs {
 			}
 			frame.reg[outreg0] = result;
 			
+			return next;
+		}
+
+	}
+	
+	public static final class DelGlobal extends Instr {
+		private int name;
+		
+		public void init1(Obj name) {
+			this.name = name.stringValue().intern();
+		}
+		
+		public Instr run(Frame frame) {
+			frame.globals.delete(name);
+			return next;
+		}
+
+	}
+	
+	public static final class DelAttr extends Instr {
+		private int name;
+		
+		public void init1(Obj name) {
+			this.name = name.stringValue().intern();
+		}
+		
+		public Instr run(Frame frame) {
+			Obj obj = frame.reg[inreg0];
+			obj.delAttr(name);
 			return next;
 		}
 

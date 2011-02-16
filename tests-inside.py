@@ -167,11 +167,9 @@ assert s == 'abcdef'
 
 assert ','.join(['1', '2', '3']) == '1,2,3'
 
-from lib import StringIO
 from test_import import value
 
 assert value == 5
-#s = StringIO()
 
 assert (1 < 2 < 3)
 assert not (3 < 2 < 3)
@@ -183,3 +181,25 @@ assert 1<=2
 assert 2>=2
 assert 1<=1
 assert 1>=1
+
+f = 10
+del f
+
+try:
+	f
+except AttributeError:
+	pass
+else:
+	assert False
+
+class S: pass
+s = S()
+s.f = 5
+del s.f
+
+try:
+	s.f
+except AttributeError:
+	pass
+else:
+	assert False

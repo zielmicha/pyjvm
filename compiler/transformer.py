@@ -216,15 +216,28 @@ class Visitor(object):
 				self.emit('setname', varname)
 	
 	def visitAssName(self, node):
-		self.emit('setname', node.name)
+		if node.flags == OP_DELETE:
+			self.emit('delname', node.name)
+		else:
+			self.emit('setname', node.name)
 	
 	def visitAssAttr(self, node):
 		# setattr attrname (TOS object, TOS1 value)
 		self.visit(node.expr)
-		self.emit('setattr', node.attrname)
+		if node.flags == OP_DELETE:
+			self.emit('delattr', node.attrname)
+		else:
+			self.emit('setattr', node.attrname)
 	
 	def visitAssTuple(self, node):
 		elems = node.nodes
+		
+		if elems and elems[0].flags == OP_DELETE:
+			# expression like "del a, b"
+			for elem in elems:
+				self.visit(elem)
+			return
+		
 		self.emit('unpacktuple', len(elems))
 		self.emit('swapn', len(elems)) # set them in order
 		for elem in elems:
@@ -415,6 +428,11 @@ class Visitor(object):
 			self.emit('setname', get.name)
 		elif isinstance(get, ast.Subscript):
 			self.visitSubscript(get, override_flag=OP_ASSIGN)
+		elif isinstance(get, ast.Getattr):
+			self.visit(get.expr)
+			self.emit('setattr', get.attrname)
+		else:
+			raise CodeError('unknown AugAssign operand type %s' % get)
 	
 	def visitBinop2(self, node):
 		self.visit(node.nodes[0])

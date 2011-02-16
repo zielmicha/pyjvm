@@ -254,6 +254,10 @@ public class Obj {
 		throw new ScriptError(ScriptError.TypeError, "Object without attributes", this);
 	}
 
+	public void delAttr(int name) {
+		throw new ScriptError(ScriptError.TypeError, "Object without deletable attributes", this);
+	}
+	
 	public Obj getObjectAttr(Obj instance) {
 		// throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
 		return this;
@@ -350,4 +354,5 @@ public class Obj {
 		if(cmp == NotImplemented) return NotImplemented;
 		return cmp.intValue() >= 0? SBool.True: SBool.False;
 	}
+
 }

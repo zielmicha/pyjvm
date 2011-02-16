@@ -133,6 +133,26 @@ public final class StringDict extends Obj {
 		SString keyString = SString.uninternQuiet(key);
 		throw new ScriptError(ScriptError.AttributeError, "not found: " + keyString);
 	}
+	 
+	public final void delete(int key) {
+		int hash = key;
+		int index = Math.abs(hash % entries.length);
+		Entry prev = null;
+		Entry e = entries[index];
+		while(e != null) {
+			if(e.key == key) {
+				if(prev == null)
+					entries[index] = e.next;
+				else
+					prev.next = e.next;
+				return;
+			}
+			prev = e;
+			e = e.next;
+		}
+		SString keyString = SString.uninternQuiet(key);
+		throw new ScriptError(ScriptError.AttributeError, "not found: " + keyString);
+	}
 	
 	public final Obj get(String s) {
 		return get(SString.intern(s));

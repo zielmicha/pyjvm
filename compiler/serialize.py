@@ -29,7 +29,10 @@ instr_types = ['assertfail', 'binop', 'binopip', 'call', 'compare', 'const',
 	'makemodule', 'maketuple', 'nop', 'popexc', 'print', 'raise3', 'reraise',
 	'return', 'setattr', 'setglobal', 'setitem', 'setlocal', 'setupexc',
 	'unaryop', 'unpacktuple', 'useonlyglobals',
-	'getimportattr']
+	'getimportattr', 'delattr', 'delglobal']
+
+instr_map = dict( (name, i) for i, name in enumerate(instr_types) )
+
 
 class Serializer(object):
 	def __init__(self):
@@ -132,7 +135,7 @@ class Serializer(object):
 		if not instr.outreg: instr.outreg = []
 		if not instr.inreg: instr.inreg = []
 		
-		self.pack_uint(instr_types.index(instr.name))
+		self.pack_uint(instr_map[instr.name])
 		self.pack_uint(len(instr.args))
 		self.pack_uint(len(instr.inreg))
 		self.pack_uint(len(instr.outreg))
