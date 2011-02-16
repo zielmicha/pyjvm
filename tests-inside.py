@@ -96,7 +96,7 @@ assert test_import.value == 5
 
 try:
 	non_exising
-except KeyError:
+except AttributeError:
 	pass
 else:
 	assert False
@@ -105,7 +105,7 @@ try:
 	non_exising
 except TypeError:
 	assert False
-except KeyError:
+except AttributeError:
 	pass
 
 def f3(a, b=1):
@@ -146,3 +146,9 @@ s += 'def'
 assert s == 'abcdef'
 
 assert ','.join(['1', '2', '3']) == '1,2,3'
+
+from lib import StringIO
+from test_import import value
+
+assert value == 5
+#s = StringIO()

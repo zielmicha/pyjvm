@@ -96,7 +96,7 @@ public final class SString extends NativeObj { //!export SString
 		return builder.getValue();
 	}
 	
-	public static Obj construct(Obj val) { //!export constructor
+	public static Obj construct(Obj val) { //!export - constructor
 		return val.str();
 	}
 	
@@ -179,5 +179,9 @@ public final class SString extends NativeObj { //!export SString
 		} catch(ScriptError err) {
 			return new SString("<" + key +" is not a key of an interned string>");
 		}
+	}
+
+	public Obj add(String string) {
+		return add(new SString(string));
 	}
 }

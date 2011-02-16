@@ -24,7 +24,7 @@ else
 fi
 mkdir -p dest
 python compiler/build.py -i "$input" -d dest
-$cmd dest < dest/__main__.bc
+$cmd dest
 
 if [ $istmp = 1 ]; then
 	rm $input

@@ -243,13 +243,13 @@ class Visitor(object):
 	
 	def visitFrom(self, node):
 		if node.modname == '__future__':
-			self.applyFutures( name for name, varname in node.names)
+			self.applyFutures( name for name, varname in node.names )
 		self.emit('import', node.modname)
 		for name, varname in node.names:
 			if not varname:
 				varname = name
 			self.emit('dup')
-			self.emit('getattr', name)
+			self.emit('getimportattr', name, node.modname)
 			self.emit('setname', varname)
 		self.emit('pop')
 	

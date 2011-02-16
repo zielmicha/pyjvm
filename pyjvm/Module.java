@@ -3,21 +3,10 @@
 package pyjvm;
 
 public final class Module extends Obj {
-	private StringDict dict;
+	public final StringDict dict;
 
 	public Module() {
 		dict = new StringDict();
-	}
-	
-	public static Module create(Instr mainInstr) {
-		Frame frame = new Frame(null);
-		frame.builtins = Builtins.dict;
-		frame.module = new Module();
-		frame.globals = frame.module.dict;
-		
-		Frame.execute(frame, mainInstr);
-		
-		return frame.module;
 	}
 
 	public void done(Obj doc) {
@@ -26,5 +15,9 @@ public final class Module extends Obj {
 	
 	public Obj getAttr(int name) {
 		return dict.get(name);
+	}
+	
+	public void setAttr(int name, Obj val) {
+		dict.put(name, val);
 	}
 }

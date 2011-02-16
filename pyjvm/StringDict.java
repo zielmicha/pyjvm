@@ -112,7 +112,7 @@ public final class StringDict extends Obj {
 			e = e.next;
 		}
 		SString keyString = SString.uninternQuiet(key);
-		throw new ScriptError(ScriptError.KeyError, "not found: " + keyString);
+		throw new ScriptError(ScriptError.AttributeError, "not found: " + keyString);
 	}
 	
 	public final Obj get(String s) {

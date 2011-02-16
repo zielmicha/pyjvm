@@ -539,4 +539,33 @@ public final class GenericInstrs {
 		}
 
 	}
+	
+	public static final class GetImportAttr extends Instr {
+		public SString name;
+		public SString modname;
+		
+		public void init2(Obj name, Obj modname) {
+			this.name = name.stringValue();
+			this.modname = modname.stringValue();
+		}
+		
+		public Instr run(Frame frame) {
+			Obj obj = frame.reg[inreg0];
+			Obj result;
+			try {
+				result = obj.getAttr(name.intern());
+			} catch (ScriptError e) {
+				if(e.kind == ScriptError.AttributeError) {
+					Importer.importModule((SString)modname.add(".").add(name));
+					result = obj.getAttr(name.intern());
+				} else {
+					throw e;
+				}
+			}
+			frame.reg[outreg0] = result;
+			
+			return next;
+		}
+
+	}
 }

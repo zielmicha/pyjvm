@@ -7,10 +7,45 @@ import java.io.InputStream;
 
 public class Importer {
 
-	public static Obj importModule(SString name) {
+	public static Module importModule(SString name) {
+		Obj imported = modules.getOrNull(name.intern());
+		if(imported != null)
+			return (Module)imported;
+		
 		InputStream module = findModule(name.toString());
-		Instr mainInstr = (Instr) Unserializer.unserialize(module);
-		return Module.create(mainInstr);
+		
+		return loadModule(module, name);
+	}
+	
+
+	public static Module importModule(String name) {
+		return importModule(new SString(name));
+	}
+	
+	public static Module loadModule(InputStream code, SString name) {
+		Instr mainInstr = (Instr) Unserializer.unserialize(code);
+		Module object = new Module();
+		modules.put(name, object);
+		String jName = name.toString();
+		if(jName.indexOf('.') != -1) {
+			// import parent module
+			int lastDot = jName.lastIndexOf('.');
+			String parentModuleName = jName.substring(0, lastDot);
+			String thisModuleName = jName.substring(lastDot + 1);
+			Module parent = importModule(new SString(parentModuleName));
+			parent.setAttr(SString.intern(thisModuleName), object);
+		}
+		executeModule(object, mainInstr);
+		return object;
+	}
+	
+	private static void executeModule(Module module, Instr mainInstr) {
+		Frame frame = new Frame(null);
+		frame.builtins = Builtins.dict;
+		frame.module = module;
+		frame.globals = frame.module.dict;
+		
+		Frame.execute(frame, mainInstr);
 	}
 	
 	public static InputStream findModule(String name) {
@@ -36,4 +71,5 @@ public class Importer {
 	}
 	
 	public static List path = new List(); 
+	public static StringDict modules = new StringDict();
 }

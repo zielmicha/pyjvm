@@ -19,14 +19,17 @@ class Builder(object):
 		
 		output_path = os.path.join(self.destdir, output + '.bc')
 		
-		if allow_caching:
-			output_modified = os.path.getmtime(output_path)
-			input_modified = os.path.getmtime(path)
-			
-			if input_modified <= output_modified:
-				return
-			
 		print 'M', module_name
+		
+		if allow_caching:
+			try:
+				output_modified = os.path.getmtime(output_path)
+				input_modified = os.path.getmtime(path)
+				
+				if input_modified <= output_modified:
+					return
+			except (OSError, IOError):
+				pass
 		
 		data = open(path, 'r').read()
 		compiled = ir.execute(data)
@@ -47,6 +50,8 @@ class Builder(object):
 				instr.args[0].body.walk_readonly(walk)
 			elif instr.name == 'import':
 				imports.add(instr.args[0])
+			elif instr.name == 'getimportattr':
+				imports.add(instr.args[1] + '.' + instr.args[0])
 		
 		main_instr.walk_readonly(walk)
 		return imports
@@ -55,7 +60,10 @@ class Builder(object):
 		imports = self.get_imports(main_instr)
 		
 		for imported_name in imports:
-			self.compile_module(module_name, imported_name)
+			try:
+				self.compile_module(module_name, imported_name)
+			except ImportError:
+				pass
 	
 	def compile_module(self, parent, name):
 		full_name, path = self.find_module(parent, name)

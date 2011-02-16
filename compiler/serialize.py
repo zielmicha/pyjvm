@@ -8,7 +8,8 @@ instr_types = ['assertfail', 'binop', 'binopip', 'call', 'compare', 'const',
 	'jumpifnot', 'listappend', 'makeclass', 'makefunction', 'makelist',
 	'makemodule', 'maketuple', 'nop', 'popexc', 'print', 'raise3', 'reraise',
 	'return', 'setattr', 'setglobal', 'setitem', 'setlocal', 'setupexc',
-	'unaryop', 'unpacktuple', 'useonlyglobals']
+	'unaryop', 'unpacktuple', 'useonlyglobals',
+	'getimportattr']
 
 class Serializer(object):
 	def __init__(self):

@@ -149,6 +149,8 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.ExcMatch();
 			case INSTR_RERAISE:
 				return new GenericInstrs.Reraise();
+			case INSTR_GETIMPORTATTR:
+				return new GenericInstrs.GetImportAttr(); 
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}
@@ -196,6 +198,7 @@ public abstract class Instr extends Obj {
 	public static final int INSTR_UNARYOP = 37;
 	public static final int INSTR_UNPACKTUPLE = 38;
 	public static final int INSTR_USEONLYGLOBALS = 39;
+	public static final int INSTR_GETIMPORTATTR = 40;
 }
 
 abstract class JumpIfLikeInstr extends Instr {

@@ -31,8 +31,8 @@ public class ScriptError extends RuntimeException {
 	
 	public static ExceptionType[] excClasses;
 	
-	private String message;
-	private int kind;
+	public final String message;
+	public final int kind;
 	private Obj sender;
 	
 	public ScriptError(int kind, String message) {
