@@ -174,6 +174,8 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.DelGlobal();
 			case INSTR_DELATTR:
 				return new GenericInstrs.DelAttr();
+			case INSTR_GETSLICE:
+				return new GenericInstrs.GetSlice();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}

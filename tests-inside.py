@@ -208,3 +208,17 @@ try:
 	raise IOError(), 5
 except TypeError: pass
 else: assert False
+
+try:
+	try:
+		raise IOError
+	except:
+		raise
+except IOError: pass
+else: assert False
+
+a=1
+assert a is a
+assert a is not 2
+
+#from lib import StringIO

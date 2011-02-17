@@ -339,7 +339,28 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-
+	
+	public static final class GetSlice extends Instr {
+		public void init0() {}
+		
+		public int inreg2;
+		
+		public void initReg(int[] inreg, int[] outreg) {
+			inreg0 = inreg[0];
+			inreg1 = inreg[1];
+			inreg2 = inreg[2];
+		}
+		
+		public Instr run(Frame frame) {
+			Obj seq = frame.reg[inreg0];
+			Obj lower = frame.reg[inreg1];
+			Obj upper = frame.reg[inreg2];
+			Obj result = seq.getSlice(frame, lower, upper);
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+	
 	public static final class GetIter extends Instr {
 		public void init0() {}
 		
@@ -421,6 +442,9 @@ public final class GenericInstrs {
 			// 'raise IOError' == 'raise IOError()'
 			// 'raise IOError, 5' == 'raise IOError(5)'
 			
+			if(exc == None)
+				throw new ExistingScriptError(frame.getException(), frame.getTraceback());
+			
 			if(value != None) {
 				if(exc instanceof ScriptError.ExceptionInstance)
 					throw new ScriptError(ScriptError.TypeError, "instance exception may not have a separate value");
@@ -456,6 +480,33 @@ public final class GenericInstrs {
 			BinOpInstrs.BinOpFactory factory = (BinOpFactory) BinOpInstrs.binOpTypes.get(name.intern());
 			return factory.create();
 		}
+		
+		static { 
+			BinOpInstrs.binOpTypes.put("is not", new BinOpFactory() {
+				public BinOp create() {
+					return new BinOp() {
+						public Instr run(Frame frame) {
+							Obj a = frame.reg[inreg0];
+							Obj b = frame.reg[inreg1];
+							frame.reg[outreg0] = a!=b? SBool.True: SBool.False;
+							return next;
+						}
+					};
+				}
+			});
+			BinOpInstrs.binOpTypes.put("is", new BinOpFactory() {
+				public BinOp create() {
+					return new BinOp() {
+						public Instr run(Frame frame) {
+							Obj a = frame.reg[inreg0];
+							Obj b = frame.reg[inreg1];
+							frame.reg[outreg0] = a==b? SBool.True: SBool.False;
+							return next;
+						}
+					};
+				}
+			});
+		}
 	}
 	
 	public static abstract class UnaryOp extends Instr {
@@ -467,15 +518,28 @@ public final class GenericInstrs {
 			
 			if(interned == NOT)
 				return new UnaryNot();
+			else if(interned == UNARYSUB)
+				return new UnarySub();
 			else
 				throw new ScriptError(ScriptError.TypeError, "unknown unary op: " + type);
 		}
 		public static final int NOT = SString.intern("not");
+		public static final int UNARYSUB = SString.intern("unarysub");
 		
 		public static class UnaryNot extends UnaryOp {
 			public final Instr run(Frame frame) {
 				Obj a = frame.reg[inreg0];
 				Obj done = a.boolValue()? SBool.False: SBool.True;
+				frame.reg[outreg0] = done;
+				
+				return next;
+			}
+		}
+		
+		public static class UnarySub extends UnaryOp {
+			public final Instr run(Frame frame) {
+				Obj a = frame.reg[inreg0];
+				Obj done = a.unarySub(frame);
 				frame.reg[outreg0] = done;
 				
 				return next;

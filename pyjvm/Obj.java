@@ -355,4 +355,20 @@ public class Obj {
 		return cmp.intValue() >= 0? SBool.True: SBool.False;
 	}
 
+	public Obj getSlice(Frame frame, Obj lower, Obj upper) {
+		return getSlice(lower, upper);
+	}
+
+	private Obj getSlice(Obj lower, Obj upper) {
+		throw new ScriptError(ScriptError.TypeError, "Object is not sliceable");
+	}
+
+	public Obj unarySub() {
+		throw new ScriptError(ScriptError.TypeError, "bad operand type for unary -", this);
+	}
+
+	public Obj unarySub(Frame frame) {
+		return unarySub();
+	}
+
 }
