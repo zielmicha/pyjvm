@@ -126,6 +126,7 @@ public final class GenericInstrs {
 
 	public static final class SetLocal extends Instr {
 		public void init0() {}
+		public void init1(Obj a) {}
 		
 		public Instr run(Frame frame) {
 			frame.reg[outreg0] = frame.reg[inreg0];
@@ -501,6 +502,24 @@ public final class GenericInstrs {
 							Obj a = frame.reg[inreg0];
 							Obj b = frame.reg[inreg1];
 							frame.reg[outreg0] = a==b? SBool.True: SBool.False;
+							return next;
+						}
+					};
+				}
+			});
+			BinOpInstrs.binOpTypes.put("!=", new BinOpFactory() {
+				public BinOp create() {
+					return new BinOp() {
+						public Instr run(Frame frame) {
+							Obj a = frame.reg[inreg0];
+							Obj b = frame.reg[inreg1];
+							Obj result = a.isEqual(frame, b);
+							if(result == null) {
+								result = b.isEqual(frame, a);
+								if(result == null)
+									this.operatorFailed(a, b, "==");
+							}
+							frame.reg[outreg0] = result.boolValue() ? SBool.False: SBool.True;
 							return next;
 						}
 					};

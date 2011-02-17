@@ -221,4 +221,11 @@ a=1
 assert a is a
 assert a is not 2
 
-#from lib import StringIO
+assert -(1) == -1
+
+from lib import StringIO
+s = StringIO.StringIO()
+s.write('123')
+assert '123' == '123'
+print s.buflist
+#StringIO.test()

@@ -31,6 +31,19 @@ public final class Builtins { //!export Builtins
 		return arg.length();
 	}
 	
+	public static final boolean isinstance(Obj obj, Obj type) { //!export
+		if(type instanceof Tuple) {
+			Obj tupleIter = type.getIter();
+			Obj item;
+			while((item=tupleIter.next()) != null) {
+				if(!Obj.isInstance(item, obj))
+					return false;
+			}
+			return true;
+		}
+		return Obj.isInstance(type, obj);
+	}
+	
 	public static final Obj xrange(Obj[] args) { //!export direct
 		int start = 0;
 		int step = 1;
@@ -91,5 +104,7 @@ public final class Builtins { //!export Builtins
 		for(int i=0; i<ScriptError.names.length; i++) {
 			dict.put(ScriptError.names[i], ScriptError.excClasses[i]);
 		}
+		
+		dict.put("str", SStringClass.instance);
 	}
 }

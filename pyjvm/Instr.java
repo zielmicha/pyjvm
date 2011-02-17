@@ -144,6 +144,7 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.ForIter();
 			case INSTR_NOP:
 				return new GenericInstrs.Nop();
+			case INSTR_SETLOCAL:
 			case INSTR_COPY:
 				return new GenericInstrs.SetLocal();
 			case INSTR_GETATTR:

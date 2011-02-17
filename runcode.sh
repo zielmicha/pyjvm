@@ -23,6 +23,7 @@ else
 	cmd="java pyjvm.Main"
 fi
 mkdir -p dest
+#rm dest/*.bc
 python compiler/build.py -i "$input" -d dest
 $cmd dest
 

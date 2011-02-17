@@ -92,7 +92,8 @@ check_count = '''if(args.length != %d) {
 converters = {
 	'int': 'return SInt.get(%s)',
 	'Obj': 'return %s',
-	'void': '%s; return None'
+	'void': '%s; return None',
+	'boolean': 'return %s? SBool.True: SBool.False',
 }
 unconverters = {
 	'int': '%s.intValue()',

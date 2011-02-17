@@ -18,7 +18,7 @@ class StringIO:
     """
     def __init__(self, buf = ''):
         # Force self.buf to be a string or unicode
-        if not isinstance(buf, basestring):
+        if not isinstance(buf, str):
             buf = str(buf)
         self.buf = buf
         self.len = len(buf)
@@ -241,11 +241,11 @@ class StringIO:
 # A little test suite
 
 def test():
-    import sys
-    if sys.argv[1:]:
-        file = sys.argv[1]
-    else:
-        file = '/etc/passwd'
+    #import sys
+    #if sys.argv[1:]:
+    #    file = sys.argv[1]
+    #else:
+    file = '/etc/passwd'
     lines = open(file, 'r').readlines()
     text = open(file, 'r').read()
     f = StringIO()
@@ -285,5 +285,5 @@ def test():
         raise RuntimeError, 'truncate did not adjust length'
     f.close()
 
-if __name__ == '__main__':
-    test()
+#if __name__ == '__main__':
+#    test()

@@ -177,4 +177,8 @@ public final class SInt extends Obj {
 		else
 			return ONE;
 	}
+	
+	public Obj unarySub() {
+		return SInt.get(-value);
+	}
 }
