@@ -30,6 +30,14 @@ public final class BuiltinsClass extends Type {
 				return SInt.get(Builtins.len(args[0]));
 			}
 		});
+		dict.put("repr", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 1) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+				}
+				return Builtins.repr(args[0]);
+			}
+		});
 		dict.put("isinstance", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 2) {

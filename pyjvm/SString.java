@@ -23,7 +23,7 @@ package pyjvm;
 
 import java.io.UnsupportedEncodingException;
 
-public final class SString extends NativeObj { //!export SString
+public final class SString extends NativeObj { //!export SString BaseString
 	public final byte[] bytes;
 	public int interned = -1;
 	
@@ -202,5 +202,9 @@ public final class SString extends NativeObj { //!export SString
 
 	public Obj add(String string) {
 		return add(new SString(string));
+	}
+	
+	public boolean boolValue() {
+		return bytes.length != 0;
 	}
 }

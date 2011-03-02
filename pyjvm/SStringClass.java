@@ -12,7 +12,7 @@ public final class SStringClass extends Type {
 		if("SString".equals("NativeObj") || "SString".equals("UserObj"))
 			dict = new StringDict();
 		else
-			dict = NativeObjClass.dict.copy();
+			dict = BaseStringClass.dict.copy();
 		
 		dict.put("join", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {

@@ -67,7 +67,7 @@ public class Obj {
 	}
 
 	public boolean boolValue() {
-		return false;
+		return true;
 	}
 	
 	public String toString() {

@@ -26,6 +26,8 @@ public class SStringBuilder {
 	private int length = 0;
 	
 	public SStringBuilder(int initialCapacity) {
+		if(initialCapacity == 0)
+			initialCapacity = 16;
 		bytes = new byte[initialCapacity];
 	}
 	

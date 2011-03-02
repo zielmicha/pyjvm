@@ -57,7 +57,7 @@ public final class List extends NativeObj { //!export List
 
 	private void reallocate() {
 		Obj[] src = array;
-		Obj[] dst = new Obj[src.length * 2];
+		Obj[] dst = new Obj[src.length==0?1:src.length * 2];
 		System.arraycopy(src, 0, dst, 0, src.length);
 		this.array = dst;
 	}

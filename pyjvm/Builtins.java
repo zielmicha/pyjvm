@@ -31,6 +31,10 @@ public final class Builtins { //!export Builtins
 		return arg.length();
 	}
 	
+	public static final Obj repr(Obj arg) { //!export
+		return arg.repr();
+	}
+	
 	public static final boolean isinstance(Obj obj, Obj type) { //!export
 		if(type instanceof Tuple) {
 			Obj tupleIter = type.getIter();

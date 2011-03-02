@@ -40,7 +40,7 @@ public final class %(name)sClass extends Type {
 		if("%(name)s".equals("NativeObj") || "%(name)s".equals("UserObj"))
 			dict = new StringDict();
 		else
-			dict = NativeObjClass.dict.copy();
+			dict = %(baseclass)sClass.dict.copy();
 		%(content)s
 	}
 	public final StringDict getDict() {
@@ -167,13 +167,15 @@ def format_entry(class_name, entry, is_direct, as_name):
 			)
 		)
 
-def format(name, data):
+def format(name, baseclass, data):
 	entries = ''.join([
 		format_entry(name, entry, is_direct, as_name)
 		for entry, is_direct, as_name in data
 	])
 	has_constructor = any( as_name == '<new>' for entry, is_direct, as_name in data )
-	return content % dict(name=name, content=entries, constructor='' if has_constructor else ' = null')
+	return content % dict(name=name, content=entries,
+						  constructor='' if has_constructor else ' = null',
+						  baseclass=baseclass)
 
 def parse_method_export(rest, name):
 	rest_split = rest.split()
@@ -190,20 +192,23 @@ def parse_method_export(rest, name):
 def run(lines):
 	def write():
 		if output:
-			output.write(format(name, data))
+			output.write(format(name, baseclass, data))
 			output.close()
 	
 	output = None
 	data = []
 	name = None
+	baseclass = None
 	for line in lines:
 		if not pattern.search(line):
 			continue
 		match = pattern.search(line)
 		rest = match.group(1).strip()
 		if 'class' in line:
-			fn = 'pyjvm/%sClass.java' % rest
-			name = rest
+			restsplit = rest.split()
+			if len(restsplit) == 1: restsplit.append('NativeObj')
+			name, baseclass = restsplit
+			fn = 'pyjvm/%sClass.java' % name
 			backup(fn)
 			write()
 			output = open(fn, 'w')

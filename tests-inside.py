@@ -227,5 +227,5 @@ from lib import StringIO
 s = StringIO.StringIO()
 s.write('123')
 assert '123' == '123'
-print s.buflist
+assert '123' == s.getvalue()
 #StringIO.test()
