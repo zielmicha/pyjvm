@@ -22,6 +22,7 @@
 package pyjvm;
 
 public class Obj {
+
 	public final boolean equals(Object other) {
 		if(!(other instanceof Obj))
 			return false;
@@ -93,6 +94,15 @@ public class Obj {
 		return repr.stringValue().toString();
 	}
 	
+	public static String typeRepr(Obj object) {
+		try {
+			Type t = object.getType();
+			return repr(t);
+		} catch(ScriptError ex) {
+			return "<no type>";
+		}
+	}
+	
 	public static final NotImplemented NotImplemented = pyjvm.NotImplemented.NotImplemented; 
 	public static final None None = pyjvm.None.None;
 	
@@ -111,7 +121,7 @@ public class Obj {
 	}
 
 	public Obj iadd(Frame frame, Obj b) {
-		return this.add(b);
+		return this.iadd(b);
 	}
 	
 	public Obj radd(Obj other) {
@@ -233,7 +243,15 @@ public class Obj {
 	public Obj getItem(Obj key) {
 		throw new ScriptError(ScriptError.TypeError, "Object not subscriptable", this);
 	}
-
+	
+	public void setItem(Frame frame, Obj index, Obj item) {
+		setItem(index, item);
+	}
+	
+	public void setItem(Obj index, Obj item) {
+		throw new ScriptError(ScriptError.TypeError, "Object not subscriptable", this);
+	}
+	
 	public Obj getIter(Frame frame) {
 		return getIter();
 	}
@@ -371,4 +389,17 @@ public class Obj {
 		return unarySub();
 	}
 
+	public boolean contains(Frame frame, Obj b) {
+		return contains(b);
+	}
+	
+	public boolean contains(Obj b) {
+		Obj iter = this.getIter();
+		Obj current;
+		while((current=iter.next()) != null) {
+			if(current.equals(b))
+				return true;
+		}
+		return false;
+	}
 }

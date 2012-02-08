@@ -228,4 +228,62 @@ s = StringIO.StringIO()
 s.write('123')
 assert '123' == '123'
 assert '123' == s.getvalue()
-#StringIO.test()
+
+assert "ab" * 3 == "ababab"
+
+import sys
+assert sys.modules['sys'] == sys
+
+try: sys.modules['aaaa']
+except AttributeError: pass
+else: assert False
+
+d = {}
+d['a'] = 1
+assert d['a'] == 1
+
+d = {'a': 1}
+assert d == {'a': 1}
+assert d != {'a': 2}
+assert d != {'a': 2, 'b': 3}
+assert d != {'b': 1}
+
+d['a'] = 3
+assert d['a'] == 3
+
+print 'argv:', ' '.join(sys.argv)
+
+assert type(7) == type(6)
+
+type_dict = {}
+type_dict['__init__'] = lambda self: None
+type_dict['m'] = lambda self, x: (self, x)
+assert 'm' in type_dict
+assert '__init__' in type_dict
+
+dyn_type = type('DynType', (), type_dict)
+dyn_type.m
+i = dyn_type()
+assert i.m(1) == (i, 1)
+
+assert '123' in '01234'
+assert '123' not in '12'
+assert '123' not in '124'
+assert '123' in '123'
+
+assert ('aa' + '12' * 1000).find('12') == 2
+assert ('aa' + '12' * 1000).find('13') == -1
+assert ('ab' * 1000).find('ab' * 100) == 0
+assert ('ab' * 1000).find('ab' * 100 + 'c') == -1
+
+#print sys.builtins
+
+import reflect
+
+f = reflect.get_class('java.io.FileInputStream')
+
+file = f.create('tests-inside.py')
+print file.read()
+
+
+

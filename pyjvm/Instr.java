@@ -21,6 +21,8 @@
 
 package pyjvm;
 
+import java.util.Arrays;
+
 public abstract class Instr extends Obj {
 	protected Instr next;
 	public int lineno;
@@ -93,7 +95,8 @@ public abstract class Instr extends Obj {
 	}
 	
 	public String toString() {
-		return "<Instr name=" + getClass().getSimpleName() + " lineno=" + lineno + " filename=" + filename + ">";
+		return "<Instr name=" + getClass().getSimpleName() + " lineno=" + lineno + " filename=" + filename +
+			" inreg0=" + inreg0 + " outreg0=" + outreg0 + ">";
 	}
 	
 	public static Instr create(int type, Tuple args) {
@@ -177,6 +180,12 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.DelAttr();
 			case INSTR_GETSLICE:
 				return new GenericInstrs.GetSlice();
+			case INSTR_MAKEDICT:
+				return new GenericInstrs.MakeDict();
+			case INSTR_SETITEM:
+				return new GenericInstrs.SetItem();
+			case INSTR_LISTAPPEND:
+				return new GenericInstrs.ListAppend();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}
@@ -228,6 +237,7 @@ public abstract class Instr extends Obj {
 	public static final int INSTR_GETIMPORTATTR = 40;
 	public static final int INSTR_DELATTR = 41;
 	public static final int INSTR_DELGLOBAL = 42;
+	public static final int INSTR_MAKEDICT = 43;
 }
 
 abstract class JumpIfLikeInstr extends Instr {

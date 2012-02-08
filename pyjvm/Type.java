@@ -21,7 +21,7 @@
 
 package pyjvm;
 
-public abstract class Type extends Obj {
+public abstract class Type extends Obj { //!export Type
 	public static final class EmptyType extends Type {
 		private String name;
 		
@@ -46,6 +46,10 @@ public abstract class Type extends Obj {
 			return new Type[0];
 		else
 			return DEFUALT_BASES;
+	}
+	
+	public Type getType() {
+		return TypeClass.instance;
 	}
 	
 	public static Type[] DEFUALT_BASES = new Type[]{

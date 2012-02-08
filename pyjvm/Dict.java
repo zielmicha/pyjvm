@@ -21,7 +21,7 @@
 
 package pyjvm;
 
-public final class Dict extends Obj {
+public final class Dict extends Obj { //!export Dict
 	public final class Entry {
 		public Entry(Obj key, Obj val) {
 			this.key = key;
@@ -40,6 +40,8 @@ public final class Dict extends Obj {
 	private static final float scaleFactor = 1.35f;
 	
 	public Dict(int initalCapacity) {
+		if(initalCapacity == 0)
+			initalCapacity = 8;
 		entries = new Entry[(int)(initalCapacity * scaleFactor)];
 		resizeAt = initalCapacity;
 	}
@@ -53,16 +55,11 @@ public final class Dict extends Obj {
 				e.val = val;
 				return;
 			}
-			if(e.next == null)
-				break;
-			else
-				e = e.next;
+			e = e.next;
 		}
 		Entry entry = new Entry(key, val);
-		if(e != null)
-			e.next = entry;
-		else
-			entries[index] = entry;
+		entry.next = entries[index];
+		entries[index] = entry;
 		length++;
 		if(length >= resizeAt) this.resize();
 	}
@@ -106,16 +103,41 @@ public final class Dict extends Obj {
 		throw new ScriptError(ScriptError.KeyError, "not found");
 	}
 	
+	public Obj getItem(Obj key) {
+		return get(key);
+	}
+	
+	public boolean contains(Obj key) {
+		return getOrNull(key) != null;
+	}
+	
+	public void setItem(Obj key, Obj val) {
+		put(key, val);
+	}
+	
 	public Dict() {
 		this(8);
 	}
 	
-	public SBool isEqual(Object other) {
+	public SBool isEqual(Obj other) {
 		if(other == this)
 			return SBool.True;
 		if(other instanceof Dict) {
-			return null;
-			// TODO: isEqual
+			Dict o = (Dict)other;
+			DictEntryIterator iter = new DictEntryIterator();
+			Entry current;
+			while((current = iter.next())!=null) {
+				Obj othVal = o.getOrNull(current.key);
+				if(othVal == null || !current.val.equals(othVal))
+					return SBool.False;
+			}
+			DictKeyIterator iter2 = o.new DictKeyIterator();
+			Obj key;
+			while((key = iter2.next())!=null) {
+				if(this.getOrNull(key) == null)
+					return SBool.False;
+			}
+			return SBool.True;
 		} else {
 			return null;
 		}
@@ -141,16 +163,20 @@ public final class Dict extends Obj {
 		return builder.toString();
 	}
 	
-	public final class DictKeyIterator {
+	public Obj getIter() {
+		return new DictKeyIterator();
+	}
+	
+	public final class DictKeyIterator extends Obj {
 		private int entryIndex = 0;
 		private Entry entry = null;
 		
 		public Obj next() {
-			if(entry == null) {
-				entry = entries[entryIndex];
-				entryIndex ++;
+			while(entry == null) {
 				if(entryIndex == entries.length)
 					return null;
+				entry = entries[entryIndex];
+				entryIndex ++;
 			}
 			Obj key = entry.key;
 			entry = entry.next;
@@ -163,14 +189,18 @@ public final class Dict extends Obj {
 		
 		public Entry next() {
 			while(entry == null) {
-				entry = entries[entryIndex];
-				entryIndex ++;
 				if(entryIndex == entries.length)
 					return null;
+				entry = entries[entryIndex];
+				entryIndex ++;
 			}
 			Entry thisEntry = entry;
 			entry = entry.next;
 			return thisEntry;
 		}
+	}
+	
+	public Type getType() {
+		return DictClass.instance;
 	}
 }

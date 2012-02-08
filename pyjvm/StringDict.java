@@ -49,6 +49,8 @@ public final class StringDict extends Obj {
 	private static final float scaleFactor = 1.35f;
 	
 	public StringDict(int initalCapacity) {
+		if(initalCapacity == 0)
+			initalCapacity = 8;
 		entries = new Entry[(int)(initalCapacity * scaleFactor)];
 		resizeAt = initalCapacity;
 	}
@@ -62,6 +64,16 @@ public final class StringDict extends Obj {
 		this.entries = entries;
 	}
 	
+	public StringDict(Obj original) {
+		this(32);
+		Obj iter = original.getIter();
+		Obj key;
+		while((key=iter.next()) != null) {
+			Obj val = original.getItem(key);
+			setItem(key, val);
+		}
+	}
+	
 	public final void put(int key, Obj val) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
@@ -71,17 +83,11 @@ public final class StringDict extends Obj {
 				e.val = val;
 				return;
 			}
-			if(e.next == null)
-				break;
-			else
-				e = e.next;
+			e = e.next;
 		}
 		Entry entry = new Entry(key, val);
-		Object next__ = e==null? "<null>" : e.next + "";
-		if(e != null)
-			e.next = entry;
-		else
-			entries[index] = entry;
+		entry.next = entries[index];
+		entries[index] = entry;
 		length++;
 		if(length >= resizeAt) this.resize();
 	}
@@ -91,7 +97,7 @@ public final class StringDict extends Obj {
 	}
 	
 	public final void put(String string, Obj val) {
-		put(SString.fromJavaString(string), val);
+		put(SString.fromJavaString(string).intern(), val);
 	}
 	
 	private void resize() {
@@ -158,6 +164,18 @@ public final class StringDict extends Obj {
 		return get(SString.intern(s));
 	}
 	
+	public Obj getItem(Obj key) {
+		return get(key.stringValue().intern());
+	}	
+	
+	public boolean contains(Obj key) {
+		return getOrNull(key.stringValue().intern()) != null;
+	}
+	
+	public void setItem(Obj key, Obj val) {
+		put(key.stringValue().intern(), val);
+	}
+	
 	public final StringDict copy() {
 		return new StringDict(this);
 	}
@@ -166,9 +184,28 @@ public final class StringDict extends Obj {
 		this(8);
 	}
 
-	public SBool isEqual() {
-		// TODO: isEqual
-		throw new RuntimeException("Not implemented.");
+	public SBool isEqual(Obj other) {
+		if(other == this)
+			return SBool.True;
+		if(other instanceof StringDict) {
+			StringDict o = (StringDict)other;
+			DictEntryIterator iter = new DictEntryIterator();
+			Entry current;
+			while((current = iter.next())!=null) {
+				Obj othVal = o.getOrNull(current.key);
+				if(othVal == null || !current.val.equals(othVal))
+					return SBool.False;
+			}
+			DictKeyIterator iter2 = o.new DictKeyIterator();
+			int key;
+			while((key = iter2.next())!=-1) {
+				if(this.getOrNull(key) == null)
+					return SBool.False;
+			}
+			return SBool.True;
+		} else {
+			return null;
+		}
 	}
 	public int hashCode() {
 		// TODO: hashCode
@@ -196,17 +233,39 @@ public final class StringDict extends Obj {
 		private Entry entry = null;
 		
 		public int next() {
-			if(entry == null) {
-				entry = entries[entryIndex];
-				entryIndex ++;
+			while(entry == null) {
 				if(entryIndex == entries.length)
 					return -1; // string keys are always >=0
+				entry = entries[entryIndex];
+				entryIndex ++;
 			}
 			int key = entry.key;
 			entry = entry.next;
 			return key;
 		}
 	}
+	
+	public Obj getIter() {
+		return new ObjKeyIterator();
+	}
+	
+	public final class ObjKeyIterator extends Obj {
+		private int entryIndex = 0;
+		private Entry entry = null;
+		
+		public Obj next() {
+			while(entry == null) {
+				if(entryIndex == entries.length)
+					return null;
+				entry = entries[entryIndex];
+				entryIndex ++;
+			}
+			Entry thisEntry = entry;
+			entry = entry.next;
+			return SString.unintern(thisEntry.key);
+		}
+	}
+	
 	public final class DictEntryIterator {
 		private int entryIndex = 0;
 		private Entry entry = null;

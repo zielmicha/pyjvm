@@ -27,7 +27,7 @@ import sys
 basic_instr = {
 	# (push, pop): [names]
 	(1, 0): 'const global nested function getexc getlocalsdict useonlyglobals import', # push 1
-	(0, 1): 'return jumpifnot jumpif setlocal delattr setglobal reraise assertfail', # pop 1 
+	(0, 1): 'return jumpifnot jumpif delattr setglobal reraise assertfail setlocal', # pop 1 
 	(1, 1): 'getattr getimportattr getiter foriter makemodule unaryop copy', # push1 pop1
 	(0, 0): 'nop jump setupexc popexc genexpcontinue delglobal', # nothing
 	(0, 2): 'setattr delitem listappend print', # pop2
@@ -271,6 +271,12 @@ class Instr(utils.Struct):
 			self.outreg = [locali]
 			self.next1, = self.next1.next
 	
+	def fix_setlocal(self):
+		def fix(instr):
+			if instr.name == 'setlocal':
+				instr.outreg = instr.args
+		self.walk_readonly(fix)
+	
 	def dump(self, dump_functions=True, _idents=None, _indent=0, mark=None):
 		def myrepr(obj):
 			if isinstance(obj, dict):
@@ -378,9 +384,11 @@ def cmdlist_to_instr(cmds, nested=None, argcount=None):
 		print 'IR error, start=line', main_instr.lineno
 		main_instr.dump(mark=err.instr)
 		raise
-	
+
 	for instr in main_instr.sibiligs():
 		instr.eliminate_setlocal()
+	
+	main_instr.fix_setlocal()
 	
 	while main_instr.is_nop() and len(main_instr.next) == 1 and main_instr.next[0]:
 		main_instr, = main_instr.next

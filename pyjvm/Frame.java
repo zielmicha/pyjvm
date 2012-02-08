@@ -45,12 +45,11 @@ public final class Frame {
 		while(instr != null) {
 			try {
 				while(instr != null) {
-					/*System.err.print("\033[01;36mreg:\033[00m ");
+					/*System.err.print("\033[01;36m" + instr.getClass().getSimpleName() + ":\033[00m reg:");
 					for(int i=0; i<10; i++)
-						System.err.print(frame.reg[i] + ", ");
+						System.err.print(Obj.repr(frame.reg[i]) + ", ");
 					System.err.println();
-					
-					instr.dump();*/
+					instr.dump();//*/
 					
 					instr = instr.run(frame);
 				}

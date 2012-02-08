@@ -109,6 +109,15 @@ public final class List extends NativeObj { //!export List
 		return ListClass.instance;
 	}
 	
+	public Obj iadd(Obj other) {
+		Obj iter = other.getIter();
+		Obj current;
+		while((current=iter.next()) != null) {
+			append(current);
+		}
+		return this;
+	}
+	
 	// TODO: hashCode
 	// TODO: equals
 }

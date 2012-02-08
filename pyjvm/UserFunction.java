@@ -44,7 +44,10 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 	}
 	
 	public String toString() {
-		return "<UserFunction lineno=" + this.func.body.next.lineno + ">";
+		int lineno = -1;
+		if(this.func!=null && this.func.body!=null && this.func.body!=null && this.func.body.next!=null)
+			lineno = this.func.body.next.lineno;
+		return "<UserFunction lineno=" + lineno + ">";
 	}
 	
 	public boolean callInFrame(Frame parentFrame, Obj[] args) {

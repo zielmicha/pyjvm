@@ -198,6 +198,33 @@ public final class GenericInstrs {
 		
 	}
 	
+	public static final class MakeDict extends Instr {
+		private int length;
+		private int[] inreg;
+		
+		public void initReg(int[] inreg, int[] outreg) {
+			this.inreg = inreg;
+			if(outreg.length != 1)
+				throw new ScriptError(ScriptError.TypeError, "Expected 1 outreg");
+			this.outreg0 = outreg[0];
+		}
+		
+		public void init1(Obj length) {
+			this.length = length.intValue();
+		}
+		
+		public Instr run(Frame frame) {
+			Dict dict = new Dict(length * 3 / 2);
+			for(int i=0; i<length*2; i+=2) {
+				dict.put(frame.reg[inreg[i]], frame.reg[inreg[i+1]]);
+			}
+			frame.reg[outreg0] = dict;
+			
+			return next;
+		}
+		
+	}
+	
 	public static final class Print extends Instr {
 		private boolean hasLF;
 		
@@ -362,6 +389,26 @@ public final class GenericInstrs {
 		}
 	}
 	
+	public static final class SetItem extends Instr {
+		public void init0() {}
+		
+		public int inreg2;
+		
+		public void initReg(int[] inreg, int[] outreg) {
+			inreg0 = inreg[0];
+			inreg1 = inreg[1];
+			inreg2 = inreg[2];
+		}
+		
+		public Instr run(Frame frame) {
+			Obj seq = frame.reg[inreg1];
+			Obj index = frame.reg[inreg2];
+			Obj item = frame.reg[inreg0];
+			seq.setItem(frame, index, item);
+			return next;
+		}
+	}
+	
 	public static final class GetIter extends Instr {
 		public void init0() {}
 		
@@ -386,7 +433,7 @@ public final class GenericInstrs {
 		}
 	}
 	
-	public static class FunctionInstr extends Instr {
+	public static final class FunctionInstr extends Instr {
 		private FunctionConst functionConst;
 
 		public void init1(Obj o) {
@@ -401,7 +448,7 @@ public final class GenericInstrs {
 
 	}
 
-	public static class MakeFunction extends Instr {
+	public static final class MakeFunction extends Instr {
 		private boolean varargs;
 		private boolean kwargs;
 		private int[] argnames;
@@ -471,7 +518,7 @@ public final class GenericInstrs {
 		public void init1(Obj name) {}
 		
 		public void operatorFailed(Obj a, Obj b, String name) {
-			throw new ScriptError(ScriptError.TypeError, "Unsupported operand type " + name + " for " + Obj.repr(a) + " and " + Obj.repr(b));
+			throw new ScriptError(ScriptError.TypeError, "Unsupported operand type " + name + " for " + Obj.typeRepr(a) + " and " + Obj.typeRepr(b));
 		}
 
 		public static Instr createBinOp(Tuple args) {
@@ -520,6 +567,32 @@ public final class GenericInstrs {
 									this.operatorFailed(a, b, "==");
 							}
 							frame.reg[outreg0] = result.boolValue() ? SBool.False: SBool.True;
+							return next;
+						}
+					};
+				}
+			});
+			BinOpInstrs.binOpTypes.put("in", new BinOpFactory() {
+				public BinOp create() {
+					return new BinOp() {
+						public Instr run(Frame frame) {
+							Obj a = frame.reg[inreg0];
+							Obj b = frame.reg[inreg1];
+							Obj result = b.contains(frame, a)?SBool.True:SBool.False;
+							frame.reg[outreg0] = result;
+							return next;
+						}
+					};
+				}
+			});
+			BinOpInstrs.binOpTypes.put("not in", new BinOpFactory() {
+				public BinOp create() {
+					return new BinOp() {
+						public Instr run(Frame frame) {
+							Obj a = frame.reg[inreg0];
+							Obj b = frame.reg[inreg1];
+							Obj result = b.contains(frame, a)?SBool.False:SBool.True;
+							frame.reg[outreg0] = result;
 							return next;
 						}
 					};
@@ -724,5 +797,17 @@ public final class GenericInstrs {
 			return next;
 		}
 
+	}
+	
+	public static final class ListAppend extends Instr {
+		public void init0() {}
+		
+		public Instr run(Frame frame) {
+			Obj list = frame.reg[inreg0];
+			Obj item = frame.reg[inreg1];
+			
+			((List)list).append(item);
+			return next;
+		}
 	}
 }

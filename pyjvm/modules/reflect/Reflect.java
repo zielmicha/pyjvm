@@ -17,17 +17,36 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+package pyjvm.modules.reflect;
 
+import pyjvm.*;
 
-package pyjvm;
-
-public class Main {
-
-	public static void main(String[] args) {;
-		Importer.path.append(SString.fromJavaString(args[0]));
-		
-		pyjvm.modules.Sys.setArgs(args, 1);
-		Importer.importModule("__main__");
+public class Reflect { //!export modules.reflect.Reflect
+	public static final StringDict dict;
+	
+	public static Obj get_class(Obj name) { //!export
+		try {
+			String n = name.stringValue().toString();
+			return new JClass(Class.forName(n));
+		} catch (ClassNotFoundException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
-
+	
+	static int match(Class[][] types, Obj[] args) {
+		throw new ScriptError(ScriptError.TypeError, "Failed to match parameters " + List.fromArrayUnsafe(args));
+	}
+	
+	static Object[] translate(Class[] types, Obj[] args) {
+		return null;
+	}
+	
+	static Obj convert(Object obj) {
+		return null;
+	}
+	
+	static {
+		dict = ReflectClass.dict;
+		dict.put("__name__", SString.fromJavaString("reflect"));
+	}
 }

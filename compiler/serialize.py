@@ -29,7 +29,7 @@ instr_types = ['assertfail', 'binop', 'binopip', 'call', 'compare', 'const',
 	'makemodule', 'maketuple', 'nop', 'popexc', 'print', 'raise3', 'reraise',
 	'return', 'setattr', 'setglobal', 'setitem', 'setlocal', 'setupexc',
 	'unaryop', 'unpacktuple', 'useonlyglobals',
-	'getimportattr', 'delattr', 'delglobal']
+	'getimportattr', 'delattr', 'delglobal', 'makedict']
 
 instr_map = dict( (name, i) for i, name in enumerate(instr_types) )
 

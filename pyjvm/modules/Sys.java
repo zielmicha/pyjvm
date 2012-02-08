@@ -18,16 +18,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+package pyjvm.modules;
 
-package pyjvm;
+import pyjvm.*;
 
-public class Main {
-
-	public static void main(String[] args) {;
-		Importer.path.append(SString.fromJavaString(args[0]));
-		
-		pyjvm.modules.Sys.setArgs(args, 1);
-		Importer.importModule("__main__");
+public class Sys { //!export modules.Sys
+	public static final StringDict dict;
+	
+	public static void setArgs(String[] args, int offset) {
+		List argv = new List(args.length);
+		argv.append(SString.fromJavaString("pyjvm"));
+		for(int i=offset; i<args.length; i++) {
+			argv.append(SString.fromJavaString(args[i]));
+		}
+		dict.put("argv", argv);
 	}
-
+	
+	static {
+		dict = SysClass.dict;
+		
+		dict.put("modules", Importer.modules);
+		dict.put("builtins", Importer.builtinModules);
+		dict.put("__name__", SString.fromJavaString("sys"));
+	}
 }

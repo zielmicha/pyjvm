@@ -17,17 +17,40 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+package pyjvm.modules.reflect;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pyjvm.*;
 
-package pyjvm;
-
-public class Main {
-
-	public static void main(String[] args) {;
-		Importer.path.append(SString.fromJavaString(args[0]));
-		
-		pyjvm.modules.Sys.setArgs(args, 1);
-		Importer.importModule("__main__");
+public class JClass extends NativeObj { //!export modules.reflect.JClass
+	Class java;
+	
+	public JClass(Class java) {
+		this.java = java;
 	}
-
+	
+	public Obj create(Obj[] args) { //!export direct
+		Constructor[] constructors = this.java.getConstructors();
+		Class[][] defs = new Class[constructors.length][];
+		for(int i=0; i<constructors.length; i++)
+			defs[i] = constructors[i].getParameterTypes();
+		int match = Reflect.match(defs, args);
+		Object[] converted = Reflect.translate(defs[match], args);
+		
+		Object result;
+		try {
+			result = constructors[match].newInstance(converted);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+		
+		return Reflect.convert(result);
+	}
+	
+	public Type getType() {
+		return JClassClass.instance;
+	}
 }

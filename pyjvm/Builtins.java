@@ -35,6 +35,23 @@ public final class Builtins { //!export Builtins
 		return arg.repr();
 	}
 	
+	public static final Obj string_dict() { //!export
+		return new StringDict();
+	}
+	
+	public static final Obj type(Obj[] args) { //!export direct
+		if(args.length == 1) {
+			return args[0].getType();
+		} else if(args.length == 3) {
+			SString name = args[0].stringValue();
+			Tuple bases = (Tuple)args[1];
+			StringDict dict = new StringDict(args[2]);
+			return UserType.create(name.intern(), bases, dict);
+		} else {
+			throw new ScriptError(ScriptError.TypeError, "requires 1 or 3 arguments");
+		}
+	}
+	
 	public static final boolean isinstance(Obj obj, Obj type) { //!export
 		if(type instanceof Tuple) {
 			Obj tupleIter = type.getIter();

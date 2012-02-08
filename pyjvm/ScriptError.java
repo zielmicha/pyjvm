@@ -40,12 +40,13 @@ public class ScriptError extends RuntimeException {
 	public static final int ImportError = 10;
 	public static final int AttributeError = 11;
 	public static final int RuntimeError = 12;
+	public static final int NameError = 13;
 	
 	public static String[] names = new String[] {
 		"Error", "KeyError", "ValueError", "TypeError", "IOError",
 		"NotImplementedError", "LookupError", "AssertionError",
 		"IndexError", "InternalError", "ImportError", "AttributeError",
-		"RuntimeError"
+		"RuntimeError", "NameError"
 	};
 	
 	public static ExceptionType[] excClasses;

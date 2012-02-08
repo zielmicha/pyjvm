@@ -22,6 +22,7 @@
 package pyjvm;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 public final class SString extends NativeObj { //!export SString BaseString
 	public final byte[] bytes;
@@ -71,8 +72,8 @@ public final class SString extends NativeObj { //!export SString BaseString
 	}
 
 	public int hashCode() {
-		if(this.interned != -1)
-			return this.interned;
+		//if(this.interned != -1) // UAHAHAHAHAHAHA
+			//return this.interned;
 		
 		int h = 0;
 		byte val[] = bytes;
@@ -97,6 +98,19 @@ public final class SString extends NativeObj { //!export SString BaseString
 		return NotImplemented;
 	}
 	
+	public SString mul(int times) {
+		SStringBuilder builder = new SStringBuilder(times * length());
+		for(int i=0; i<times; i++)
+			builder.append(this);
+		return builder.getValue();
+	}
+	
+	public Obj mul(Obj other) {
+		if(other instanceof SInt)
+			return this.mul(other.intValue());
+		return NotImplemented;
+	}
+        
 	public SString join(Obj seq) { //!export 
 		Obj iter = seq.getIter();
 		SStringBuilder builder = new SStringBuilder(16);
@@ -139,7 +153,67 @@ public final class SString extends NativeObj { //!export SString BaseString
 			return null;
 		}
 	}
-
+	
+	public boolean contains(Obj other) { //!export contains
+		return find(other) != -1;
+	}
+	
+	public int find(Obj other) { //!export find
+		SString o = other.stringValue();
+		byte[] ob = o.bytes;
+		if(ob.length > bytes.length)
+			return -1;
+		if(ob.length * (bytes.length-ob.length) < 500) {
+			m:
+			for(int i=0; i<bytes.length-ob.length+1; i++) {
+				for(int j=0; j<ob.length; j++) {
+					if(ob[j] != bytes[i + j])
+						continue m;
+				}
+				return i;
+			}
+		} else {
+			// this is KMP
+			// I know that it is useless
+			// but tommorow I have contest
+			int[] pi = new int[ob.length];
+			
+			// compute Knuth prefix function
+			
+			int q = 0;
+			pi[0] = 0;
+			for(int i=1; i<pi.length; ) {
+				if(ob[q] == ob[i]) {
+					q++;
+				} else {
+					q = 0;
+					if(ob[i] == ob[0])
+						continue;
+				}
+				pi[i] = q;
+				i++;
+			}
+			
+			// find
+			q = 0;
+			for(int i=0; i<bytes.length; ) {
+				if(ob[q] == bytes[i]) {
+					q++;
+					if(q == ob.length) {
+						return i + 1 - ob.length;
+						// q = pi[q]
+					}
+					i++;
+				} else if(q == 0) {
+					i++;
+				} else {
+					q = pi[q];
+				}
+			}
+		}
+		return -1;
+	}
+	
 	public SString stringValue() {
 		return this;
 	}
@@ -167,10 +241,12 @@ public final class SString extends NativeObj { //!export SString BaseString
 				int key = nextIdent++;
 				internTable.put(this, SInt.get(key));
 				reverseInternTable.put(SInt.get(key), this);
-				return this.interned=key;
+				this.interned = key;
 			} else {
-				return this.interned=((SInt)val).value; 
+				this.interned = ((SInt)val).value; 
 			}
+			
+			return this.interned;
 		}
 	}
 	
@@ -180,7 +256,7 @@ public final class SString extends NativeObj { //!export SString BaseString
 			result = (SString) reverseInternTable.getOrNull(SInt.get(code));
 		}
 		if(result == null)
-			throw new ScriptError(ScriptError.LookupError, code + " is not a key of interned string");
+			throw new ScriptError(ScriptError.LookupError, code + " is not a key of an interned string");
 		return result;
 	}
 	

@@ -32,6 +32,12 @@ public class Importer {
 		if(imported != null)
 			return (Module)imported;
 		
+		Obj builtin = builtinModules.getOrNull(name.intern());
+		if(builtin != null) {
+			modules.put(name, builtin);
+			return (Module)builtin;
+		}
+		
 		InputStream module = findModule(name.toString());
 		
 		return loadModule(module, name);
@@ -73,23 +79,28 @@ public class Importer {
 		for(int i=0; i<path.length(); i++) {
 			String item = path.getItem(i).stringValue().toString();
 			try {
-				InputStream res = Importer.class.getResourceAsStream("/" + item + "/" + nameExt);
-				if(res == null)
-					throw new IOException();
-				return res;
+                                File f = new File(new File(item), nameExt);
+                                return new FileInputStream(f);
 			} catch (Exception e) {
 				try {
-					File f = new File(new File(item), nameExt);
-					return new FileInputStream(f);
-				} catch (IOException e2) {
+                                    InputStream res = Importer.class.getResourceAsStream("/" + item + "/" + nameExt);
+                                    if(res == null)
+                                            throw new IOException();
+                                    return res;
+				} catch (Exception e2) {
 					continue;
 				}
 			}
 		}
-		System.err.println("Path is: " + path);
 		throw new ScriptError(ScriptError.ImportError, "No module named " + name);
 	}
 	
 	public static List path = new List(); 
 	public static StringDict modules = new StringDict();
+	public static StringDict builtinModules = new StringDict();
+	
+	static {
+		builtinModules.put("sys", new Module(pyjvm.modules.Sys.dict));
+		builtinModules.put("reflect", new Module(pyjvm.modules.reflect.Reflect.dict));
+	}
 }

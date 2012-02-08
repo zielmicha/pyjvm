@@ -21,7 +21,7 @@
 
 package pyjvm;
 
-public final class SInt extends Obj {
+public final class SInt extends Obj { //!export SInt
 	public static final SInt ONE = SInt.get(1);
 	public static final SInt MINUS_ONE = SInt.get(-1);
 	public static final SInt ZERO = SInt.get(0);
@@ -180,5 +180,9 @@ public final class SInt extends Obj {
 	
 	public Obj unarySub() {
 		return SInt.get(-value);
+	}
+	
+	public Type getType() {
+		return SIntClass.instance;
 	}
 }

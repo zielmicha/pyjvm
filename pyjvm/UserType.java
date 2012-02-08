@@ -47,7 +47,7 @@ public final class UserType extends Type {
 		Obj init = instance.getAttr(StringConst.__init__);
 		Obj returned = init.call(args);
 		if(returned != None)
-			throw new ScriptError(ScriptError.TypeError, "__init__() should return None, not " + SString.repr(returned));
+			throw new ScriptError(ScriptError.TypeError, "__init__() should return None, not " + typeRepr(returned));
 		
 		return instance;
 	}

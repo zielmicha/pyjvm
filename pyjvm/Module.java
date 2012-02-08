@@ -27,7 +27,11 @@ public final class Module extends Obj {
 	public Module() {
 		dict = new StringDict();
 	}
-
+	
+	public Module(StringDict dict) {
+		this.dict = dict;
+	}
+	
 	public void done(Obj doc) {
 		// TODO: useless	
 	}

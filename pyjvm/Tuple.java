@@ -21,7 +21,7 @@
 
 package pyjvm;
 
-public class Tuple extends Obj {
+public class Tuple extends Obj { //!export
 	public Obj[] items;
 	
 	public Tuple(Obj[] items) {
@@ -58,8 +58,30 @@ public class Tuple extends Obj {
 	
 	public static final Tuple Empty = new Tuple(new Obj[0]);
 	
-	// TODO: isEqual
 	// TODO: hashCode
+	
+	public SBool isEqual(Obj obj) {
+		if(obj instanceof Tuple) {
+			Tuple t = (Tuple)obj;
+			if(t.items.length != items.length)
+				return SBool.False;
+			for(int i=0; i<items.length; i++)
+				if(! t.items[i].equals(items[i]) )
+					return SBool.False;
+			return SBool.True;
+		} else {
+			return null;
+		}
+	}
+	
+	public int hashCode() {
+		int code = 0;
+		for(int i=0; i<items.length; i++) {
+			code += items[i].hashCode();
+			code *= 13;
+		}
+		return code;
+	}
 	
 	public final String toString() {
 		StringBuilder builder = new StringBuilder("(");
@@ -84,5 +106,19 @@ public class Tuple extends Obj {
 		for(int i=0; i<in.length; i++)
 			arr[i] = SInt.get(in[i]);
 		return new Tuple(arr);
+	}
+	
+	public Obj getIter() {
+		return new TupleIter();
+	}
+	
+	class TupleIter extends Obj {
+		int pos = 0;
+		
+		public Obj next() {
+			if(pos == items.length)
+				return null;
+			return items[pos++];
+		}
 	}
 }
