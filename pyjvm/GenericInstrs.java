@@ -377,6 +377,7 @@ public final class GenericInstrs {
 			inreg0 = inreg[0];
 			inreg1 = inreg[1];
 			inreg2 = inreg[2];
+			outreg0 = outreg[0];
 		}
 		
 		public Instr run(Frame frame) {

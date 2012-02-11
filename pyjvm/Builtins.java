@@ -18,13 +18,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-
 package pyjvm;
 
 public final class Builtins { //!export Builtins
-
+	
+	public static final Obj chr(int val) { //!export
+		if(val < 0 || val > 255) 
+			throw new ScriptError(ScriptError.ValueError, "chr() args not in range(256)");
+		byte b = (byte)val;
+		return new SString(new byte[]{b});
+	}
+	
 	public static final Obj int_(Obj arg) { //!export
 		return SInt.get(arg.intValue());
+	}
+	
+	public static final int hash(Obj args) { //!export
+		return args.hashCode();
 	}
 	
 	public static final int len(Obj arg) { //!export
@@ -37,6 +47,10 @@ public final class Builtins { //!export Builtins
 	
 	public static final Obj string_dict() { //!export
 		return new StringDict();
+	}
+	
+	public static final Obj bytearray(int length) { //!export
+		return new ByteArray(length);
 	}
 	
 	public static final Obj type(Obj[] args) { //!export direct
@@ -63,6 +77,54 @@ public final class Builtins { //!export Builtins
 			return true;
 		}
 		return Obj.isInstance(type, obj);
+	}
+	
+	public static final Obj max(Obj[] args) { //!export direct
+		if(args.length == 0) {
+			throw new ScriptError(ScriptError.TypeError, "max() requires at least 1 argument");
+		}
+		Obj iter;
+		if(args.length == 1) {
+			iter = args[0].getIter();
+		} else {
+			iter = List.fromArrayUnsafe(args).getIter();
+		}
+		Obj max = null;
+		Obj current;
+		
+		while((current=iter.next()) != null) {
+			if(max == null || current.compare(max).intValue() > 0)
+				max = current;
+		}
+		
+		if(max == null)
+			throw new ScriptError(ScriptError.TypeError, "max() arg is an empty sequence");
+		
+		return max;
+	}
+	
+	public static final Obj min(Obj[] args) { //!export direct
+		if(args.length == 0) {
+			throw new ScriptError(ScriptError.TypeError, "min() requires at least 1 argument");
+		}
+		Obj iter;
+		if(args.length == 1) {
+			iter = args[0].getIter();
+		} else {
+			iter = List.fromArrayUnsafe(args).getIter();
+		}
+		Obj max = null;
+		Obj current;
+		
+		while((current=iter.next()) != null) {
+			if(max == null || current.compare(max).intValue() < 0)
+				max = current;
+		}
+		
+		if(max == null)
+			throw new ScriptError(ScriptError.TypeError, "min() arg is an empty sequence");
+		
+		return max;
 	}
 	
 	public static final Obj xrange(Obj[] args) { //!export direct
@@ -127,5 +189,6 @@ public final class Builtins { //!export Builtins
 		}
 		
 		dict.put("str", SStringClass.instance);
+		dict.put("list", ListClass.instance);
 	}
 }

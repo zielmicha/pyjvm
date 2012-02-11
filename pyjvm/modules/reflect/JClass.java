@@ -38,7 +38,7 @@ public class JClass extends NativeObj { //!export modules.reflect.JClass
 		for(int i=0; i<constructors.length; i++)
 			defs[i] = constructors[i].getParameterTypes();
 		int match = Reflect.match(defs, args);
-		Object[] converted = Reflect.translate(defs[match], args);
+		Object[] converted = Reflect.argsToJava(defs[match], args);
 		
 		Object result;
 		try {
@@ -47,7 +47,7 @@ public class JClass extends NativeObj { //!export modules.reflect.JClass
 			throw new RuntimeException(ex);
 		}
 		
-		return Reflect.convert(result);
+		return Reflect.fromJava(result);
 	}
 	
 	public Type getType() {

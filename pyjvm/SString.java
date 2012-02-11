@@ -22,7 +22,6 @@
 package pyjvm;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 public final class SString extends NativeObj { //!export SString BaseString
 	public final byte[] bytes;
@@ -44,6 +43,17 @@ public final class SString extends NativeObj { //!export SString BaseString
 		return new String(bytes);
 	}
 	
+	public Obj repr_bytes() { //!export
+		SStringBuilder builder = new SStringBuilder(this.length() * 5);
+		
+		for(int i=0; i < length(); i++) {
+			byte ch = charAt(i);
+			builder.append(((int)ch) + ",");
+		}
+		
+		return builder.getValue();
+	}
+	
 	public Obj repr() {
 		SStringBuilder builder = new SStringBuilder(this.length() * 15 / 10);
 		
@@ -52,7 +62,10 @@ public final class SString extends NativeObj { //!export SString BaseString
 			byte ch = charAt(i);
 			if(ch == '"')
 				builder.append('\\');
-			builder.append(ch);
+			if(ch == '\n')
+				builder.append("\\n");
+			else
+				builder.append(ch);
 		}
 		builder.append('"');
 		
@@ -154,18 +167,31 @@ public final class SString extends NativeObj { //!export SString BaseString
 		}
 	}
 	
-	public boolean contains(Obj other) { //!export contains
-		return find(other) != -1;
+	public boolean contains(Obj other) { //!export
+		return find(other, 0) != -1;
 	}
 	
-	public int find(Obj other) { //!export find
+	public int find(Obj[] args) { //!export direct
+		if(args.length > 2 || args.length == 0)
+			throw new ScriptError(ScriptError.TypeError, "str.find() requires 1 or 2 arguments");
+		Obj other = args[0];
+		int start;
+		if(args.length == 2) {
+			start = args[1].intValue();
+		} else {
+			start = 0;
+		}
+		return find(other, start);
+	}
+	
+	public int find(Obj other, int start) {
 		SString o = other.stringValue();
 		byte[] ob = o.bytes;
-		if(ob.length > bytes.length)
+		if(ob.length > bytes.length - start)
 			return -1;
 		if(ob.length * (bytes.length-ob.length) < 500) {
 			m:
-			for(int i=0; i<bytes.length-ob.length+1; i++) {
+			for(int i=start; i<bytes.length-ob.length+1; i++) {
 				for(int j=0; j<ob.length; j++) {
 					if(ob[j] != bytes[i + j])
 						continue m;
@@ -196,7 +222,7 @@ public final class SString extends NativeObj { //!export SString BaseString
 			
 			// find
 			q = 0;
-			for(int i=0; i<bytes.length; ) {
+			for(int i=start; i<bytes.length; ) {
 				if(ob[q] == bytes[i]) {
 					q++;
 					if(q == ob.length) {
@@ -282,5 +308,27 @@ public final class SString extends NativeObj { //!export SString BaseString
 	
 	public boolean boolValue() {
 		return bytes.length != 0;
+	}
+	
+	public Obj getSlice(Obj lower, Obj upper) {
+		int len = this.length();
+		int l = (lower == None)? 0 : lower.intValue();
+		int u = (upper == None)? len : upper.intValue();
+		if(l < 0) {
+			l = len + l;
+			if(l < 0) l = 0;
+		} else if(l >= len) {
+			l = len;
+		}
+		if(u < 0) {
+			u = len + u;
+			if(u < 0) u = 0;
+		} else if(u >= len) {
+			u = len;
+		}
+		
+		byte[] n = new byte[u - l];
+		System.arraycopy(this.bytes, l, n, 0, u - l);
+		return new SString(n);
 	}
 }

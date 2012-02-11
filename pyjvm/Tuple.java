@@ -21,7 +21,7 @@
 
 package pyjvm;
 
-public class Tuple extends Obj { //!export
+public class Tuple extends Obj { //!export Tuple
 	public Obj[] items;
 	
 	public Tuple(Obj[] items) {
@@ -110,6 +110,10 @@ public class Tuple extends Obj { //!export
 	
 	public Obj getIter() {
 		return new TupleIter();
+	}
+	
+	public Type getType() {
+		return TupleClass.instance;
 	}
 	
 	class TupleIter extends Obj {

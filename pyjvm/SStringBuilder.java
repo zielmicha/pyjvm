@@ -43,10 +43,17 @@ public class SStringBuilder {
 		this.length ++;
 	}
 	
+	public void append(String s) {
+		byte[] bytes = s.getBytes();
+		checkAppend(bytes.length);
+		System.arraycopy(bytes, 0, this.bytes, this.length, bytes.length);
+		this.length += bytes.length;
+	}
+	
 	private void checkAppend(int length) {
 		if(length + this.length >= this.bytes.length) {
 			byte[] oldBytes = this.bytes;
-			this.bytes = new byte[oldBytes.length * 2];
+			this.bytes = new byte[Math.max(oldBytes.length * 2, length + this.length + 1)];
 			System.arraycopy(oldBytes, 0, this.bytes, 0, this.length);
 		}
 	}

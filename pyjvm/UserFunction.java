@@ -76,10 +76,9 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 			int defaultsCount = expectedCount - args.length;
 			int startDefaults = defaults.length - defaultsCount;
 			
-			if(defaultsCount > defaults.length)
-				throw new ScriptError(ScriptError.TypeError, "Too few arguments");
-			if(defaultsCount < 0)
-				throw new ScriptError(ScriptError.TypeError, "Too many arguments");
+			if(defaultsCount > defaults.length || defaultsCount < 0)
+				throw new ScriptError(ScriptError.TypeError, "expected " + expectedCount + " arguments (" + 
+					defaults.length + " defaults), got " + args.length + " instead.");
 
 			System.arraycopy(args, 0, finalArgs, 0, args.length);
 			System.arraycopy(defaults, startDefaults, finalArgs, args.length, defaultsCount);
@@ -169,7 +168,8 @@ public final class UserFunction extends Obj implements CallInExistingFrame {
 			allArgs[0] = this.instance;
 			System.arraycopy(args, 0, allArgs, 1, args.length);
 			
-			func.prepareFrame(frame, allArgs);
+			//func.prepareFrame(frame, allArgs);
+			UserFunction.this.callInExistingFrame(frame, allArgs);
 		}
 		
 		public String toString() {

@@ -17,48 +17,41 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
-
 package pyjvm;
 
-import java.io.UnsupportedEncodingException;
-
-public final class Unicode extends Obj {
-	public final char[] chars;
+public class ByteArray extends NativeObj { //!export ByteArray
+	public byte[] bytes;
+	public int length;
 	
-	public Unicode() {
-		this(new char[0]);
+	public ByteArray(byte[] bytes, int length) {
+		this.bytes = bytes;
+		this.length = length;
 	}
-	
-	public Unicode(char[] data) {
-		throw new NotImplementedError();
-		//this.chars = data;
+
+	public ByteArray(int capacity) {
+		this.length = 0;
+		this.bytes = new byte[capacity];
+	}
+
+	public ByteArray() {
+		this(16);
 	}
 	
 	public String toString() {
-		return new String(chars);
+		return "<bytearray " + repr(this.str()) + ">";
 	}
 	
-	public int hashCode() {
-		int h = 0;
-		char val[] = chars;
-		int len = chars.length;
-
-		for (int i = 0; i < len; i++) {
-		    h = 31*h + val[i];
-		}
-		return h;
-	}
-
-	public static Unicode createFromUtf8(byte[] bytes) {
-		String s;
-		try {
-			s = new String(bytes, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new ScriptError(ScriptError.InternalError, "utf-8 encoding is not present", e);
-		}
-		return new Unicode(s.toCharArray());
+	public SString str() {
+		return (SString)to_string(0, length);
 	}
 	
-	// TODO: equals
+	public Obj to_string(int offset, int length) { //!export
+		byte[] dest = new byte[length];
+		System.arraycopy(bytes, offset, dest, 0, length);
+		return new SString(dest);
+	}
+	
+	public Type getType() {
+		return ByteArrayClass.instance;
+	}
 }

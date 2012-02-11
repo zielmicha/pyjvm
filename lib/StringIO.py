@@ -241,49 +241,51 @@ class StringIO:
 # A little test suite
 
 def test():
-    #import sys
-    #if sys.argv[1:]:
-    #    file = sys.argv[1]
-    #else:
-    file = '/etc/passwd'
-    lines = open(file, 'r').readlines()
-    text = open(file, 'r').read()
-    f = StringIO()
-    for line in lines[:-2]:
-        f.write(line)
-    f.writelines(lines[-2:])
-    if f.getvalue() != text:
-        raise RuntimeError, 'write failed'
-    length = f.tell()
-    print 'File length =', length
-    f.seek(len(lines[0]))
-    f.write(lines[1])
-    f.seek(0)
-    print 'First line =', repr(f.readline())
-    print 'Position =', f.tell()
-    line = f.readline()
-    print 'Second line =', repr(line)
-    f.seek(-len(line), 1)
-    line2 = f.read(len(line))
-    if line != line2:
-        raise RuntimeError, 'bad result after seek back'
-    f.seek(len(line2), 1)
-    list = f.readlines()
-    line = list[-1]
-    f.seek(f.tell() - len(line))
-    line2 = f.read()
-    if line != line2:
-        raise RuntimeError, 'bad result after seek back from EOF'
-    print 'Read', len(list), 'more lines'
-    print 'File length =', f.tell()
-    if f.tell() != length:
-        raise RuntimeError, 'bad length'
-    f.truncate(length/2)
-    f.seek(0, 2)
-    print 'Truncated length =', f.tell()
-    if f.tell() != length/2:
-        raise RuntimeError, 'truncate did not adjust length'
-    f.close()
+	#import sys
+	#if sys.argv[1:]:
+	#    file = sys.argv[1]
+	#else:
+	from lib import os
+	open = os.File
+	file = 'example'
+	lines = open(file, 'r').readlines()
+	text = open(file, 'r').read()
+	f = StringIO()
+	for line in lines[:-2]:
+		f.write(line)
+	f.writelines(lines[-2:])
+	if f.getvalue() != text:
+		raise RuntimeError('write failed', f.getvalue(), text)
+	length = f.tell()
+	print 'File length =', length
+	f.seek(len(lines[0]))
+	f.write(lines[1])
+	f.seek(0)
+	print 'First line =', repr(f.readline())
+	print 'Position =', f.tell()
+	line = f.readline()
+	print 'Second line =', repr(line)
+	f.seek(-len(line), 1)
+	line2 = f.read(len(line))
+	if line != line2:
+		raise RuntimeError, 'bad result after seek back'
+	f.seek(len(line2), 1)
+	list = f.readlines()
+	line = list[-1]
+	f.seek(f.tell() - len(line))
+	line2 = f.read()
+	if line != line2:
+		raise RuntimeError, 'bad result after seek back from EOF'
+	print 'Read', len(list), 'more lines'
+	print 'File length =', f.tell()
+	if f.tell() != length:
+		raise RuntimeError, 'bad length'
+	f.truncate(length/2)
+	f.seek(0, 2)
+	print 'Truncated length =', f.tell()
+	if f.tell() != length/2:
+		raise RuntimeError, 'truncate did not adjust length'
+	f.close()
 
 #if __name__ == '__main__':
 #    test()

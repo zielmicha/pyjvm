@@ -16,10 +16,18 @@ public final class SStringClass extends Type {
 		else
 			dict = BaseStringClass.dict.copy();
 		
+		dict.put("repr_bytes", new Method() {
+			public Obj callMethod(Obj self, Obj[] args) {
+				if(args.length != 0) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 0, got " + args.length + ")");
+				}
+				return ((SString)self).repr_bytes();
+			}
+		});
 		dict.put("join", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
 				return ((SString)self).join(args[0]);
 			}
@@ -27,18 +35,24 @@ public final class SStringClass extends Type {
 		constructor = new Obj() {
 			public Obj call(Obj[] args)  {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
 				return SString.construct(args[0]);
 			}
 		};
 		
-		dict.put("find", new Method() {
+		dict.put("contains", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
-				return SInt.get(((SString)self).find(args[0]));
+				return ((SString)self).contains(args[0])? SBool.True: SBool.False;
+			}
+		});
+		dict.put("find", new Method() {
+			public Obj callMethod(Obj self, Obj[] args) {
+				// direct
+				return SInt.get(((SString)self).find(args));
 			}
 		});
 	}

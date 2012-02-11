@@ -87,7 +87,7 @@ def execute(code):
 
 if __name__ == '__main__':
 	import sys
-	sys.setrecursionlimit(600)
+	sys.setrecursionlimit(2000)
 	try:
 		execute(sys.stdin.read()).dump()
 	except:

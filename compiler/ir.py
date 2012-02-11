@@ -103,7 +103,7 @@ class Instr(utils.Struct):
 		sibiligs.add(self)
 		
 		for next in self.next:
-			if next not in sibiligs and next:
+			if next and next not in sibiligs:
 				next._sibiligs(sibiligs)
 	
 	def sibiligs(self):

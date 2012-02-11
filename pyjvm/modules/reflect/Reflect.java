@@ -19,6 +19,9 @@
 // THE SOFTWARE.
 package pyjvm.modules.reflect;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import pyjvm.*;
 
 public class Reflect { //!export modules.reflect.Reflect
@@ -33,20 +36,116 @@ public class Reflect { //!export modules.reflect.Reflect
 		}
 	}
 	
+	// to Java authors: it was so hard to make type Pair???
+	static Map<Type, Map<Class, ToJava>> toJavaConverters = new HashMap<Type, Map<Class, ToJava>>();
+	static Map<Class, FromJava> fromJavaConverters = new HashMap<Class, FromJava>();
+	
 	static int match(Class[][] types, Obj[] args) {
-		throw new ScriptError(ScriptError.TypeError, "Failed to match parameters " + List.fromArrayUnsafe(args));
+		int j = 0;
+		
+		typeLoop:
+		for(Class[] typeArray: types) {
+			if(typeArray.length == args.length) {
+				for(int i=0; i<args.length; i++) {
+					Class c = typeArray[i];
+					Obj obj = args[i];
+					Type type = obj.getType();
+					Map<Class, ToJava> s = toJavaConverters.get(type);
+					if(s == null || s.get(c) == null)
+						continue typeLoop;
+				}
+				// Success! We have matched Python args with Java types!!!
+				return j;
+			}
+			j++;
+		}
+		
+		String errmsg = "Failed to match parameters " + List.fromArrayUnsafe(args) + ", to definitions: ";
+		for(Class[] typeArray: types)
+			errmsg += Arrays.toString(typeArray) + " ";
+		
+		throw new ScriptError(ScriptError.TypeError, errmsg);
 	}
 	
-	static Object[] translate(Class[] types, Obj[] args) {
-		return null;
+	static Object[] argsToJava(Class[] types, Obj[] args) {
+		Object[] result = new Object[args.length];
+		for(int i=0; i<args.length; i++) {
+			Class c = types[i];
+			Obj obj = args[i];
+			Type type = obj.getType();
+			ToJava s = toJavaConverters.get(type).get(c);
+			result[i] = s.convert(args[i]);
+		}
+		return result;
 	}
 	
-	static Obj convert(Object obj) {
-		return null;
+	static Obj fromJava(Object obj) {
+		Class c = obj.getClass();
+		if(fromJavaConverters.containsKey(c)) {
+			return fromJavaConverters.get(c).convert(obj);
+		} else {
+			return new JInstance(obj);
+		}
+	}
+	
+	static void addToJavaConverter(Class c, Type t, ToJava func) {
+		Map<Class, ToJava> m = toJavaConverters.get(t);
+		if(m == null) {
+			toJavaConverters.put(t, m = new HashMap<Class, ToJava>());
+		}
+		m.put(c, func);
+		
+	}
+	
+	static void addFromJavaConverter(Class c, FromJava func) {
+		fromJavaConverters.put(c, func);
 	}
 	
 	static {
 		dict = ReflectClass.dict;
 		dict.put("__name__", SString.fromJavaString("reflect"));
+		
+		addToJavaConverter(String.class, SStringClass.instance, new ToJava() {
+			@Override
+			public Object convert(Obj o) {
+				return o.stringValue().toString();
+			}
+		});
+		
+		addToJavaConverter(byte[].class, ByteArrayClass.instance, new ToJava() {
+			@Override
+			public Object convert(Obj o) {
+				return ((ByteArray)o).bytes;
+			}
+		});
+		
+		addToJavaConverter(int.class, SIntClass.instance, new ToJava() {
+			@Override
+			public Object convert(Obj o) {
+				return Integer.valueOf(o.intValue());
+			}
+		});
+		
+		addFromJavaConverter(Integer.class, new FromJava() {
+			@Override
+			public Obj convert(Object obj) {
+				return SInt.get(((Integer)obj).intValue());
+			}
+		});
+		
+		addFromJavaConverter(String.class, new FromJava() {
+			@Override
+			public Obj convert(Object obj) {
+				return SString.fromJavaString((String)obj);
+			}
+		});
+	}
+	
+	public interface ToJava {
+		Object convert(Obj o);
+	}
+	
+	public interface FromJava {
+		Obj convert(Object obj);
 	}
 }

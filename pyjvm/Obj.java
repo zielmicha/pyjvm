@@ -78,7 +78,11 @@ public class Obj {
 	// repr
 	
 	public Obj repr() {
-		return new SString(toString());
+		try {
+			return new SString(toString());
+		} catch(StackOverflowError err) {
+			return new SString("<recursive>");
+		}
 	}
 	
 	public Obj str() {
@@ -377,7 +381,7 @@ public class Obj {
 		return getSlice(lower, upper);
 	}
 
-	private Obj getSlice(Obj lower, Obj upper) {
+	public Obj getSlice(Obj lower, Obj upper) {
 		throw new ScriptError(ScriptError.TypeError, "Object is not sliceable");
 	}
 

@@ -63,9 +63,12 @@ public final class List extends NativeObj { //!export List
 	}
 	
 	public Obj getItem(int index) {
-		if(index >= length)
-			throw new ScriptError(ScriptError.IndexError, "bad index");
-		return array[index];
+		int nindex = index;
+		if(index < 0)
+			nindex = length + index;
+		if(nindex >= length)
+			throw new ScriptError(ScriptError.IndexError, "bad index " + index);
+		return array[nindex];
 	}
 	
 	public Obj getItem(Obj key) {
@@ -118,6 +121,53 @@ public final class List extends NativeObj { //!export List
 		return this;
 	}
 	
+	public Obj getSlice(Obj lower, Obj upper) {
+		int len = this.length();
+		int l = (lower == None)? 0 : lower.intValue();
+		int u = (upper == None)? len : upper.intValue();
+		if(l < 0) {
+			l = len + l;
+			if(l < 0) l = 0;
+		} else if(l >= len) {
+			l = len;
+		}
+		if(u < 0) {
+			u = len + u;
+			if(u < 0) u = 0;
+		} else if(u >= len) {
+			u = len;
+		}
+		//System.err.println("len=" + len + "; creating range " + l + " to " + u + ", from " + this);
+		List list = new List();
+		for(int i=l; i < u; i++) {
+			list.append(array[i]);
+		}
+		//System.err.println("result: " + list);
+		return list;
+	}
+	
+	public static Obj construct(Obj[] args) { //!export direct <new>
+		List l = new List();
+		if(args.length == 1) {
+			l.iadd(args[0]);
+		} else if(args.length != 0) {
+			throw new ScriptError(ScriptError.TypeError, "int() takes at most 1 argument");
+		}
+		return l;
+	}
+	
+	public SBool isEqual(Obj other) {
+		if(other instanceof List) {
+			List l = (List)other;
+			if(l.length != length)
+				return SBool.False;
+			for(int i=0; i<length; i++) 
+				if(! l.array[i].equals(array[i]))
+					return SBool.False;
+			return SBool.True;
+		}
+		return null;
+	}
+	
 	// TODO: hashCode
-	// TODO: equals
 }

@@ -278,12 +278,44 @@ assert ('ab' * 1000).find('ab' * 100 + 'c') == -1
 
 #print sys.builtins
 
+def deep_recur(i):
+	if i != 0:
+		return deep_recur(i - 1)
+
+deep_recur(3000)
+
+s = '123' * 3000
+a = []
+for i in xrange(10):
+	a.append(s)
+assert ''.join(a) == s * 10
+
 import reflect
 
 f = reflect.get_class('java.io.FileInputStream')
 
 file = f.create('tests-inside.py')
-print file.read()
+assert file.read() == 35 # 35 is code of '#'
 
+from lib import os
 
+f = os.File('tests-inside.py')
+assert f.read(20) == "# Copyright (C) 2011"
+
+l = [1, 2, 3]
+l2 = list(xrange(20))
+
+assert max(2, 3, 1, 5, 3) == 5
+assert max(2, 3, 1) == 3
+assert max([1, 2, 3]) == 3
+
+assert ''.join(os.File('example').readlines()) == os.File('example').read()
+
+print l2[:-3], l2[-3:]
+assert l2[:-3] + l2[-3:] == l2
+
+assert '01234'[2:3] == '2'
+assert '01234'[2:4] == '23'
+
+StringIO.test()
 

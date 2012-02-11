@@ -87,8 +87,8 @@ constructor_template = '''
 call_method_template = '%s.%s(%s)'
 arg_template = "args[%d]"
 
-check_count = '''if(args.length != %d) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+check_count = '''if(args.length != %(cnt)d) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected %(cnt)d, got " + args.length + ")");
 				}'''
 
 converters = {
@@ -153,7 +153,7 @@ def format_entry(class_name, entry, is_direct, as_name):
 	
 		return entry_tmpl % dict(
 			name=as_name,
-			check=check_count % len(entry.args),
+			check=check_count % dict(cnt= len(entry.args)),
 			code=convert(
 				entry.return_type,
 				call_method_template % (object, entry.name, result)

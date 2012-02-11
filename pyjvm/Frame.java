@@ -46,8 +46,8 @@ public final class Frame {
 			try {
 				while(instr != null) {
 					/*System.err.print("\033[01;36m" + instr.getClass().getSimpleName() + ":\033[00m reg:");
-					for(int i=0; i<10; i++)
-						System.err.print(Obj.repr(frame.reg[i]) + ", ");
+					//for(int i=0; i<10; i++)
+					//	System.err.print(Obj.repr(frame.reg[i]) + ", ");
 					System.err.println();
 					instr.dump();//*/
 					
@@ -87,10 +87,14 @@ public final class Frame {
 	public static void printExc(Frame frame, Throwable e) {
 		System.err.println("Traceback (most recent call last):");
 		Frame current = frame;
+		java.util.Vector lines = new java.util.Vector();
 		while(current != null) {
 			Instr instr = current.counter;
-			System.err.println("  File " + instr.filename.repr() + ", line " + instr.lineno + ", in ?");
+			lines.add("  File " + instr.filename.repr() + ", line " + instr.lineno + ", in ?");
 			current = current.parent;
+		}
+		for(int i=0; i < lines.size(); i++) {
+			System.err.println((String)lines.get(lines.size() - i - 1));
 		}
 		System.err.println(e);
 		System.err.println();

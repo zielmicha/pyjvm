@@ -129,6 +129,9 @@ class Builder(object):
 
 def main():
 	import optparse
+	import sys
+	
+	sys.setrecursionlimit(2000)
 
 	parser = optparse.OptionParser()
 	

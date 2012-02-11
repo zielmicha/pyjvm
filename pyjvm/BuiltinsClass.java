@@ -16,18 +16,34 @@ public final class BuiltinsClass extends Type {
 		else
 			dict = NativeObjClass.dict.copy();
 		
+		dict.put("chr", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 1) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
+				}
+				return Builtins.chr(args[0].intValue());
+			}
+		});
 		dict.put("int", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
 				return Builtins.int_(args[0]);
+			}
+		});
+		dict.put("hash", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 1) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
+				}
+				return SInt.get(Builtins.hash(args[0]));
 			}
 		});
 		dict.put("len", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
 				return SInt.get(Builtins.len(args[0]));
 			}
@@ -35,7 +51,7 @@ public final class BuiltinsClass extends Type {
 		dict.put("repr", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
 				return Builtins.repr(args[0]);
 			}
@@ -43,9 +59,17 @@ public final class BuiltinsClass extends Type {
 		dict.put("string_dict", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 0) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 0, got " + args.length + ")");
 				}
 				return Builtins.string_dict();
+			}
+		});
+		dict.put("bytearray", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 1) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
+				}
+				return Builtins.bytearray(args[0].intValue());
 			}
 		});
 		dict.put("type", new Obj() {
@@ -57,9 +81,21 @@ public final class BuiltinsClass extends Type {
 		dict.put("isinstance", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 2) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 2, got " + args.length + ")");
 				}
 				return Builtins.isinstance(args[0], args[1])? SBool.True: SBool.False;
+			}
+		});
+		dict.put("max", new Obj() {
+			public Obj call(Obj[] args) {
+				// direct
+				return Builtins.max(args);
+			}
+		});
+		dict.put("min", new Obj() {
+			public Obj call(Obj[] args) {
+				// direct
+				return Builtins.min(args);
 			}
 		});
 		dict.put("xrange", new Obj() {
