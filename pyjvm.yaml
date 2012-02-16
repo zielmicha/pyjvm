@@ -1,0 +1,5 @@
+path:
+- lib
+java:
+- java
+build-script: src/build.py

@@ -26,8 +26,8 @@ public class Main {
 	public static void main(String[] args) {;
 		Importer.path.append(SString.fromJavaString(args[0]));
 		
-		pyjvm.modules.Sys.setArgs(args, 1);
-		Importer.importModule("__main__");
+		pyjvm.modules.Sys.setArgs(args, 2);
+		Importer.importModule(SString.fromJavaString(args[1]));
 	}
 
 }

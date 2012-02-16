@@ -223,7 +223,7 @@ assert a is not 2
 
 assert -(1) == -1
 
-from lib import StringIO
+import StringIO
 s = StringIO.StringIO()
 s.write('123')
 assert '123' == '123'
@@ -294,12 +294,12 @@ import reflect
 
 f = reflect.get_class('java.io.FileInputStream')
 
-file = f.create('tests-inside.py')
+file = f.create('main.py')
 assert file.read() == 35 # 35 is code of '#'
 
-from lib import os
+import os
 
-f = os.File('tests-inside.py')
+f = os.File('main.py')
 assert f.read(20) == "# Copyright (C) 2011"
 
 l = [1, 2, 3]

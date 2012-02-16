@@ -245,7 +245,7 @@ def test():
 	#if sys.argv[1:]:
 	#    file = sys.argv[1]
 	#else:
-	from lib import os
+	import os
 	open = os.File
 	file = 'example'
 	lines = open(file, 'r').readlines()

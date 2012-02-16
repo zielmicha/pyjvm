@@ -1,0 +1,17 @@
+#!/usr/bin/python
+import sys
+import os
+
+try:
+    __file__ = os.readlink(__file__)
+except OSError:
+    pass
+
+base_dir = os.path.dirname(__file__)
+src_dir = os.path.join(base_dir, 'src')
+
+sys.path.append(src_dir)
+
+import pyjvm.main
+
+pyjvm.main.main()
