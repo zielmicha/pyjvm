@@ -75,6 +75,19 @@ public final class List extends NativeObj { //!export List
 		return getItem(key.intValue());
 	}
 	
+	public void setItem(int index, Obj val) {
+		int nindex = index;
+		if(index < 0)
+			nindex = length + index;
+		if(nindex >= length)
+			throw new ScriptError(ScriptError.IndexError, "bad index " + index);
+		array[nindex] = val;
+	}
+	
+	public void setItem(Obj key, Obj val) {
+		setItem(key.intValue(), val);
+	}
+	
 	public int[] toInternedStringArray() {
 		int[] dest = new int[length];
 		for(int i=0; i<length; i++) {
@@ -119,6 +132,14 @@ public final class List extends NativeObj { //!export List
 			append(current);
 		}
 		return this;
+	}
+	
+	public Obj mul(Obj other) {
+		List n = new List();
+		int v = other.intValue();
+		for(int i=0; i < v; i++)
+			n.iadd(this);
+		return n;
 	}
 	
 	public Obj getSlice(Obj lower, Obj upper) {

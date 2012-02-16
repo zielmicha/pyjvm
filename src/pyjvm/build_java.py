@@ -6,10 +6,10 @@ class JavacError(Exception): pass
 def build(sources, dest):
     all_files = [  ]
     for source in sources:
-        java_files = find_ext(source, '')
+        java_files = find_ext(source, '.java')
         for java_path in java_files:
             class_path = os.path.join(dest, os.path.relpath(java_path, source))
-            assert class_path.endswith('.java')
+            assert class_path.endswith('.java'), class_path
             class_path = class_path[:-5] + '.class'
             if is_source_earlier(java_path, class_path):
                 all_files.append(java_path)

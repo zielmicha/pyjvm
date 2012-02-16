@@ -18,6 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import os
+os.chdir(os.path.join(os.path.dirname(__file__), '..', 'java'))
+
 import re
 import collections
 import sys

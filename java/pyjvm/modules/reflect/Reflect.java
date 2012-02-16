@@ -139,6 +139,13 @@ public class Reflect { //!export modules.reflect.Reflect
 				return SString.fromJavaString((String)obj);
 			}
 		});
+		
+		addFromJavaConverter(Long.class, new FromJava() {
+
+			public Obj convert(Object obj) {
+				return SInt.get(((Long)obj).longValue());
+			}
+		});
 	}
 	
 	public interface ToJava {

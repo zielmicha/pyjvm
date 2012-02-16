@@ -29,6 +29,13 @@ public final class Builtins { //!export Builtins
 		return new SString(new byte[]{b});
 	}
 	
+	public static final int ord(Obj val) { //!export
+		SString s = val.stringValue();
+		if(s.length() != 1)
+			throw new ScriptError(ScriptError.ValueError, "ord() arg not string of length 1");
+		return (int)s.bytes[0];
+	}
+	
 	public static final Obj int_(Obj arg) { //!export
 		return SInt.get(arg.intValue());
 	}
@@ -127,6 +134,12 @@ public final class Builtins { //!export Builtins
 		return max;
 	}
 	
+	public static final Obj range(Obj[] args) { //!export direct
+		List l = new List();
+		l.iadd(xrange(args));
+		return l;
+	}
+	
 	public static final Obj xrange(Obj[] args) { //!export direct
 		int start = 0;
 		int step = 1;
@@ -177,6 +190,11 @@ public final class Builtins { //!export Builtins
 			this.index += this.step;
 			return SInt.get(val);
 		}
+	}
+	
+	public static void importBuiltins() {
+		Module m = Importer.importModule("builtins");
+		dict.put("map", m.dict.get("map"));
 	}
 	
 	public static final StringDict dict;

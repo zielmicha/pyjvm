@@ -221,6 +221,9 @@ class Instr(utils.Struct):
 	
 	def cmd_run_pop(self, stack):
 		stack.pop()
+	
+	def cmd_run_makeglobal(self, stack):
+		pass
 
 	def cmd_getstackops_unpacktuple(self, length):
 		return length, 1

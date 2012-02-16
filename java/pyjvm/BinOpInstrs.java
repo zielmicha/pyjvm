@@ -92,6 +92,21 @@ public final class BinOpInstrs {
 		}
 	}
 
+	public static final class Mod extends GenericInstrs.BinOp {
+		public Instr run(Frame frame) {
+			Obj a = frame.reg[inreg0];
+			Obj b = frame.reg[inreg1];
+			Obj result = a.mod(frame, b);
+			if(result == NotImplemented) {
+				result = b.rmod(frame, a);
+				if(result == NotImplemented)
+					this.operatorFailed(a, b, "mod");
+			}
+			frame.reg[outreg0] = result;
+			return next;
+		}
+	}
+
 	public static final class IsEqual extends GenericInstrs.BinOp {
 		public Instr run(Frame frame) {
 			Obj a = frame.reg[inreg0];
@@ -238,6 +253,12 @@ public final class BinOpInstrs {
 		binOpTypes.put("truediv", new BinOpFactory(){
 			public GenericInstrs.BinOp create() {
 				return new Truediv();
+			}
+		});
+
+		binOpTypes.put("mod", new BinOpFactory(){
+			public GenericInstrs.BinOp create() {
+				return new Mod();
 			}
 		});
 

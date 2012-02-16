@@ -85,7 +85,8 @@ class Serializer(object):
 		elif isinstance(value, float):
 			s = repr(value)
 			self.write('F')
-			self.pack_uint(len(s)) + s
+			self.pack_uint(len(s))
+			self.out.write(s)
 		elif isinstance(value, str):
 			self.write('S')
 			self.pack_uint(len(value))

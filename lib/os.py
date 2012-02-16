@@ -4,7 +4,7 @@ RandomAccessFile = reflect.get_class('java.io.RandomAccessFile')
 
 class File:
     def __init__(self, name, mode='r'):
-        self.f = RandomAccessFile.create(name, mode)
+        self.f = RandomAccessFile.new(name, mode)
     
     def read(self, size=1000000000): # power not yet implemented = 2**30
         result = []

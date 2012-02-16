@@ -60,7 +60,10 @@ public class JInstance extends Obj { //!export
 				j++;
 			}
 		}
-
+		
+		if(good_methods.length == 0)
+			throw new ScriptError(ScriptError.AttributeError, obj.getClass() + " has no method named " + name);
+		
 		return new JMethod(obj, name, good_methods, defs);
 	}
 	
@@ -100,17 +103,7 @@ public class JInstance extends Obj { //!export
 		}
 		
 		public Type getType() {
-			return MethodClass.instance;
-		}
-	}
-	
-	public static final class MethodClass extends Type {
-		private MethodClass() {};
-		
-		public static final MethodClass instance = new MethodClass();
-
-		public Obj getEntry(int name) {
-			throw new ScriptError(ScriptError.TypeError, "Object without attributes");
+			return new Type.EmptyType("JMethodType");
 		}
 	}
 }

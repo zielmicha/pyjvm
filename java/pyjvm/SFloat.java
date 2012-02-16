@@ -21,7 +21,7 @@
 
 package pyjvm;
 
-public final class SFloat extends Obj {
+public final class SFloat extends Obj { //!export SFloat
 	public double value;
 	
 	public SFloat(double val) {
@@ -32,14 +32,168 @@ public final class SFloat extends Obj {
 		return (int)Double.doubleToLongBits(value);
 	}
 	
-	public SBool isEqual(Object other) {
+	public SBool isEqual(Obj other) {
 		if(other instanceof SFloat)
-			throw new ScriptError(ScriptError.TypeError, "float.__eq__ is not possible" +
-					" (http://bit.ly/decimalEq). Use decimal module instead.");
+			return this.value == ((SFloat)other).value ? SBool.True: SBool.False;
+			/*throw new ScriptError(ScriptError.TypeError, "float.__eq__ is not possible" +
+					" (http://bit.ly/decimalEq). Use decimal module instead.");*/
 		return null;
 	}
 
 	public static SFloat get(double d) {
 		return new SFloat(d);
+	}
+	
+	
+	public Obj add(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(value + otherValue);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(value + otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj radd(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(value + otherValue);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(value + otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj sub(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(value - otherValue);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(value - otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rsub(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(otherValue - value);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(otherValue - value);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj mul(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(value * otherValue);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(value * otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rmul(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(otherValue * value);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(otherValue * value);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj div(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(value / otherValue);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(value / otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rdiv(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(otherValue / value);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(otherValue / value);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj truediv(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(value / otherValue);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(value / otherValue);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rtruediv(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(otherValue / value);
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(otherValue / value);
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj floordiv(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(Math.floor(value / otherValue));
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(Math.floor(value / otherValue));
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Obj rfloordiv(Obj other) {
+		if(other instanceof SInt) {
+			long otherValue = ((SInt)other).value;
+			return SFloat.get(Math.floor(otherValue / value));
+		} else if(other instanceof SFloat) {
+			double otherValue = ((SFloat)other).value;
+			return SFloat.get(Math.floor(otherValue / value));
+		} else {
+			return NotImplemented;
+		}
+	}
+	
+	public Type getType() {
+		return SFloatClass.instance;
+	}
+	
+	public String toString() {
+		return "" + value;
 	}
 }

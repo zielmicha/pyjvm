@@ -93,7 +93,7 @@ public class ScriptError extends RuntimeException {
 			rest = "";
 		String str = getName() + rest;
 		if(sender != null)
-			str += " (" + sender + ")";
+			str += " (" + Obj.typeRepr(sender) + ")";
 		return str;
 	}
 	

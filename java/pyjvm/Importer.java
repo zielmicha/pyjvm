@@ -28,6 +28,10 @@ import java.io.InputStream;
 public class Importer {
 
 	public static Module importModule(SString name) {
+		if(!builtinsImported) {
+			builtinsImported = true;
+			Builtins.importBuiltins();
+		}
 		Obj imported = modules.getOrNull(name.intern());
 		if(imported != null)
 			return (Module)imported;
@@ -51,6 +55,7 @@ public class Importer {
 	public static Module loadModule(InputStream code, SString name) {
 		Instr mainInstr = (Instr) Unserializer.unserialize(code);
 		Module object = new Module();
+		object.dict.put("__name__", name);
 		modules.put(name, object);
 		String jName = name.toString();
 		if(jName.indexOf('.') != -1) {
@@ -98,6 +103,7 @@ public class Importer {
 	public static List path = new List(); 
 	public static StringDict modules = new StringDict();
 	public static StringDict builtinModules = new StringDict();
+	public static boolean builtinsImported;
 	
 	static {
 		builtinModules.put("sys", new Module(pyjvm.modules.Sys.dict));

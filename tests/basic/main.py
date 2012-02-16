@@ -294,7 +294,7 @@ import reflect
 
 f = reflect.get_class('java.io.FileInputStream')
 
-file = f.create('main.py')
+file = f.new('main.py')
 assert file.read() == 35 # 35 is code of '#'
 
 import os
@@ -318,4 +318,26 @@ assert '01234'[2:3] == '2'
 assert '01234'[2:4] == '23'
 
 StringIO.test()
+
+def g():
+	global j
+	j = 5
+
+g()
+assert j == 5
+
+c = (1, 2)
+a, b = c
+assert (a, b) == (1, 2)
+
+import time
+assert type(time.clock()) == type(1.0)
+print 'clock:', time.clock()
+
+
+assert 'abc' < 'abd'
+assert 'b' < 'c'
+assert 'abcd' > 'abc'
+assert 'abc' >= 'abc'
+assert 'abc' <= 'abc'
 

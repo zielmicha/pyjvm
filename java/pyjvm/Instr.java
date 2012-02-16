@@ -186,6 +186,8 @@ public abstract class Instr extends Obj {
 				return new GenericInstrs.SetItem();
 			case INSTR_LISTAPPEND:
 				return new GenericInstrs.ListAppend();
+			case INSTR_UNPACKTUPLE:
+				return new GenericInstrs.UnpackTuple();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}

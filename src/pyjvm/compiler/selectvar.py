@@ -28,7 +28,7 @@ def selectvar(nestedvars, instr):
 		instr.args[0] for instr in code if instr.name == 'setname'
 	)
 	globalnames = set(
-		instr.args[0] for instr in code if instr.name == 'global'
+		instr.args[0] for instr in code if instr.name in ('global', 'makeglobal')
 	)
 	localnames -= globalnames
 	localnames = list(localnames)

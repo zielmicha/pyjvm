@@ -134,6 +134,38 @@ public final class GenericInstrs {
 		}
 	}
 	
+	public static final class UnpackTuple extends Instr {
+		private int length;
+		private int[] outreg;
+		
+		public void init1(Obj length) {
+			this.length = length.intValue();
+		}
+		
+		public void initReg(int[] inreg, int[] outreg) {
+			this.outreg = outreg;
+			if(inreg.length != 1)
+				throw new ScriptError(ScriptError.TypeError, "Expected 1 inreg");
+			this.inreg0 = inreg[0];
+		}
+		
+		public Instr run(Frame frame) {
+			Obj seq = frame.reg[inreg0];
+			Obj iter = seq.getIter();
+			
+			for(int i=0; i<this.length; i++) {
+				Obj val = iter.next();
+				if(val == null)
+					throw new ScriptError(ScriptError.ValueError, "need more than " + i + " values to unpack");
+				frame.reg[outreg[i]] = val;
+			}
+			if(iter.next() != null)
+				throw new ScriptError(ScriptError.ValueError, "too many values to unpack");
+			
+			return next;
+		}
+	}
+	
 	public static final class MakeTuple extends Instr {
 		private int length;
 		private int[] inreg;

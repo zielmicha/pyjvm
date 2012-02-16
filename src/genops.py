@@ -17,11 +17,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+import os
+os.chdir(os.path.join(os.path.dirname(__file__), '..', 'java'))
 
 import sys
 sys.stdout = open('pyjvm/BinOpInstrs.java', 'w')
 
-names = ['add', 'sub', 'mul', 'floordiv', 'div', 'truediv']
+names = ['add', 'sub', 'mul', 'floordiv', 'div', 'truediv', 'mod']
 names = [ (n, n, 'r' + n) for n in names ]
 
 names += [('==', 'isEqual', 'isEqual'),

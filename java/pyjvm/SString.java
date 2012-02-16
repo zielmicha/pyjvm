@@ -31,6 +31,10 @@ public final class SString extends NativeObj { //!export SString BaseString
 		this.bytes = new byte[0];
 	}
 	
+	public SString(byte b) {
+		this.bytes = new byte[]{ b };
+	}
+	
 	public SString(String data) {
 		this(data.getBytes());
 	}
@@ -256,6 +260,64 @@ public final class SString extends NativeObj { //!export SString BaseString
 		return SStringClass.instance;
 	}
 	
+	
+	public Obj add(String string) {
+		return add(new SString(string));
+	}
+	
+	public boolean boolValue() {
+		return bytes.length != 0;
+	}
+	
+	public Obj getSlice(Obj lower, Obj upper) {
+		int len = this.length();
+		int l = (lower == None)? 0 : lower.intValue();
+		int u = (upper == None)? len : upper.intValue();
+		if(l < 0) {
+			l = len + l;
+			if(l < 0) l = 0;
+		} else if(l >= len) {
+			l = len;
+		}
+		if(u < 0) {
+			u = len + u;
+			if(u < 0) u = 0;
+		} else if(u >= len) {
+			u = len;
+		}
+		
+		byte[] n = new byte[u - l];
+		System.arraycopy(this.bytes, l, n, 0, u - l);
+		return new SString(n);
+	}
+	
+	public Obj getItem(int index) {
+		int nindex = index;
+		if(index < 0)
+			nindex = bytes.length + index;
+		if(nindex >= bytes.length)
+			throw new ScriptError(ScriptError.IndexError, "bad index " + index);
+		return new SString(bytes[nindex]);
+	}
+	
+	public Obj getItem(Obj key) {
+		return getItem(key.intValue());
+	}
+	
+	public Obj compare(Obj other) {
+		SString o = (SString)other;
+		int min = Math.min(o.bytes.length, bytes.length);
+		for(int i=0; i<min; i++) {
+			if(o.bytes[i] == bytes[i])
+				continue;
+			return bytes[i] > o.bytes[i]? SInt.ONE: SInt.MINUS_ONE;
+		}
+		if(o.bytes.length == bytes.length)
+			return SInt.ZERO;
+		
+		return o.bytes.length < bytes.length ? SInt.ONE: SInt.MINUS_ONE;
+	}
+	
 	// intern
 	
 	public final int intern() {
@@ -269,7 +331,7 @@ public final class SString extends NativeObj { //!export SString BaseString
 				reverseInternTable.put(SInt.get(key), this);
 				this.interned = key;
 			} else {
-				this.interned = ((SInt)val).value; 
+				this.interned = val.intValue(); 
 			}
 			
 			return this.interned;
@@ -302,33 +364,4 @@ public final class SString extends NativeObj { //!export SString BaseString
 		}
 	}
 
-	public Obj add(String string) {
-		return add(new SString(string));
-	}
-	
-	public boolean boolValue() {
-		return bytes.length != 0;
-	}
-	
-	public Obj getSlice(Obj lower, Obj upper) {
-		int len = this.length();
-		int l = (lower == None)? 0 : lower.intValue();
-		int u = (upper == None)? len : upper.intValue();
-		if(l < 0) {
-			l = len + l;
-			if(l < 0) l = 0;
-		} else if(l >= len) {
-			l = len;
-		}
-		if(u < 0) {
-			u = len + u;
-			if(u < 0) u = 0;
-		} else if(u >= len) {
-			u = len;
-		}
-		
-		byte[] n = new byte[u - l];
-		System.arraycopy(this.bytes, l, n, 0, u - l);
-		return new SString(n);
-	}
 }

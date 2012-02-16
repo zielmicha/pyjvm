@@ -223,7 +223,23 @@ public class Obj {
 	public Obj rtruediv(Obj b) {
 		return NotImplemented;
 	}
-
+	//	
+	public Obj mod(Frame frame, Obj b) {
+		return mod(b);
+	}
+	
+	public Obj mod(Obj b) {
+		return NotImplemented;
+	}
+	
+	public Obj rmod(Frame frame, Obj b) {
+		return rmod(b);
+	}
+	
+	public Obj rmod(Obj b) {
+		return NotImplemented;
+	}
+	
 	public Obj isEqual(Frame frame, Obj b) {
 		return isEqual(b);
 	}

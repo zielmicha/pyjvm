@@ -25,18 +25,22 @@ public final class SInt extends Obj { //!export SInt
 	public static final SInt ONE = SInt.get(1);
 	public static final SInt MINUS_ONE = SInt.get(-1);
 	public static final SInt ZERO = SInt.get(0);
-	public int value;
 
-	private SInt(int i) {
+	public long value;
+
+	private SInt(long i) {
 		this.value = i;
 	}
 	
 	public int hashCode() {
-		return this.value;
+		return (int)this.value;
 	}
 	
 	public final int intValue() {
-		return this.value;
+		int val = (int)this.value;
+		if(val != this.value)
+			throw new ScriptError(ScriptError.TypeError, "number to large to convert to integer");
+		return val;
 	}
 	
 	public SBool isEqual(Obj other) {
@@ -51,6 +55,10 @@ public final class SInt extends Obj { //!export SInt
 		return new SInt(num);
 	}
 	
+	public static Obj get(long num) {
+		return new SInt(num);
+	}
+	
 	public String toString() {
 		return this.value + "";
 	}
@@ -61,7 +69,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj add(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(value + otherValue);
 		} else {
 			return NotImplemented;
@@ -70,7 +78,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj radd(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(otherValue + value);
 		} else {
 			return NotImplemented;
@@ -79,7 +87,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj sub(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(value - otherValue);
 		} else {
 			return NotImplemented;
@@ -88,7 +96,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj rsub(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(otherValue - value);
 		} else {
 			return NotImplemented;
@@ -97,7 +105,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj mul(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(otherValue * value);
 		} else {
 			return NotImplemented;
@@ -106,7 +114,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj rmul(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(value * otherValue);
 		} else {
 			return NotImplemented;
@@ -115,7 +123,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj rfloordiv(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(otherValue / value);
 		} else {
 			return NotImplemented;
@@ -124,7 +132,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj floordiv(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(value / otherValue);
 		} else {
 			return NotImplemented;
@@ -133,7 +141,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj rdiv(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(otherValue / value);
 		} else {
 			return NotImplemented;
@@ -142,7 +150,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj div(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SInt.get(value / otherValue);
 		} else {
 			return NotImplemented;
@@ -151,7 +159,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj truediv(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SFloat.get((double)otherValue / value);
 		} else {
 			return NotImplemented;
@@ -160,7 +168,7 @@ public final class SInt extends Obj { //!export SInt
 	
 	public Obj rtruediv(Obj other) {
 		if(other instanceof SInt) {
-			int otherValue = ((SInt)other).value;
+			long otherValue = ((SInt)other).value;
 			return SFloat.get((double)value / otherValue);
 		} else {
 			return NotImplemented;

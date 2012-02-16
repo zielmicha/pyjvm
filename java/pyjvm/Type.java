@@ -52,6 +52,10 @@ public abstract class Type extends Obj { //!export Type
 		return TypeClass.instance;
 	}
 	
+	public SBool isEqual(Obj other) {
+		return this == other ? SBool.True: SBool.False;
+	}
+	
 	public static Type[] DEFUALT_BASES = new Type[]{
 		NativeObjClass.instance
 	};

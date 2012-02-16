@@ -51,6 +51,8 @@ def cmd_run(path, args):
         modname = None
     
     proj = pyjvm.build.Project(path)
+    if modname:
+        proj.include_modules.append(modname)
     proj.build()
     proj.execute(modname or proj.main_module)
 

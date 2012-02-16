@@ -26,3 +26,4 @@ def func():
 func()
 c = {}
 func()
+print 'ok!'

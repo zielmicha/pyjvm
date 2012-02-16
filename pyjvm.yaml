@@ -2,4 +2,5 @@ path:
 - lib
 java:
 - java
-build-script: src/build.py
+include:
+- builtins

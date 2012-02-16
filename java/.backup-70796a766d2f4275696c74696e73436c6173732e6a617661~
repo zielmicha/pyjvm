@@ -24,14 +24,6 @@ public final class BuiltinsClass extends Type {
 				return Builtins.chr(args[0].intValue());
 			}
 		});
-		dict.put("ord", new Obj() {
-			public Obj call(Obj[] args) {
-				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
-				}
-				return SInt.get(Builtins.ord(args[0]));
-			}
-		});
 		dict.put("int", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {

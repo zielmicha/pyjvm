@@ -20,19 +20,30 @@
 package pyjvm.modules.reflect;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import pyjvm.*;
 
-public class JClass extends NativeObj { //!export modules.reflect.JClass
-	Class java;
+public class JClass extends Obj {
+	public Class java;
+	static final int str_new = SString.intern("new");
 	
 	public JClass(Class java) {
 		this.java = java;
 	}
+
+	public Obj getAttr(int name) {
+		if(name == str_new)
+			return new Obj() {
+				public Obj call(Obj[] args) {
+					return create(args);
+				}
+			};
+		
+		return getStaticMethod(SString.unintern(name).toString());
+	}
 	
-	public Obj create(Obj[] args) { //!export direct
+	public Obj create(Obj[] args) {
 		Constructor[] constructors = this.java.getConstructors();
 		Class[][] defs = new Class[constructors.length][];
 		for(int i=0; i<constructors.length; i++)
@@ -51,6 +62,31 @@ public class JClass extends NativeObj { //!export modules.reflect.JClass
 	}
 	
 	public Type getType() {
-		return JClassClass.instance;
+		return new Type.EmptyType("JClassType");
+	}
+
+	private Obj getStaticMethod(String name) {
+		Method[] methods = java.getMethods();
+		int count = 0;
+		for(Method m:methods)
+			if(Modifier.isStatic(m.getModifiers()) && m.getName().equals(name))
+				count ++;
+
+		Method[] good_methods = new Method[count];
+		Class[][] defs = new Class[count][];
+
+		int j = 0;
+		for(Method m:methods) {
+			if(m.getName().equals(name)) {
+				good_methods[j] = m;
+				defs[j] = m.getParameterTypes();
+				j++;
+			}
+		}
+		
+		if(good_methods.length == 0)
+			throw new ScriptError(ScriptError.AttributeError, java + " has no static method named " + name);
+		
+		return new JInstance.JMethod(null, name, good_methods, defs);
 	}
 }
