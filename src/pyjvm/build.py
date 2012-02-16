@@ -75,6 +75,20 @@ class Project(object):
         
         shutil.rmtree(join(self.path, 'build'), onerror=on_error)
     
+    def create(self):
+        if os.path.exists(join(self.path, 'pyjvm.yaml')):
+            print 'project aleardy exists'
+            return
+        
+        mkdir_quiet(self.path)
+        
+        with open(join(self.path, 'pyjvm.yaml'), 'w') as f:
+            f.write('depend: [$pyjvm]\npath: [.]\ninclude: [os, main]\nmain: main')
+        
+        if not os.path.exists(join(self.path, 'main.py')):
+            with open(join(self.path, 'main.py'), 'w') as f:
+                f.write('print \'Hello world!\'\n')
+    
 
 class ProjectConf(object):
     def __init__(self, path):

@@ -1,15 +1,18 @@
 pyjvm
 =====
 
-Download
+Installation
 --------
 
 	git clone git://github.com/zielmicha/pyjvm
 	cd pyjvm
-	javac pyjvm/*.java
+	ln -s $PWD/pyjvm ~/bin/pyjvm
 
 Usage
 -----
 
-	sh runcode.sh filename.py
-
+	# create project
+    pyjvm -p ~/pyjvm_example create
+    # run project
+    pyjvm -p ~/pyjvm_example run
+    
