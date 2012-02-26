@@ -11,8 +11,10 @@ Installation
 Usage
 -----
 
-	# create project
+    # create project
     pyjvm -p ~/pyjvm_example create
     # run project
     pyjvm -p ~/pyjvm_example run
-    
+    # build and run JAR
+    pyjvm -p ~/pyjvm_example jar
+    java -jar ~/pyjvm_example/build/build.jar

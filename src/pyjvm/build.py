@@ -36,6 +36,7 @@ class Project(object):
         
         shutil.copytree(join(self.path, 'build', 'classes'), join(self.path, 'build', 'jar'))
         shutil.copytree(join(self.path, 'build', 'bytecode'), join(self.path, 'build', 'jar', 'bc'))
+        os.remove(join(self.path, 'build', 'jar', 'sources.list'))
         
         with open(join(self.path, 'build', 'jar', 'bc', 'mf'), 'w') as f:
             f.write(self.main_module + '\n')
