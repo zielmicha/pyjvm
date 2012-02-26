@@ -16,6 +16,8 @@ def main():
         cmd_clean(project_path, args)
     elif cmd == 'create':
         cmd_create(project_path, args)
+    elif cmd == 'jar':
+        cmd_jar(project_path, args)
     else:
         return help()
 
@@ -41,7 +43,8 @@ def help():
     print 'action:'
     print '\trun     runs project'
     print '\tclean   cleans project build output'
-    print '\tcreate  creates new project' 
+    print '\tcreate  creates new project'
+    print '\tjar     build JAR for project'
     print 'see also: pyjvm.zielm.com'
 
 def cmd_run(path, args):
@@ -69,3 +72,11 @@ def cmd_create(path, args):
     
     proj = pyjvm.build.Project(path)
     proj.create()
+
+def cmd_jar(path, args):
+    if args:
+        sys.exit("pyjvm jar - not expecting any arguments")
+    
+    proj = pyjvm.build.Project(path)
+    proj.build()
+    proj.create_jar()

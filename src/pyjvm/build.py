@@ -2,6 +2,7 @@ import os
 import yaml
 import shutil
 import subprocess
+import subprocess
 
 from os.path import join
 
@@ -28,6 +29,29 @@ class Project(object):
         
         build_java.build(self.java_path, join(self.path, 'build', 'classes'))
         build_py.build(self.python_path, self.include_modules, join(self.path, 'build', 'bytecode'))
+    
+    def create_jar(self):
+        if os.path.exists(join(self.path, 'build', 'jar')):
+            shutil.rmtree(join(self.path, 'build', 'jar'))
+        
+        shutil.copytree(join(self.path, 'build', 'classes'), join(self.path, 'build', 'jar'))
+        shutil.copytree(join(self.path, 'build', 'bytecode'), join(self.path, 'build', 'jar', 'bc'))
+        
+        with open(join(self.path, 'build', 'jar', 'bc', 'mf'), 'w') as f:
+            f.write(self.main_module + '\n')
+        
+        mkdir_quiet(join(self.path, 'build', 'jar', 'META-INF'))
+        
+        with open(join(self.path, 'build', 'jar', 'META-INF', 'MANIFEST.MF'), 'w') as f:
+            f.write('Manifest-Version: 1.0\n')
+            f.write('Main-Class: pyjvm.JarMain\n')
+            f.write('\n')
+        
+        subprocess.check_call(('jar', 'cfm',
+                               join(self.path, 'build', 'build.jar'),
+                               join(self.path, 'build', 'jar', 'META-INF', 'MANIFEST.MF'),
+                               '-C', join(self.path, 'build', 'jar'),
+                                '.'))
     
     def load(self):
         if self._loaded:
