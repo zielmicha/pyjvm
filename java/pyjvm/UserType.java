@@ -28,7 +28,12 @@ public final class UserType extends Type {
 	private UserType(int name, Tuple bases, StringDict dict) {
 		this.name = name;
 		this.bases = bases;
-		this.dict = UserObjClass.dict.copy();
+		if(bases.length() == 0)
+			this.dict = UserObjClass.dict.copy();
+		else if(bases.length() == 1)
+			this.dict = ((UserType)bases.get(0)).dict.copy();
+		else
+			throw new ScriptError(ScriptError.NotImplementedError, "multiple inhertiance");
 		this.dict.update(dict);
 	}
 

@@ -51,13 +51,16 @@ public class Reflect { //!export modules.reflect.Reflect
 					Obj obj = args[i];
 					Type type = obj.getType();
 					Map<Class, ToJava> s = toJavaConverters.get(type);
-					if(s == null || s.get(c) == null)
+					if(s == null || s.get(c) == null) {
+						j++;
 						continue typeLoop;
+					}
 				}
 				// Success! We have matched Python args with Java types!!!
 				return j;
+			} else {
+				j++;
 			}
-			j++;
 		}
 		
 		String errmsg = "Failed to match parameters " + List.fromArrayUnsafe(args) + ", to definitions: ";
@@ -68,18 +71,27 @@ public class Reflect { //!export modules.reflect.Reflect
 	}
 	
 	static Object[] argsToJava(Class[] types, Obj[] args) {
+		if(types.length != args.length) {
+			throw new ScriptError(ScriptError.InternalError, "not matching length of " + Arrays.toString(types) + " and " + Arrays.toString(args));
+		}
 		Object[] result = new Object[args.length];
 		for(int i=0; i<args.length; i++) {
 			Class c = types[i];
 			Obj obj = args[i];
 			Type type = obj.getType();
-			ToJava s = toJavaConverters.get(type).get(c);
+			Map<Class, ToJava> hash = toJavaConverters.get(type);
+			if(hash == null)
+				throw new ScriptError(ScriptError.InternalError, "no map for " + type);
+			ToJava s = hash.get(c);
+			if(s == null)
+				throw new ScriptError(ScriptError.InternalError, "no def for " + type + ", " + c);
 			result[i] = s.convert(args[i]);
 		}
 		return result;
 	}
 	
 	static Obj fromJava(Object obj) {
+		if(obj == null) return Obj.None;
 		Class c = obj.getClass();
 		if(fromJavaConverters.containsKey(c)) {
 			return fromJavaConverters.get(c).convert(obj);
@@ -116,6 +128,13 @@ public class Reflect { //!export modules.reflect.Reflect
 			@Override
 			public Object convert(Obj o) {
 				return ((ByteArray)o).bytes;
+			}
+		});
+		
+		addToJavaConverter(byte[].class, SStringClass.instance, new ToJava() {
+			@Override
+			public Object convert(Obj o) {
+				return ((SString)o).bytes;
 			}
 		});
 		

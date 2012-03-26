@@ -341,3 +341,7 @@ assert 'abcd' > 'abc'
 assert 'abc' >= 'abc'
 assert 'abc' <= 'abc'
 
+assert not None
+
+if None:
+	assert False

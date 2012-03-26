@@ -22,6 +22,7 @@
 package pyjvm;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 public final class SString extends NativeObj { //!export SString BaseString
 	public final byte[] bytes;
@@ -169,6 +170,35 @@ public final class SString extends NativeObj { //!export SString BaseString
 		} else {
 			return null;
 		}
+	}
+	
+	public SString strip() { //!export
+		int left, right;
+		for(left=0; left < length(); left++) {
+			byte ch = bytes[left];
+			if(!(ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r'))
+				break;
+		}
+		for(right=length()-1; right > left; right--) {
+			byte ch = bytes[left];
+			if(!(ch == ' ' || ch == '\n' || ch == '\t' || ch == '\t'))
+				break;
+		}
+		return (SString)getSlice(SInt.get(left), SInt.get(right));
+	}
+	
+	public SString lower() { //!export
+		SString n = new SString(Arrays.copyOf(bytes, bytes.length));
+		for(int i=0; i<bytes.length; i++)
+			n.bytes[i] = (byte) Character.toLowerCase(n.bytes[i]);
+		return n;
+	}
+	
+	public SString upper() { //!export
+		SString n = new SString(Arrays.copyOf(bytes, bytes.length));
+		for(int i=0; i<bytes.length; i++)
+			n.bytes[i] = (byte) Character.toUpperCase(n.bytes[i]);
+		return n;
 	}
 	
 	public boolean contains(Obj other) { //!export

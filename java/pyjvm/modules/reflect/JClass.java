@@ -20,8 +20,11 @@
 package pyjvm.modules.reflect;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import pyjvm.*;
 
 public class JClass extends Obj {
@@ -40,7 +43,12 @@ public class JClass extends Obj {
 				}
 			};
 		
-		return getStaticMethod(SString.unintern(name).toString());
+		Obj result = getStaticField(SString.unintern(name).toString());
+		if(result == null) {
+			return getStaticMethod(SString.unintern(name).toString());
+		} else {
+			return result;
+		}
 	}
 	
 	public Obj create(Obj[] args) {
@@ -85,8 +93,22 @@ public class JClass extends Obj {
 		}
 		
 		if(good_methods.length == 0)
-			throw new ScriptError(ScriptError.AttributeError, java + " has no static method named " + name);
+			throw new ScriptError(ScriptError.AttributeError, java + " has no static method/field named " + name);
 		
 		return new JInstance.JMethod(null, name, good_methods, defs);
+	}
+
+	private Obj getStaticField(String name) {
+		Field field;
+		Object ret;
+		try {
+			field = java.getField(name);
+			ret = field.get(this.java);
+		} catch (NoSuchFieldException ex) {
+			return null;
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+		return Reflect.fromJava(ret);
 	}
 }

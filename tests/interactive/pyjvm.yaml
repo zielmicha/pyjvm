@@ -1,0 +1,4 @@
+depend: [$pyjvm]
+path: [.]
+include: [os, main]
+main: main

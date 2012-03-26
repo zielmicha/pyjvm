@@ -112,6 +112,14 @@ public final class BuiltinsClass extends Type {
 				return Builtins.range(args);
 			}
 		});
+		dict.put("getattr", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 2) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 2, got " + args.length + ")");
+				}
+				return Builtins.getattr(args[0], args[1]);
+			}
+		});
 		dict.put("xrange", new Obj() {
 			public Obj call(Obj[] args) {
 				// direct

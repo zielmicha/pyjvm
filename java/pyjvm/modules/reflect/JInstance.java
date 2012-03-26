@@ -57,6 +57,9 @@ public class JInstance extends Obj { //!export
 			if(m.getName().equals(name)) {
 				good_methods[j] = m;
 				defs[j] = m.getParameterTypes();
+				// Java is stupid; if class is protected it doesn't
+				// allow access to _any_ methods via reflection
+				m.setAccessible(true);
 				j++;
 			}
 		}
@@ -98,7 +101,7 @@ public class JInstance extends Obj { //!export
 				result = methods[match].invoke(obj, jargs);
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
-			} 
+			}
 			return Reflect.fromJava(result);
 		}
 		

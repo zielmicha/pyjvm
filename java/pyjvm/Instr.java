@@ -23,7 +23,7 @@ package pyjvm;
 
 import java.util.Arrays;
 
-public abstract class Instr extends Obj {
+public abstract class Instr extends NativeObj { //!export Instr
 	protected Instr next;
 	public int lineno;
 	public SString filename;
@@ -32,6 +32,19 @@ public abstract class Instr extends Obj {
 	protected int inreg1 = -1;
 	
 	protected int outreg0; 
+	
+	public Type getType() {
+		return InstrClass.instance;
+	}
+	
+	public void run(Obj dict) { //!export
+		Frame frame = new Frame(null);
+		frame.builtins = Builtins.dict;
+		frame.module = new Module();
+		if(dict != null)
+			frame.globals = (StringDict) dict;
+		Frame.execute(frame, this);
+	}
 	
 	public void initReg(int[] inreg, int[] outreg) {
 		if(outreg.length > 1 || inreg.length > 2)

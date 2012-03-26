@@ -140,6 +140,10 @@ public final class Builtins { //!export Builtins
 		return l;
 	}
 	
+	public static final Obj getattr(Obj obj, Obj name) { //!export
+		return obj.getAttr(name.stringValue().intern());
+	}
+	
 	public static final Obj xrange(Obj[] args) { //!export direct
 		int start = 0;
 		int step = 1;
@@ -195,6 +199,7 @@ public final class Builtins { //!export Builtins
 	public static void importBuiltins() {
 		Module m = Importer.importModule("builtins");
 		dict.put("map", m.dict.get("map"));
+		dict.put("raw_input", m.dict.get("raw_input"));
 	}
 	
 	public static final StringDict dict;

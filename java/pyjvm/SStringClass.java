@@ -41,6 +41,30 @@ public final class SStringClass extends Type {
 			}
 		};
 		
+		dict.put("strip", new Method() {
+			public Obj callMethod(Obj self, Obj[] args) {
+				if(args.length != 0) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 0, got " + args.length + ")");
+				}
+				return ((SString)self).strip();
+			}
+		});
+		dict.put("lower", new Method() {
+			public Obj callMethod(Obj self, Obj[] args) {
+				if(args.length != 0) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 0, got " + args.length + ")");
+				}
+				return ((SString)self).lower();
+			}
+		});
+		dict.put("upper", new Method() {
+			public Obj callMethod(Obj self, Obj[] args) {
+				if(args.length != 0) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 0, got " + args.length + ")");
+				}
+				return ((SString)self).upper();
+			}
+		});
 		dict.put("contains", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 1) {

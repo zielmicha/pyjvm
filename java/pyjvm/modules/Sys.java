@@ -20,6 +20,8 @@
 
 package pyjvm.modules;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import pyjvm.*;
 
 public class Sys { //!export modules.Sys
@@ -32,6 +34,11 @@ public class Sys { //!export modules.Sys
 			argv.append(SString.fromJavaString(args[i]));
 		}
 		dict.put("argv", argv);
+	}
+	
+	public static Obj unserialize(Obj data) { //!export
+		InputStream in = new ByteArrayInputStream(data.stringValue().bytes);
+		return Unserializer.unserialize(in);
 	}
 	
 	static {
