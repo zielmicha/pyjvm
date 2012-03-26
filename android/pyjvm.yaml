@@ -1,0 +1,9 @@
+depend: [$pyjvm]
+path:
+- lib
+include:
+- os
+- _android_main
+java:
+- java
+build-script: src/build.py

@@ -20,10 +20,12 @@
 
 package pyjvm;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 
 public class Importer {
 
@@ -42,7 +44,7 @@ public class Importer {
 			return (Module)builtin;
 		}
 		
-		InputStream module = findModule(name.toString());
+		Instr module = readModule(name.toString());
 		
 		return loadModule(module, name);
 	}
@@ -52,8 +54,7 @@ public class Importer {
 		return importModule(new SString(name));
 	}
 	
-	public static Module loadModule(InputStream code, SString name) {
-		Instr mainInstr = (Instr) Unserializer.unserialize(code);
+	public static Module loadModule(Instr code, SString name) {
 		Module object = new Module();
 		object.dict.put("__name__", name);
 		modules.put(name, object);
@@ -66,7 +67,7 @@ public class Importer {
 			Module parent = importModule(new SString(parentModuleName));
 			parent.setAttr(SString.intern(thisModuleName), object);
 		}
-		executeModule(object, mainInstr);
+		executeModule(object, code);
 		return object;
 	}
 	
@@ -79,7 +80,15 @@ public class Importer {
 		Frame.execute(frame, mainInstr);
 	}
 	
-	public static InputStream findModule(String name) {
+	public static Instr readModule(String name) {
+		Obj preloaded = loadedFiles.getOrNull(new SString(name).intern());
+		if(preloaded != null)
+			return (Instr) preloaded;
+		InputStream in = findModule(name);
+		return (Instr) Unserializer.unserialize(in);
+	}
+	
+	private static InputStream findModule(String name) {
 		String nameExt = name + ".bc";
 		for(int i=0; i<path.length(); i++) {
 			String item = path.getItem(i).stringValue().toString();
@@ -100,9 +109,15 @@ public class Importer {
 		throw new ScriptError(ScriptError.ImportError, "No module named " + name);
 	}
 	
+	public static void loadArchive(InputStream stream) {
+		StringDict read = (StringDict) Unserializer.unserialize(stream);
+		loadedFiles.update(read);
+	}
+	
 	public static List path = new List(); 
 	public static StringDict modules = new StringDict();
 	public static StringDict builtinModules = new StringDict();
+	public static StringDict loadedFiles = new StringDict();
 	public static boolean builtinsImported;
 	
 	static {

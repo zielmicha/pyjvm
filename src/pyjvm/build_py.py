@@ -8,9 +8,11 @@ def build(path, include, dest):
 
 
 class Builder(object):
-    def __init__(self, path, dest):
+    def __init__(self, path, dest, build_archive=False):
         self.path = path
         self.dest = dest
+        self.build_archive = build_archive
+        self.archive = []
         self.find_cache = {}
         self.compiled = set()
     
@@ -21,6 +23,15 @@ class Builder(object):
         while self.queue:
             parent, name = self.queue.pop()
             self.build_module(parent, name)
+        
+        if self.build_archive:
+            self.write_archive()
+    
+    def write_archive(self):
+        serializer = serialize.Serializer()
+        serializer.serialize_archive_dict(self.archive)
+        with open(self.dest, 'wb') as f:
+            f.write(serializer.out.getvalue())
     
     def build_module(self, parent, name):
         full_name, path = self.find_module(parent, name)
@@ -40,9 +51,12 @@ class Builder(object):
         
         self.scan_imports(full_name, main_instr)
         
-        dest_path = os.path.join(self.dest, full_name + '.bc')
-        with open(dest_path, 'wb') as f:
-            f.write(serialize.serialize(main_instr, filename=path))
+        if self.build_archive:
+            self.archive.append((full_name, main_instr, path))
+        else:
+            dest_path = os.path.join(self.dest, full_name + '.bc')
+            with open(dest_path, 'wb') as f:
+                f.write(serialize.serialize(main_instr, filename=path))
     
     def scan_imports(self, module_name, main_instr):
         imports = get_imports(main_instr)

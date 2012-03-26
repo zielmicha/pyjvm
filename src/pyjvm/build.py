@@ -19,6 +19,7 @@ class Project(object):
         self.python_path = []
         self.java_path = []
         self.include_modules = []
+        self.actions = {}
     
     def build(self):
         self.load()
@@ -54,6 +55,12 @@ class Project(object):
                                '-C', join(self.path, 'build', 'jar'),
                                 '.'))
     
+    def action(self, name):
+        def decorator(func):
+            self.actions[name] = func
+            return func
+        return decorator
+    
     def load(self):
         if self._loaded:
             return
@@ -83,6 +90,13 @@ class Project(object):
         self.include_modules += conf.get_include_modules()
         self.python_path += conf.get_python_path()
         self.java_path += conf.get_java_path()
+        
+        script = conf.get_build_script()
+        if script:
+            self.execute_build_script(script)
+    
+    def execute_build_script(self, path):
+        execfile(path, {'__file__': path, '__name__': '__build__', 'project': self})
     
     def execute(self, module):
         last_cwd = os.getcwd()
@@ -125,6 +139,8 @@ class ProjectConf(object):
         for name in self.config.get('depend', []):
             if name == '$pyjvm':
                 l.append(pyjvm_project_path)
+            elif name.startswith('$pyjvm/'):
+                l.append(join(pyjvm_project_path, name.split('/', 1)[1]))
             else:
                 l.append(os.path.abspath(join(self.path, name)))
         return l
@@ -140,6 +156,10 @@ class ProjectConf(object):
     
     def get_main_module(self):
         return self.config.get('main', 'main')
+    
+    def get_build_script(self):
+        if 'build-script' in self.config:
+            return os.path.abspath(join(self.path, self.config['build-script']))
 
 def mkdir_quiet(path):
     try:

@@ -1,0 +1,5 @@
+name: Basic Test
+activity_name: BasicTest
+version: 1.0.0
+vercode: 1000
+package: com.zielm.pyjvm.test.basic

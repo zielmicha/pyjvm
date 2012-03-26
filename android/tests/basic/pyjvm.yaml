@@ -1,0 +1,4 @@
+depend: [$pyjvm/android]
+path: [.]
+include: [os, main]
+# main: main - currently ignored

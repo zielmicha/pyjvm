@@ -3,7 +3,7 @@ import subprocess
 
 class JavacError(Exception): pass
 
-def build(sources, dest):
+def build(sources, dest, use_javac=None):
     all_files = [  ]
     for source in sources:
         java_files = find_ext(source, '.java')
@@ -13,7 +13,7 @@ def build(sources, dest):
             class_path = class_path[:-5] + '.class'
             if is_source_earlier(java_path, class_path):
                 all_files.append(java_path)
-    javac(all_files, sources, dest)
+    (use_javac or javac)(all_files, sources, dest)
     
 
 def is_source_earlier(src, dest):

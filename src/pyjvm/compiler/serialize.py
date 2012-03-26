@@ -195,6 +195,15 @@ class Serializer(object):
 			self.write('l')
 		else:
 			self.serialize_value(obj)
+	
+	def serialize_archive_dict(self, archive):
+		self.write('D')
+		self.pack_uint(len(archive))
+		
+		for name, code, fn in archive:
+			self.pack_uint(len(name))
+			self.write(name)
+			self.serialize(code, filename=fn)
 
 def serialize(obj, filename=None):
 	serializer = Serializer()
