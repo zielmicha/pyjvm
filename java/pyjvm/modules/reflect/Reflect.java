@@ -118,49 +118,42 @@ public class Reflect { //!export modules.reflect.Reflect
 		dict.put("__name__", SString.fromJavaString("reflect"));
 		
 		addToJavaConverter(String.class, SStringClass.instance, new ToJava() {
-			@Override
 			public Object convert(Obj o) {
 				return o.stringValue().toString();
 			}
 		});
 		
 		addToJavaConverter(byte[].class, ByteArrayClass.instance, new ToJava() {
-			@Override
 			public Object convert(Obj o) {
 				return ((ByteArray)o).bytes;
 			}
 		});
 		
 		addToJavaConverter(byte[].class, SStringClass.instance, new ToJava() {
-			@Override
 			public Object convert(Obj o) {
 				return ((SString)o).bytes;
 			}
 		});
 		
 		addToJavaConverter(int.class, SIntClass.instance, new ToJava() {
-			@Override
 			public Object convert(Obj o) {
 				return Integer.valueOf(o.intValue());
 			}
 		});
 		
 		addFromJavaConverter(Integer.class, new FromJava() {
-			@Override
 			public Obj convert(Object obj) {
 				return SInt.get(((Integer)obj).intValue());
 			}
 		});
 		
 		addFromJavaConverter(String.class, new FromJava() {
-			@Override
 			public Obj convert(Object obj) {
 				return SString.fromJavaString((String)obj);
 			}
 		});
 		
 		addFromJavaConverter(Long.class, new FromJava() {
-
 			public Obj convert(Object obj) {
 				return SInt.get(((Long)obj).longValue());
 			}

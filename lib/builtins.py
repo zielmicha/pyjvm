@@ -7,3 +7,6 @@ def map(func, seq):
 def raw_input(prompt):
     print prompt,
     return sys.stdin.readline()
+
+def open(name, mode='r'):
+    return os.File(name, mode)

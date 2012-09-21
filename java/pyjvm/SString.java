@@ -321,6 +321,7 @@ public final class SString extends NativeObj { //!export SString BaseString
 		} else if(u >= len) {
 			u = len;
 		}
+		if(l > u) l = u;
 
 		byte[] n = new byte[u - l];
 		System.arraycopy(this.bytes, l, n, 0, u - l);
