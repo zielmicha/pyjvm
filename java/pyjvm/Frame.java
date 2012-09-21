@@ -41,6 +41,14 @@ public final class Frame {
 		this.parent = parent;
 	}
 
+	public Frame getRoot() {
+		Frame current = this;
+		while(current.parent != null) {
+			current = current.parent;
+		}
+		return current;
+	}
+	
 	public static void execute(Frame frame, Instr instr) {
 		while(instr != null) {
 			try {
@@ -69,6 +77,15 @@ public final class Frame {
 	private static void causeException(Frame frame, Throwable e) {
 		frame.throwable = e;
 		frame.exceptionObject = null;
+		Frame bindFrame = frame;
+		if(e instanceof ScriptError) {
+			Frame cause = ((ScriptError)e).cause;
+			if(cause != null) {
+				Frame lastRoot = cause.getRoot();	
+				lastRoot.parent = frame;
+				bindFrame = cause; 
+			}
+		}
 		Frame current = frame;
 		while(current != null) {
 			while(current.excHandlersCount > 0) {
@@ -80,10 +97,14 @@ public final class Frame {
 			}
 			current = current.parent;
 		}
-		printExc(frame, e);
-		throw new ScriptError(ScriptError.Error, e);
+		//printExc(frame, e);
+		throw new ScriptError(ScriptError.Error, e, bindFrame);
 	}
 
+	public void printPythonTrace(Throwable e) {
+		printExc(this, e);
+	}
+	
 	public static void printExc(Frame frame, Throwable e) {
 		System.err.println("Traceback (most recent call last):");
 		Frame current = frame;
@@ -96,7 +117,8 @@ public final class Frame {
 		for(int i=0; i < lines.size(); i++) {
 			System.err.println((String)lines.get(lines.size() - i - 1));
 		}
-		System.err.println(e);
+		if(e != null)
+			System.err.println(e);
 		System.err.println();
 	}
 	

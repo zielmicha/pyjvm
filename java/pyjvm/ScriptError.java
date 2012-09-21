@@ -53,6 +53,7 @@ public class ScriptError extends RuntimeException {
 	
 	public final String message;
 	public final int kind;
+	public Frame cause = null;
 	private Obj sender;
 	
 	public ScriptError(int kind, String message) {
@@ -61,15 +62,26 @@ public class ScriptError extends RuntimeException {
 		this.message = message;
 	}
 	
+	public ScriptError(int kind, String message, Throwable e) {
+		super(message == null ? e.getMessage() : message, e);
+		this.kind = (e instanceof ScriptError)? ((ScriptError)e).kind : kind;
+		this.message = this.getMessage();
+	}
+	
 	public ScriptError(int kind, Throwable e) {
-		this(kind, "", e);
+		this(kind, null, e);
+	}
+	
+	public ScriptError(int kind, Throwable e, Frame cause) {
+		this(kind, e);
+		this.cause = cause;
 	}
 
-	public ScriptError(int kind, String message, Throwable e) {
-		super(message, e);
-		this.kind = kind;
-		this.message = message;
-	}
+	/*public ScriptError(int kind, String message, Throwable e) {
+		super(message, (e instanceof ScriptError)?null:e);
+		this.kind = (e instanceof ScriptError)?((ScriptError)e).kind:kind;
+		this.message = (e instanceof ScriptError)?((ScriptError)e).message:message;
+	}*/
 	
 	public ScriptError(int kind, String message, Obj sender) {
 		super(message);
@@ -111,6 +123,9 @@ public class ScriptError extends RuntimeException {
 	public void printStackTrace(PrintStream s) {
 		s.print("\r                          \r"); // hides "Exception in..." ugly message 
 		super.printStackTrace(s);
+		if(cause != null) {
+			cause.printPythonTrace(this);
+		}
 	}
 	
 	static {

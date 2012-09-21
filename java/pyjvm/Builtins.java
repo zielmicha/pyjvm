@@ -200,7 +200,7 @@ public final class Builtins { //!export Builtins
 		Module m = Importer.importModule("builtins");
 		dict.put("map", m.dict.get("map"));
 		dict.put("raw_input", m.dict.get("raw_input"));
-                dict.put("open", m.dict.get("open"));
+		dict.put("open", m.dict.get("open"));
 	}
 
 	public static final StringDict dict;

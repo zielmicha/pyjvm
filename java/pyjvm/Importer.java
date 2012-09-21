@@ -93,14 +93,14 @@ public class Importer {
 		for(int i=0; i<path.length(); i++) {
 			String item = path.getItem(i).stringValue().toString();
 			try {
-                                File f = new File(new File(item), nameExt);
-                                return new FileInputStream(f);
+				File f = new File(new File(item), nameExt);
+                return new FileInputStream(f);
 			} catch (Exception e) {
 				try {
-                                    InputStream res = Importer.class.getResourceAsStream("/" + item + "/" + nameExt);
-                                    if(res == null)
-                                            throw new IOException();
-                                    return res;
+					InputStream res = Importer.class.getResourceAsStream("/" + item + "/" + nameExt);
+					if(res == null)
+						throw new IOException();
+					return res;
 				} catch (Exception e2) {
 					continue;
 				}
