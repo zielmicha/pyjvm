@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,16 +27,16 @@ public abstract class Instr extends NativeObj { //!export Instr
 	protected Instr next;
 	public int lineno;
 	public SString filename;
-	
+
 	protected int inreg0 = -1;
 	protected int inreg1 = -1;
-	
-	protected int outreg0; 
-	
+
+	protected int outreg0;
+
 	public Type getType() {
 		return InstrClass.instance;
 	}
-	
+
 	public void run(Obj dict) { //!export
 		Frame frame = new Frame(null);
 		frame.builtins = Builtins.dict;
@@ -45,7 +45,7 @@ public abstract class Instr extends NativeObj { //!export Instr
 			frame.globals = (StringDict) dict;
 		Frame.execute(frame, this);
 	}
-	
+
 	public void initReg(int[] inreg, int[] outreg) {
 		if(outreg.length > 1 || inreg.length > 2)
 			throw new ScriptError(ScriptError.TypeError, "Instr " + this + " expects 1 outreg and 2 inregs");
@@ -56,7 +56,7 @@ public abstract class Instr extends NativeObj { //!export Instr
 		if(outreg.length >= 1)
 			outreg0 = outreg[0];
 	}
-	
+
 	public void init(Tuple args) {
 		if(args.length() == 0)
 			init0();
@@ -67,11 +67,11 @@ public abstract class Instr extends NativeObj { //!export Instr
 		else
 			throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (" + args.length() + ")");
 	}
-	
+
 	public void init0() {
 		throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (0)");
 	}
-	
+
 	public void init1(Obj arg) {
 		throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (1)");
 	}
@@ -79,7 +79,7 @@ public abstract class Instr extends NativeObj { //!export Instr
 	public void init2(Obj arg0, Obj arg1) {
 		throw new ScriptError(ScriptError.TypeError, "Invalid number of arguments (2)");
 	}
-	
+
 	public void setNext2(Instr next) {
 		throw new ScriptError(ScriptError.TypeError, "Setting next2 on non-JumpIf like instr");
 	}
@@ -88,10 +88,10 @@ public abstract class Instr extends NativeObj { //!export Instr
 		Tuple args = (Tuple)data.get(0);
 		Tuple inreg = (Tuple)data.get(1);
 		Tuple outreg = (Tuple)data.get(2);
-		
+
 		int next1offset = data.getInt(3);
 		int next2offset = data.getInt(4);
-		
+
 		if(next1offset != 0) {
 			int next1 = id + next1offset;
 			this.next = instrs[next1];
@@ -100,18 +100,18 @@ public abstract class Instr extends NativeObj { //!export Instr
 			int next2 = id + next2offset;
 			this.setNext2(instrs[next2]);
 		}
-		
+
 		this.lineno = data.getInt(5);
-		
+
 		this.initReg(inreg.toIntArray(), outreg.toIntArray());
 		this.init(args);
 	}
-	
+
 	public String toString() {
 		return "<Instr name=" + getClass().getSimpleName() + " lineno=" + lineno + " filename=" + filename +
 			" inreg0=" + inreg0 + " outreg0=" + outreg0 + ">";
 	}
-	
+
 	public static Instr create(int type, Tuple args) {
 		switch(type) {
 			case INSTR_BINOP:
@@ -186,7 +186,7 @@ public abstract class Instr extends NativeObj { //!export Instr
 			case INSTR_RERAISE:
 				return new GenericInstrs.Reraise();
 			case INSTR_GETIMPORTATTR:
-				return new GenericInstrs.GetImportAttr(); 
+				return new GenericInstrs.GetImportAttr();
 			case INSTR_DELGLOBAL:
 				return new GenericInstrs.DelGlobal();
 			case INSTR_DELATTR:
@@ -201,25 +201,29 @@ public abstract class Instr extends NativeObj { //!export Instr
 				return new GenericInstrs.ListAppend();
 			case INSTR_UNPACKTUPLE:
 				return new GenericInstrs.UnpackTuple();
+			case INSTR_NESTED:
+				return new GenericInstrs.Nested();
+			case INSTR_CALL1:
+				return new GenericInstrs.Call1();
 			default:
 				throw new ScriptError(ScriptError.ValueError, "Unknown Instr type code (" + type + ")");
 		}
 	}
-	
+
 	public abstract Instr run(Frame frame);
-	
+
 	public static final int INSTR_ASSERTFAIL = 0;
-	public static final int INSTR_BINOP = 1;     
-	public static final int INSTR_BINOPIP = 2;   
-	public static final int INSTR_CALL = 3;      
-	public static final int INSTR_COMPARE = 4;   
-	public static final int INSTR_CONST = 5;     
-	public static final int INSTR_COPY = 6;      
-	public static final int INSTR_EXCMATCH = 7;  
-	public static final int INSTR_FORITER = 8;   
-	public static final int INSTR_FUNCTION = 9;  
-	public static final int INSTR_GETATTR = 10;  
-	public static final int INSTR_GETEXC = 11;   
+	public static final int INSTR_BINOP = 1;
+	public static final int INSTR_BINOPIP = 2;
+	public static final int INSTR_CALL = 3;
+	public static final int INSTR_COMPARE = 4;
+	public static final int INSTR_CONST = 5;
+	public static final int INSTR_COPY = 6;
+	public static final int INSTR_EXCMATCH = 7;
+	public static final int INSTR_FORITER = 8;
+	public static final int INSTR_FUNCTION = 9;
+	public static final int INSTR_GETATTR = 10;
+	public static final int INSTR_GETEXC = 11;
 	public static final int INSTR_GETITEM = 12;
 	public static final int INSTR_GETITER = 13;
 	public static final int INSTR_GETLOCALSDICT = 14;
@@ -248,16 +252,18 @@ public abstract class Instr extends NativeObj { //!export Instr
 	public static final int INSTR_UNARYOP = 37;
 	public static final int INSTR_UNPACKTUPLE = 38;
 	public static final int INSTR_USEONLYGLOBALS = 39;
-	
+
 	public static final int INSTR_GETIMPORTATTR = 40;
 	public static final int INSTR_DELATTR = 41;
 	public static final int INSTR_DELGLOBAL = 42;
 	public static final int INSTR_MAKEDICT = 43;
+	public static final int INSTR_NESTED = 44;
+	public static final int INSTR_CALL1 = 45;
 }
 
 abstract class JumpIfLikeInstr extends Instr {
 	public Instr next2;
-	
+
 	public void setNext2(Instr next) {
 		this.next2 = next;
 	}

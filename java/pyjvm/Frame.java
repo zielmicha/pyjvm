@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,13 +30,14 @@ public final class Frame {
 	public Instr counter;
 	public final Instr[] excHandlers = new Instr[16];
 	public int excHandlersCount = 0;
-	
+
 	public Frame setFrame = null;
 	public Instr setInstr = null;
 	public int returnValueTo = -1;
+	public Frame parentScope;
 	private Throwable throwable;
 	private Obj exceptionObject;
-	
+
 	public Frame(Frame parent) {
 		this.parent = parent;
 	}
@@ -48,7 +49,7 @@ public final class Frame {
 		}
 		return current;
 	}
-	
+
 	public static void execute(Frame frame, Instr instr) {
 		while(instr != null) {
 			try {
@@ -58,7 +59,7 @@ public final class Frame {
 					//	System.err.print(Obj.repr(frame.reg[i]) + ", ");
 					System.err.println();
 					instr.dump();//*/
-					
+
 					instr = instr.run(frame);
 				}
 			} catch(Throwable e) {
@@ -81,9 +82,9 @@ public final class Frame {
 		if(e instanceof ScriptError) {
 			Frame cause = ((ScriptError)e).cause;
 			if(cause != null) {
-				Frame lastRoot = cause.getRoot();	
+				Frame lastRoot = cause.getRoot();
 				lastRoot.parent = frame;
-				bindFrame = cause; 
+				bindFrame = cause;
 			}
 		}
 		Frame current = frame;
@@ -104,7 +105,7 @@ public final class Frame {
 	public void printPythonTrace(Throwable e) {
 		printExc(this, e);
 	}
-	
+
 	public static void printExc(Frame frame, Throwable e) {
 		System.err.println("Traceback (most recent call last):");
 		Frame current = frame;
@@ -121,7 +122,7 @@ public final class Frame {
 			System.err.println(e);
 		System.err.println();
 	}
-	
+
 	public final void loadRegisters(int[] inregs, Obj[] args) {
 		int length = inregs.length;
 		for(int i=0; i<length; i++) {
@@ -137,23 +138,23 @@ public final class Frame {
 		if(throwable == null)
 			throw new ScriptError(ScriptError.RuntimeError, "there is no error thrown");
 		if(exceptionObject == null)
-			exceptionObject = ScriptError.createObject(throwable); 
+			exceptionObject = ScriptError.createObject(throwable);
 		return exceptionObject;
 	}
 
 	public Traceback getTraceback() {
 		return null;
 	}
-	
+
 	public static Obj call(CallInExistingFrame func, Obj[] args) {
 		Frame frame = new Frame(null);
 		frame.builtins = Builtins.dict;
-		
+
 		Instr instr = func.callInExistingFrame(frame, args);
-		
+
 		frame.setInstr = null;
 		Frame.execute(frame, instr);
-		
+
 		return frame.reg[0];
 	}
 

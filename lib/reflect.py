@@ -8,9 +8,7 @@ def get_class_loader():
 
 def implement(interface, methods):
     def handler(name, args):
-        # nested scopes not yet supported
-        #func = methods[name]
-        #return func(*args)
-        print name, args
+        func = methods[name]
+        return func(*list(args))
 
     return Proxy.newProxyInstance(get_class_loader(), [interface], create_invocation_handler(handler))

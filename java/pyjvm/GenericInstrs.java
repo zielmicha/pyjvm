@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,12 +27,12 @@ public final class GenericInstrs {
 	/**
 	 * Container class for various instructions.
 	 */
-	
+
 	private GenericInstrs() {}
-	
+
 	public static class JumpIfNot extends JumpIfLikeInstr {
-		public void init1(Obj label) {} 
-		
+		public void init1(Obj label) {}
+
 		public Instr run(Frame frame) {
 			Obj value = frame.reg[inreg0];
 			if(value.boolValue())
@@ -42,10 +42,10 @@ public final class GenericInstrs {
 		}
 
 	}
-	
+
 	public static class JumpIf extends JumpIfLikeInstr {
-		public void init1(Obj label) {} 
-		
+		public void init1(Obj label) {}
+
 		public Instr run(Frame frame) {
 			Obj value = frame.reg[inreg0];
 			if(value.boolValue())
@@ -55,20 +55,20 @@ public final class GenericInstrs {
 		}
 
 	}
-	
+
 
 	public static class AssertFail extends Instr {
-		public void init0() {} 
-		
+		public void init0() {}
+
 		public Instr run(Frame frame) {
 			Obj err = frame.reg[this.inreg0];
 			throw new ScriptError(ScriptError.AssertionError, err == Obj.None? null: err.toString());
 		}
 	}
-	
+
 	public static final class Const extends Instr {
 		Obj value;
-		
+
 		public void init1(Obj value) {
 			this.value = value;
 		}
@@ -87,16 +87,16 @@ public final class GenericInstrs {
 			frame.reg[outreg0] = frame.globals;
 			return next;
 		}
-		
+
 	}
-	
+
 	public static final class Global extends Instr {
 		private int name;
-		
+
 		public void init1(Obj name) {
 			this.name = name.stringValue().intern();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj val = frame.globals.getOrNull(name);
 			if(val == null)
@@ -109,11 +109,11 @@ public final class GenericInstrs {
 
 	public static final class SetGlobal extends Instr {
 		private int name;
-		
+
 		public void init1(Obj name) {
 			this.name = name.stringValue().intern();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj val = frame.reg[inreg0];
 			if(val == null)
@@ -122,37 +122,56 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 
 	public static final class SetLocal extends Instr {
 		public void init0() {}
 		public void init1(Obj a) {}
-		
+
 		public Instr run(Frame frame) {
 			frame.reg[outreg0] = frame.reg[inreg0];
 			return next;
 		}
 	}
-	
+
+	public static final class Nested extends Instr {
+		private int nestingLevel;
+		private int regnum;
+
+		public void init2(Obj a, Obj b) {
+			nestingLevel = a.intValue();
+			regnum = b.intValue();
+		}
+
+		public Instr run(Frame frame) {
+			Frame current = frame.parentScope;
+			for(int i=0; i<nestingLevel; i++) {
+				current = current.parentScope;
+			}
+			frame.reg[outreg0] = current.reg[regnum];
+			return next;
+		}
+	}
+
 	public static final class UnpackTuple extends Instr {
 		private int length;
 		private int[] outreg;
-		
+
 		public void init1(Obj length) {
 			this.length = length.intValue();
 		}
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			this.outreg = outreg;
 			if(inreg.length != 1)
 				throw new ScriptError(ScriptError.TypeError, "Expected 1 inreg");
 			this.inreg0 = inreg[0];
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj seq = frame.reg[inreg0];
 			Obj iter = seq.getIter();
-			
+
 			for(int i=0; i<this.length; i++) {
 				Obj val = iter.next();
 				if(val == null)
@@ -161,26 +180,26 @@ public final class GenericInstrs {
 			}
 			if(iter.next() != null)
 				throw new ScriptError(ScriptError.ValueError, "too many values to unpack");
-			
+
 			return next;
 		}
 	}
-	
+
 	public static final class MakeTuple extends Instr {
 		private int length;
 		private int[] inreg;
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			this.inreg = inreg;
 			if(outreg.length != 1)
 				throw new ScriptError(ScriptError.TypeError, "Expected 1 outreg");
 			this.outreg0 = outreg[0];
 		}
-		
+
 		public void init1(Obj length) {
 			this.length = length.intValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Tuple tuple;
 			if(this.length == 0)
@@ -192,29 +211,29 @@ public final class GenericInstrs {
 				}
 				tuple = new Tuple(arr);
 			}
-			
+
 			frame.reg[outreg0] = tuple;
-			
+
 			return next;
 		}
-		
+
 	}
-	
+
 	public static final class MakeList extends Instr {
 		private int length;
 		private int[] inreg;
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			this.inreg = inreg;
 			if(outreg.length != 1)
 				throw new ScriptError(ScriptError.TypeError, "Expected 1 outreg");
 			this.outreg0 = outreg[0];
 		}
-		
+
 		public void init1(Obj length) {
 			this.length = length.intValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			List tuple;
 			Obj[] arr = new Obj[length];
@@ -222,48 +241,48 @@ public final class GenericInstrs {
 				arr[i] = frame.reg[inreg[i]];
 			}
 			tuple = List.fromArrayUnsafe(arr);
-			
+
 			frame.reg[outreg0] = tuple;
-			
+
 			return next;
 		}
-		
+
 	}
-	
+
 	public static final class MakeDict extends Instr {
 		private int length;
 		private int[] inreg;
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			this.inreg = inreg;
 			if(outreg.length != 1)
 				throw new ScriptError(ScriptError.TypeError, "Expected 1 outreg");
 			this.outreg0 = outreg[0];
 		}
-		
+
 		public void init1(Obj length) {
 			this.length = length.intValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Dict dict = new Dict(length * 3 / 2);
 			for(int i=0; i<length*2; i+=2) {
 				dict.put(frame.reg[inreg[i]], frame.reg[inreg[i+1]]);
 			}
 			frame.reg[outreg0] = dict;
-			
+
 			return next;
 		}
-		
+
 	}
-	
+
 	public static final class Print extends Instr {
 		private boolean hasLF;
-		
+
 		public void init1(Obj obj) {
 			hasLF = obj.boolValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			// TODO: dest
 			Tuple args = (Tuple) frame.reg[this.inreg1];
@@ -275,27 +294,27 @@ public final class GenericInstrs {
 				System.out.println();
 			return next;
 		}
-		
+
 	}
-	
+
 	public static final class MakeModule extends Instr {
 		private Obj doc;
-		
+
 		public void init1(Obj doc) {
 			this.doc = doc;
 		}
-		
+
 		public Instr run(Frame frame) {
 			frame.module.done(doc);
 			frame.reg[outreg0] = frame.module;
 			return next;
 		}
-		
+
 	}
-	
+
 	public static final class Return extends Instr {
 		public void init0(){}
-		
+
 		public Instr run(Frame frame) {
 			Obj value = frame.reg[inreg0];
 			if(frame.parent == null) {
@@ -307,23 +326,23 @@ public final class GenericInstrs {
 			}
 			return null;
 		}
-		
+
 	}
-	
+
 	public static final class Call extends Instr {
 		private int argCount;
 		private int[] inArgs;
 		private int inFunc;
-		
+
 		private int[] kwargs;
 		private boolean hasKwargs;
-		
+
 		public void init2(Obj count, Obj kwargNames){
 			this.kwargs = ((List)kwargNames).toInternedStringArray();
 			hasKwargs = this.kwargs.length != 0;
 			this.argCount = count.intValue();
 		}
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			this.outreg0 = outreg[0];
 			this.inArgs = new int[inreg.length - 1];
@@ -331,12 +350,12 @@ public final class GenericInstrs {
 				this.inArgs[i - 1] = inreg[i];
 			this.inFunc = inreg[0];
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj[] args = new Obj[argCount];
 			frame.loadRegisters(inArgs, args);
 			Obj funcObj = frame.reg[inFunc];
-			
+
 			frame.counter = next;
 			boolean wasCalled;
 			if(!hasKwargs)
@@ -353,44 +372,96 @@ public final class GenericInstrs {
 		}
 
 	}
-	
+
+	public static final class Call1 extends Instr {
+		private int argCount;
+		private int[] inArgs;
+		private int inFunc;
+		private int inStarArgs;
+
+		private int[] kwargs;
+		private boolean hasKwargs;
+
+		public void init2(Obj count, Obj kwargNames){
+			this.kwargs = ((List)kwargNames).toInternedStringArray();
+			hasKwargs = this.kwargs.length != 0;
+			if(hasKwargs)
+				throw new ScriptError(ScriptError.InternalError, "call1 doesn't support keyword arguments");
+			this.argCount = count.intValue();
+		}
+
+		public void initReg(int[] inreg, int[] outreg) {
+			this.outreg0 = outreg[0];
+			this.inArgs = new int[inreg.length - 2];
+			for(int i=1; i<inreg.length - 1; i++)
+				this.inArgs[i - 1] = inreg[i];
+			this.inStarArgs = inreg[inreg.length - 1];
+
+			this.inFunc = inreg[0];
+		}
+
+		public Instr run(Frame frame) {
+			Obj funcObj = frame.reg[inFunc];
+			Obj starArgs = frame.reg[inStarArgs];
+
+			Obj[] args = new Obj[argCount + starArgs.length()];
+			frame.loadRegisters(inArgs, args);
+			int i = argCount;
+			for(Obj item: starArgs) {
+				args[i++] = item;
+			}
+
+			frame.counter = next;
+			boolean wasCalled;
+			wasCalled = funcObj.callInFrame(frame, args);
+			if(wasCalled) {
+				frame.returnValueTo = outreg0;
+				return null;
+			} else {
+				frame.reg[outreg0] = funcObj.call(args);
+				return next;
+			}
+		}
+
+	}
+
 	public static final class GetAttr extends Instr {
 		public int name;
-		
+
 		public void init1(Obj name) {
 			this.name = name.stringValue().intern();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj obj = frame.reg[inreg0];
 			Obj result = obj.getAttr(name);
 			frame.reg[outreg0] = result;
-			
+
 			return next;
 		}
 
 	}
-	
+
 	public static final class SetAttr extends Instr {
 		public int name;
-		
+
 		public void init1(Obj name) {
 			this.name = name.stringValue().intern();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj obj = frame.reg[inreg1];
 			Obj value = frame.reg[inreg0];
 			obj.setAttr(name, value);
-			
+
 			return next;
 		}
 
 	}
-	
+
 	public static final class GetItem extends Instr {
 		public void init0() {}
-		
+
 		public Instr run(Frame frame) {
 			Obj seq = frame.reg[inreg0];
 			Obj key = frame.reg[inreg1];
@@ -399,19 +470,19 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 	public static final class GetSlice extends Instr {
 		public void init0() {}
-		
+
 		public int inreg2;
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			inreg0 = inreg[0];
 			inreg1 = inreg[1];
 			inreg2 = inreg[2];
 			outreg0 = outreg[0];
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj seq = frame.reg[inreg0];
 			Obj lower = frame.reg[inreg1];
@@ -421,18 +492,18 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 	public static final class SetItem extends Instr {
 		public void init0() {}
-		
+
 		public int inreg2;
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			inreg0 = inreg[0];
 			inreg1 = inreg[1];
 			inreg2 = inreg[2];
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj seq = frame.reg[inreg1];
 			Obj index = frame.reg[inreg2];
@@ -441,10 +512,10 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 	public static final class GetIter extends Instr {
 		public void init0() {}
-		
+
 		public Instr run(Frame frame) {
 			Obj seq = frame.reg[inreg0];
 			Obj result = seq.getIter(frame);
@@ -452,10 +523,10 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 	public static final class ForIter extends JumpIfLikeInstr {
 		public void init1(Obj arg) {}
-		
+
 		public Instr run(Frame frame) {
 			Obj iter = frame.reg[inreg0];
 			Obj result = iter.next(frame);
@@ -465,17 +536,17 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 	public static final class FunctionInstr extends Instr {
 		private FunctionConst functionConst;
 
 		public void init1(Obj o) {
 			this.functionConst = (FunctionConst)o;
 		}
-		
+
 		public Instr run(Frame frame) {
 			frame.reg[outreg0] = functionConst.createInstance(frame);
-			
+
 			return next;
 		}
 
@@ -492,7 +563,7 @@ public final class GenericInstrs {
 			this.kwargs = args.get("kwargs").boolValue();
 			this.argnames = ((List)args.get("argnames")).toInternedStringArray();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Function func = (Function) frame.reg[inreg0];
 			Tuple defaults = (Tuple) frame.reg[inreg1];
@@ -501,31 +572,31 @@ public final class GenericInstrs {
 		}
 
 	}
-	
+
 	public static final class Raise3 extends Instr {
 		public void init0() {}
-		
+
 		public int inreg2;
-		
+
 		public void initReg(int[] inreg, int[] outreg) {
 			inreg0 = inreg[0];
 			inreg1 = inreg[1];
 			inreg2 = inreg[2];
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj exc = frame.reg[inreg0];
 			Obj value = frame.reg[inreg1];
 			Obj traceback = frame.reg[inreg2];
-			
+
 			// TODO: implement traceback
 			// 'raise' - reraise
 			// 'raise IOError' == 'raise IOError()'
 			// 'raise IOError, 5' == 'raise IOError(5)'
-			
+
 			if(exc == None)
 				throw new ExistingScriptError(frame.getException(), frame.getTraceback());
-			
+
 			if(value != None) {
 				if(exc instanceof ScriptError.ExceptionInstance)
 					throw new ScriptError(ScriptError.TypeError, "instance exception may not have a separate value");
@@ -533,23 +604,23 @@ public final class GenericInstrs {
 			} else if(exc instanceof ScriptError.ExceptionType) {
 				exc = exc.call(new Obj[]{ value });
 			}
-			
+
 			throw new ExistingScriptError(exc, null);
 		}
 	}
-	
+
 	public static final class Nop extends Instr {
 		public void init0() {}
 		public void init1(Obj useless) {}
-		
+
 		public Instr run(Frame frame) {
 			return next;
 		}
 	}
-	
+
 	public static abstract class BinOp extends Instr {
 		public void init1(Obj name) {}
-		
+
 		public void operatorFailed(Obj a, Obj b, String name) {
 			throw new ScriptError(ScriptError.TypeError, "Unsupported operand type " + name + " for " + Obj.typeRepr(a) + " and " + Obj.typeRepr(b));
 		}
@@ -561,8 +632,8 @@ public final class GenericInstrs {
 			BinOpInstrs.BinOpFactory factory = (BinOpFactory) BinOpInstrs.binOpTypes.get(name.intern());
 			return factory.create();
 		}
-		
-		static { 
+
+		static {
 			BinOpInstrs.binOpTypes.put("is not", new BinOpFactory() {
 				public BinOp create() {
 					return new BinOp() {
@@ -633,14 +704,14 @@ public final class GenericInstrs {
 			});
 		}
 	}
-	
+
 	public static abstract class UnaryOp extends Instr {
 		public void init1(Obj name) {}
 
 		public static Instr createOp(Tuple args) {
 			SString type = args.get(0).stringValue();
 			int interned = type.intern();
-			
+
 			if(interned == NOT)
 				return new UnaryNot();
 			else if(interned == UNARYSUB)
@@ -650,67 +721,67 @@ public final class GenericInstrs {
 		}
 		public static final int NOT = SString.intern("not");
 		public static final int UNARYSUB = SString.intern("unarysub");
-		
+
 		public static class UnaryNot extends UnaryOp {
 			public final Instr run(Frame frame) {
 				Obj a = frame.reg[inreg0];
 				Obj done = a.boolValue()? SBool.False: SBool.True;
 				frame.reg[outreg0] = done;
-				
+
 				return next;
 			}
 		}
-		
+
 		public static class UnarySub extends UnaryOp {
 			public final Instr run(Frame frame) {
 				Obj a = frame.reg[inreg0];
 				Obj done = a.unarySub(frame);
 				frame.reg[outreg0] = done;
-				
+
 				return next;
 			}
 		}
 	}
-	
+
 	public static final class SetupExc extends JumpIfLikeInstr {
 		public void init1(Obj label) {}
-		
+
 		public Instr run(Frame frame) {
 			if(next2 == null)
 				throw new ScriptError(ScriptError.InternalError, "next2 is null");
 			frame.addExcHandler(next2);
-			
+
 			return next;
 		}
 	}
-	
+
 	public static final class GetExc extends Instr {
 		public void init0() {}
-		
+
 		public Instr run(Frame frame) {
 			frame.reg[outreg0] = frame.getException();
 			return next;
 		}
 	}
-	
+
 	public static final class PopExc extends Instr {
 		private int num;
 		public void init1(Obj num) {
 			this.num = num.intValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			frame.excHandlersCount -= num;
 			return next;
 		}
 	}
-	
+
 	public static final class GetLocalsDict extends Instr {
 		private int[] names;
 		public void init1(Obj names) {
 			this.names = ((List)names).toInternedStringArray();
 		}
-		
+
 		public Instr run(Frame frame) {
 			StringDict dict = new StringDict(names.length);
 			for(int i=0; i<names.length; i++) {
@@ -720,7 +791,7 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 	public static final class MakeClass extends Instr {
 		private int name;
 		private Obj doc;
@@ -729,33 +800,33 @@ public final class GenericInstrs {
 			this.name = args.get("name").stringValue().intern();
 			this.doc = args.get("doc");
 		}
-		
+
 		public Instr run(Frame frame) {
 			StringDict dict = (StringDict)frame.reg[inreg0];
 			Tuple bases = (Tuple)frame.reg[inreg1];
-			
+
 			frame.reg[outreg0] = UserType.create(name, bases, dict);
-			
+
 			return next;
 		}
 	}
-	
+
 	public static final class Import extends Instr {
 		private SString name;
 		public void init1(Obj name) {
 			this.name = name.stringValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			frame.reg[outreg0] = Importer.importModule(name);
-			
+
 			return next;
 		}
 	}
-	
+
 	public static final class ExcMatch extends Instr {
 		public void init0() {}
-		
+
 		public Instr run(Frame frame) {
 			Obj excClass = frame.reg[inreg1];
 			Obj exception = frame.reg[inreg0];
@@ -763,26 +834,26 @@ public final class GenericInstrs {
 			return next;
 		}
 	}
-	
+
 
 	public static final class Reraise extends Instr {
 		public void init0() {}
-		
+
 		public Instr run(Frame frame) {
 			throw new ExistingScriptError(frame.getException(), frame.getTraceback());
 		}
 
 	}
-	
+
 	public static final class GetImportAttr extends Instr {
 		public SString name;
 		public SString modname;
-		
+
 		public void init2(Obj name, Obj modname) {
 			this.name = name.stringValue();
 			this.modname = modname.stringValue();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj obj = frame.reg[inreg0];
 			Obj result;
@@ -797,33 +868,33 @@ public final class GenericInstrs {
 				}
 			}
 			frame.reg[outreg0] = result;
-			
+
 			return next;
 		}
 
 	}
-	
+
 	public static final class DelGlobal extends Instr {
 		private int name;
-		
+
 		public void init1(Obj name) {
 			this.name = name.stringValue().intern();
 		}
-		
+
 		public Instr run(Frame frame) {
 			frame.globals.delete(name);
 			return next;
 		}
 
 	}
-	
+
 	public static final class DelAttr extends Instr {
 		private int name;
-		
+
 		public void init1(Obj name) {
 			this.name = name.stringValue().intern();
 		}
-		
+
 		public Instr run(Frame frame) {
 			Obj obj = frame.reg[inreg0];
 			obj.delAttr(name);
@@ -831,14 +902,14 @@ public final class GenericInstrs {
 		}
 
 	}
-	
+
 	public static final class ListAppend extends Instr {
 		public void init0() {}
-		
+
 		public Instr run(Frame frame) {
 			Obj list = frame.reg[inreg0];
 			Obj item = frame.reg[inreg1];
-			
+
 			((List)list).append(item);
 			return next;
 		}

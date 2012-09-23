@@ -345,3 +345,16 @@ assert not None
 
 if None:
 	assert False
+
+def parent():
+        a = 2
+        def nested():
+                return a
+        return nested
+
+assert parent()() == 2
+
+def args(a, b, c):
+        return (a, b, c)
+
+assert args(1, *[2, 3]) == (1, 2, 3)

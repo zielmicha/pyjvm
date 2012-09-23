@@ -457,4 +457,22 @@ public class Obj implements Iterable<Obj> {
 
 		};
 	}
+
+	public static final class IndexableIter extends Obj {
+		private int pos;
+		private int length;
+		private Obj list;
+
+		public IndexableIter(Obj list) {
+			this.pos = 0;
+			this.length = list.length();
+			this.list = list;
+		}
+
+		public Obj next() {
+			if(pos == length)
+				return null;
+			return list.getItem(SInt.get(pos++));
+		}
+	}
 }

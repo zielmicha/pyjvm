@@ -260,6 +260,12 @@ public class Reflect { //!export modules.reflect.Reflect
 				return SInt.get(((Long)obj).longValue());
 			}
 		});
+
+		addFromJavaConverter(Object[].class, new FromJava() {
+			public Obj convert(Object obj) {
+				return new ArrayWrapper((Object[])obj);
+			}
+		});
 	}
 
 	public interface ToJava {

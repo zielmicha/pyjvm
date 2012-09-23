@@ -1,15 +1,15 @@
 # Copyright (C) 2011 by Michal Zielinski
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,7 +29,8 @@ instr_types = ['assertfail', 'binop', 'binopip', 'call', 'compare', 'const',
 	'makemodule', 'maketuple', 'nop', 'popexc', 'print', 'raise3', 'reraise',
 	'return', 'setattr', 'setglobal', 'setitem', 'setlocal', 'setupexc',
 	'unaryop', 'unpacktuple', 'useonlyglobals',
-	'getimportattr', 'delattr', 'delglobal', 'makedict']
+	'getimportattr', 'delattr', 'delglobal', 'makedict',
+        'nested', 'call1']
 
 instr_map = dict( (name, i) for i, name in enumerate(instr_types) )
 
@@ -42,33 +43,33 @@ class Serializer(object):
 	def increment_uid(self):
 		self.uid += 1
 		return self.uid
-	
+
 	def	write(self, ch):
 		self.out.write(ch)
 
 	def pack_uint(self, num):
 		assert isinstance(num, (int, long)), 'invalid value %s' % num
 		assert num >= 0
-		
+
 		data = []
-		
+
 		while num:
 			data.append(0b1111111 & num)
 			num >>= 7
-		
+
 		for d in data[:-1]:
 			self.out.write(chr(0b10000000 | d))
-		
+
 		self.out.write(chr(data[-1] if data else 0))
-	
+
 	def pack_int(self, num):
 		if num == 0:
 			self.write('\0')
 			return
-		
+
 		unum = abs(num)
 		sign = num // unum
-		
+
 		first = unum & 0b111111
 		rest = unum >> 6
 		sign_data = 0b10000000 if sign == -1 else 0
@@ -77,7 +78,7 @@ class Serializer(object):
 			self.pack_uint(rest)
 		else:
 			self.out.write(chr(first|sign_data))
-	
+
 	def serialize_value(self, value):
 		if isinstance(value, int):
 			self.write('I')
@@ -104,10 +105,10 @@ class Serializer(object):
 			self.write('B0')
 		elif isinstance(value, dict):
 			assert all( isinstance(k, str) for k in value.keys() )
-			
+
 			self.write('D')
 			self.pack_uint(len(value))
-			
+
 			for k,v in value.items():
 				self.pack_uint(len(k))
 				self.write(k)
@@ -119,41 +120,41 @@ class Serializer(object):
 				self.serialize(val)
 		else:
 			raise TypeError('Unserializable type %s' % type(value))
-	
+
 	def pack_uint_list(self, l):
 		for v in l:
 			self.pack_uint(v)
-	
+
 	def serialize_instr(self, ident, instr, ids):
 		'''
 		Columns: id, name, next1, next2, lineno, inreg, outreg, args
 		'''
 		assert not any( (n is instr) for n in instr.next )
-		next = [ ids.get(n, ident) for n in instr.next ] 
+		next = [ ids.get(n, ident) for n in instr.next ]
 		if len(next) == 0: next.append(ident)
 		if len(next) == 1: next.append(ident)
-		
+
 		if not instr.outreg: instr.outreg = []
 		if not instr.inreg: instr.inreg = []
-		
+
 		self.pack_uint(instr_map[instr.name])
 		self.pack_uint(len(instr.args))
 		self.pack_uint(len(instr.inreg))
 		self.pack_uint(len(instr.outreg))
 		self.pack_int(next[0] - ident)
 		self.pack_int(next[1] - ident)
-		
+
 		for arg in instr.args:
 			self.serialize(arg)
 		self.pack_uint_list(instr.inreg)
 		self.pack_uint_list(instr.outreg)
 		self.pack_uint(instr.lineno if instr.lineno >= 0 else 0)
-	
+
 	def serialize_instrs(self, main):
 		instrs = {}
 		ident = 0
 		to_be_processed = [main]
-		
+
 		while to_be_processed:
 			instr = to_be_processed.pop()
 			if not instr:
@@ -163,17 +164,17 @@ class Serializer(object):
 			instrs[instr] = ident
 			ident += 1
 			to_be_processed.extend(instr.next)
-		
+
 		result = []
-		
+
 		self.write('i')
 		self.pack_uint(self.increment_uid())
 		self.write('-')
 		self.pack_uint(len(instrs))
-		
+
 		for instr, id_ in sorted(instrs.items(), key=lambda (i,id_): id_):
 			self.serialize_instr(id_, instr, instrs)
-		
+
 	def serialize_function(self, func):
 		self.write('f')
 		self.pack_uint(func.argcount)
@@ -181,7 +182,7 @@ class Serializer(object):
 		self.pack_uint_list(func.loadargs)
 		self.pack_uint(func.varcount)
 		self.serialize(func.body)
-	
+
 	def serialize(self, obj, filename=None):
 		if filename:
 			self.write('m')
@@ -195,11 +196,11 @@ class Serializer(object):
 			self.write('l')
 		else:
 			self.serialize_value(obj)
-	
+
 	def serialize_archive_dict(self, archive):
 		self.write('D')
 		self.pack_uint(len(archive))
-		
+
 		for name, code, fn in archive:
 			self.pack_uint(len(name))
 			self.write(name)
