@@ -19,9 +19,17 @@ public final class ReflectClass extends Type {
 		dict.put("get_class", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {
-					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments");
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
 				}
 				return Reflect.get_class(args[0]);
+			}
+		});
+		dict.put("create_invocation_handler", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 1) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
+				}
+				return Reflect.create_invocation_handler(args[0]);
 			}
 		});
 	}

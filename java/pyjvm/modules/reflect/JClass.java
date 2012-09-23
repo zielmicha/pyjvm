@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,8 @@ import pyjvm.*;
 public class JClass extends Obj {
 	public Class java;
 	static final int str_new = SString.intern("new");
-	
+	static final Type type = new Type.EmptyType("JClassType");
+
 	public JClass(Class java) {
 		this.java = java;
 	}
@@ -42,7 +43,7 @@ public class JClass extends Obj {
 					return create(args);
 				}
 			};
-		
+
 		Obj result = getStaticField(SString.unintern(name).toString());
 		if(result == null) {
 			return getStaticMethod(SString.unintern(name).toString());
@@ -50,7 +51,7 @@ public class JClass extends Obj {
 			return result;
 		}
 	}
-	
+
 	public Obj create(Obj[] args) {
 		Constructor[] constructors = this.java.getConstructors();
 		Class[][] defs = new Class[constructors.length][];
@@ -58,19 +59,19 @@ public class JClass extends Obj {
 			defs[i] = constructors[i].getParameterTypes();
 		int match = Reflect.match(defs, args);
 		Object[] converted = Reflect.argsToJava(defs[match], args);
-		
+
 		Object result;
 		try {
 			result = constructors[match].newInstance(converted);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-		
+
 		return Reflect.fromJava(result);
 	}
-	
+
 	public Type getType() {
-		return new Type.EmptyType("JClassType");
+		return type;
 	}
 
 	private Obj getStaticMethod(String name) {
@@ -91,10 +92,10 @@ public class JClass extends Obj {
 				j++;
 			}
 		}
-		
+
 		if(good_methods.length == 0)
 			throw new ScriptError(ScriptError.AttributeError, java + " has no static method/field named " + name);
-		
+
 		return new JInstance.JMethod(null, name, good_methods, defs);
 	}
 

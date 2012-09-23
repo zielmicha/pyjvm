@@ -172,7 +172,7 @@ public final class List extends NativeObj { //!export List
 		if(args.length == 1) {
 			l.iadd(args[0]);
 		} else if(args.length != 0) {
-			throw new ScriptError(ScriptError.TypeError, "int() takes at most 1 argument");
+			throw new ScriptError(ScriptError.TypeError, "list() takes at most 1 argument");
 		}
 		return l;
 	}

@@ -25,6 +25,7 @@ public final class None extends Obj {
 	private None() {}
 	
 	public static final None None = new None(); 
+	public static final Type type = new Type.EmptyType("NoneType");
 	
 	public String toString() {
 		return "None";
@@ -35,6 +36,6 @@ public final class None extends Obj {
 	}	
 	
 	public Type getType() {
-		return new Type.EmptyType("NoneType");
+		return type;
 	}
 }

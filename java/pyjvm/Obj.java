@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,14 +21,17 @@
 
 package pyjvm;
 
-public class Obj {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class Obj implements Iterable<Obj> {
 
 	public final boolean equals(Object other) {
 		if(!(other instanceof Obj))
 			return false;
 		return equals((Obj)other);
 	}
-	
+
 	public final boolean equals(Obj other) {
 		SBool isEqual = isEqual((Obj)other);
 		if(isEqual == null) {
@@ -40,7 +43,7 @@ public class Obj {
 		}
 		return isEqual == SBool.True;
 	}
-	
+
 	public SBool isEqual(Obj other) {
 		/**
 		 * Test for equality.
@@ -50,19 +53,19 @@ public class Obj {
 			return SBool.True;
 		return null;
 	}
-	
+
 	public int intValue() {
 		throw new ScriptError(ScriptError.TypeError, "Object unconvertable to int", this);
 	}
-	
+
 	public SString stringValue() {
 		throw new ScriptError(ScriptError.TypeError, "Object unconvertable to string", this);
 	}
-	
+
 	public void dump() {
 		System.err.println(this.repr());
 	}
-	
+
 	public void dump(String name) {
 		System.err.println(name + " " + this.repr());
 	}
@@ -70,13 +73,13 @@ public class Obj {
 	public boolean boolValue() {
 		return true;
 	}
-	
+
 	public String toString() {
 		return "<" + getClass().getSimpleName() + " at " + System.identityHashCode(this) + ">";
 	}
 
 	// repr
-	
+
 	public Obj repr() {
 		try {
 			return new SString(toString());
@@ -84,11 +87,11 @@ public class Obj {
 			return new SString("<recursive>");
 		}
 	}
-	
+
 	public Obj str() {
 		return new SString(toString());
 	}
-	
+
 	public static String repr(Obj object) {
 		if(object == null)
 			return "null";
@@ -97,7 +100,7 @@ public class Obj {
 			return object.toString();
 		return repr.stringValue().toString();
 	}
-	
+
 	public static String typeRepr(Obj object) {
 		try {
 			Type t = object.getType();
@@ -106,12 +109,12 @@ public class Obj {
 			return "<no type>";
 		}
 	}
-	
-	public static final NotImplemented NotImplemented = pyjvm.NotImplemented.NotImplemented; 
+
+	public static final NotImplemented NotImplemented = pyjvm.NotImplemented.NotImplemented;
 	public static final None None = pyjvm.None.None;
-	
+
 	// operators
-	
+
 	public Obj add(Obj other) {
 		return NotImplemented;
 	}
@@ -119,7 +122,7 @@ public class Obj {
 	public Obj add(Frame frame, Obj b) {
 		return this.iadd(b);
 	}
-	
+
 	public Obj iadd(Obj other) {
 		return this.add(other);
 	}
@@ -127,7 +130,7 @@ public class Obj {
 	public Obj iadd(Frame frame, Obj b) {
 		return this.iadd(b);
 	}
-	
+
 	public Obj radd(Obj other) {
 		return NotImplemented;
 	}
@@ -139,23 +142,23 @@ public class Obj {
 	public Obj sub(Frame frame, Obj b) {
 		return sub(b);
 	}
-	
+
 	public Obj sub(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj isub(Frame frame, Obj b) {
 		return isub(b);
 	}
-	
+
 	public Obj isub(Obj b) {
 		return this.sub(b);
 	}
-	
+
 	public Obj rsub(Frame frame, Obj b) {
 		return rsub(b);
 	}
-	
+
 	public Obj rsub(Obj b) {
 		return NotImplemented;
 	}
@@ -163,15 +166,15 @@ public class Obj {
 	public Obj mul(Frame frame, Obj b) {
 		return mul(b);
 	}
-	
+
 	public Obj mul(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj rmul(Frame frame, Obj b) {
 		return rmul(b);
 	}
-	
+
 	public Obj rmul(Obj b) {
 		return NotImplemented;
 	}
@@ -179,15 +182,15 @@ public class Obj {
 	public Obj floordiv(Frame frame, Obj b) {
 		return floordiv(b);
 	}
-	
+
 	public Obj floordiv(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj rfloordiv(Frame frame, Obj b) {
 		return rfloordiv(b);
 	}
-	
+
 	public Obj rfloordiv(Obj b) {
 		return NotImplemented;
 	}
@@ -195,15 +198,15 @@ public class Obj {
 	public Obj div(Frame frame, Obj b) {
 		return div(b);
 	}
-	
+
 	public Obj div(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj rdiv(Frame frame, Obj b) {
 		return rdiv(b);
 	}
-	
+
 	public Obj rdiv(Obj b) {
 		return NotImplemented;
 	}
@@ -211,35 +214,35 @@ public class Obj {
 	public Obj truediv(Frame frame, Obj b) {
 		return truediv(b);
 	}
-	
+
 	public Obj truediv(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj rtruediv(Frame frame, Obj b) {
 		return rtruediv(b);
 	}
-	
+
 	public Obj rtruediv(Obj b) {
 		return NotImplemented;
 	}
-	//	
+	//
 	public Obj mod(Frame frame, Obj b) {
 		return mod(b);
 	}
-	
+
 	public Obj mod(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj rmod(Frame frame, Obj b) {
 		return rmod(b);
 	}
-	
+
 	public Obj rmod(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj isEqual(Frame frame, Obj b) {
 		return isEqual(b);
 	}
@@ -259,19 +262,19 @@ public class Obj {
 	public Obj getItem(Frame frame, Obj key) {
 		return getItem(key);
 	}
-	
+
 	public Obj getItem(Obj key) {
 		throw new ScriptError(ScriptError.TypeError, "Object not subscriptable", this);
 	}
-	
+
 	public void setItem(Frame frame, Obj index, Obj item) {
 		setItem(index, item);
 	}
-	
+
 	public void setItem(Obj index, Obj item) {
 		throw new ScriptError(ScriptError.TypeError, "Object not subscriptable", this);
 	}
-	
+
 	public Obj getIter(Frame frame) {
 		return getIter();
 	}
@@ -283,7 +286,7 @@ public class Obj {
 	public Obj next(Frame frame) {
 		return next();
 	}
-	
+
 	public Obj next() {
 		throw new ScriptError(ScriptError.TypeError, "Object is not an iterator", this);
 	}
@@ -295,16 +298,16 @@ public class Obj {
 	public void delAttr(int name) {
 		throw new ScriptError(ScriptError.TypeError, "Object without deletable attributes", this);
 	}
-	
+
 	public Obj getObjectAttr(Obj instance) {
 		// throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
 		return this;
 	}
-	
+
 	public void setObjectAttr(Obj instance, Obj value) {
 		throw new ScriptError(ScriptError.AttributeError, "Attribute declared in class", this);
 	}
-	
+
 	public Obj getClassAttr() {
 		// throw new ScriptError(ScriptError.TypeError, "Object without property protocol", this);
 		return this;
@@ -313,15 +316,15 @@ public class Obj {
 	public boolean callInFrame(Frame frame, Obj[] args) {
 		return false;
 	}
-	
+
 	public boolean callInFrame(Frame frame, Obj[] args, int[] kwargs) {
 		return false;
 	}
-	
+
 	public void setAttr(int name, Obj value) {
-		throw new ScriptError(ScriptError.TypeError, "Object without writeable attributes", this);		
+		throw new ScriptError(ScriptError.TypeError, "Object without writeable attributes", this);
 	}
-	
+
 	public Type getType() {
 		throw new ScriptError(ScriptError.InternalError, "Object without type (???)", this);
 	}
@@ -346,17 +349,17 @@ public class Obj {
 			return call(args);
 		throw new ScriptError(ScriptError.TypeError, "Object takes no keywords arguments or is not callable");
 	}
-	
+
 	// comparators
-	
+
 	public Obj compare(Obj b) {
 		return NotImplemented;
 	}
-	
+
 	public Obj lessThan(Frame frame, Obj b) {
 		return lessThan(b);
 	}
-	
+
 	public Obj lessThan(Obj b) {
 		Obj cmp = compare(b);
 		if(cmp == NotImplemented) return NotImplemented;
@@ -366,27 +369,27 @@ public class Obj {
 	public Obj lessOrEqual(Frame frame, Obj b) {
 		return lessOrEqual(b);
 	}
-	
+
 	public Obj lessOrEqual(Obj b) {
 		Obj cmp = compare(b);
 		if(cmp == NotImplemented) return NotImplemented;
 		return cmp.intValue() <= 0? SBool.True: SBool.False;
 	}
-	
+
 	public Obj greaterThan(Frame frame, Obj b) {
 		return greaterThan(b);
 	}
-	
+
 	public Obj greaterThan(Obj b) {
 		Obj cmp = compare(b);
 		if(cmp == NotImplemented) return NotImplemented;
 		return cmp.intValue() > 0? SBool.True: SBool.False;
 	}
-	
+
 	public Obj greaterOrEqual(Frame frame, Obj b) {
 		return greaterOrEqual(b);
 	}
-	
+
 	public Obj greaterOrEqual(Obj b) {
 		Obj cmp = compare(b);
 		if(cmp == NotImplemented) return NotImplemented;
@@ -412,7 +415,7 @@ public class Obj {
 	public boolean contains(Frame frame, Obj b) {
 		return contains(b);
 	}
-	
+
 	public boolean contains(Obj b) {
 		Obj iter = this.getIter();
 		Obj current;
@@ -421,5 +424,37 @@ public class Obj {
 				return true;
 		}
 		return false;
+	}
+
+	public Iterator<Obj> iterator() {
+		final Obj iter = getIter();
+		return new Iterator<Obj>() {
+			boolean nextFetched = false;
+			Obj next;
+
+			void fetch() {
+				if(!nextFetched) {
+					next = iter.next();
+					nextFetched = true;
+				}
+			}
+
+			public boolean hasNext() {
+				fetch();
+				return next != null;
+			}
+
+			public Obj next() {
+				fetch();
+				if(next == null) throw new NoSuchElementException();
+				nextFetched = false;
+				return next;
+			}
+
+			public void remove() {
+				throw new ScriptError(ScriptError.NotImplementedError, "removing not implemented in iterator");
+			}
+
+		};
 	}
 }

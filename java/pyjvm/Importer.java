@@ -122,6 +122,6 @@ public class Importer {
 	
 	static {
 		builtinModules.put("sys", new Module(pyjvm.modules.Sys.dict));
-		builtinModules.put("reflect", new Module(pyjvm.modules.reflect.Reflect.dict));
+		builtinModules.put("_reflect", new Module(pyjvm.modules.reflect.Reflect.dict));
 	}
 }
