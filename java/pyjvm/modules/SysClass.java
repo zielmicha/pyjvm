@@ -24,6 +24,14 @@ public final class SysClass extends Type {
 				return Sys.unserialize(args[0]);
 			}
 		});
+		dict.put("catch_errors", new Obj() {
+			public Obj call(Obj[] args) {
+				if(args.length != 1) {
+					throw new ScriptError(ScriptError.TypeError, "Bad number of arguments (expected 1, got " + args.length + ")");
+				}
+				return Sys.catch_errors(args[0]);
+			}
+		});
 	}
 	public final StringDict getDict() {
 		return dict;

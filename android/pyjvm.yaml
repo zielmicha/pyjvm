@@ -3,7 +3,7 @@ path:
 - lib
 include:
 - os
-- _android_main
+- android_main
 java:
 - java
 build-script: src/build.py

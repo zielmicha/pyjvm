@@ -19,11 +19,14 @@
 // THE SOFTWARE.
 package pyjvm.modules.reflect;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pyjvm.*;
+import pyjvm.modules.reflect.Reflect.FromJava;
+
 import java.lang.reflect.Method;
 
 public class JInstance extends Obj { //!export
@@ -43,6 +46,16 @@ public class JInstance extends Obj { //!export
 
 	public Obj getAttr(int i) {
 		String name = SString.unintern(i).toString();
+
+		try {
+			Field field = obj.getClass().getField(name);
+			Object ret = field.get(obj);
+			return Reflect.fromJava(ret);
+		} catch(NoSuchFieldException ex) {
+
+		} catch(Exception ex) {
+			throw new RuntimeException(ex);
+		}
 
 		Method[] methods = obj.getClass().getMethods();
 		int count = 0;

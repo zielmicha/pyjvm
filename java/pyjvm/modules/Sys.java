@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,7 @@ import pyjvm.*;
 
 public class Sys { //!export modules.Sys
 	public static final StringDict dict;
-	
+
 	public static void setArgs(String[] args, int offset) {
 		List argv = new List(args.length);
 		argv.append(SString.fromJavaString("pyjvm"));
@@ -35,15 +35,36 @@ public class Sys { //!export modules.Sys
 		}
 		dict.put("argv", argv);
 	}
-	
+
 	public static Obj unserialize(Obj data) { //!export
 		InputStream in = new ByteArrayInputStream(data.stringValue().bytes);
 		return Unserializer.unserialize(in);
 	}
-	
+
+	public static Obj catch_errors(Obj func) { //!export
+		/**
+		 * Creates wrapper around function that catches errors and prints stack trace.
+		 * Created mainly for Android which doesn't use printStackTrace in its logs.
+		 */
+		final Obj func_ = func;
+		return new Obj() {
+			public Obj call(Obj[] args) {
+				try {
+					return func_.call(args);
+				} catch(RuntimeException ex) {
+					ex.printStackTrace();
+					if(ex instanceof ScriptError && ((ScriptError)ex).cause != null) {
+						((ScriptError)ex).cause.printPythonTrace(ex);
+					}
+					throw ex;
+				}
+			}
+		};
+	}
+
 	static {
 		dict = SysClass.dict;
-		
+
 		dict.put("modules", Importer.modules);
 		dict.put("builtins", Importer.builtinModules);
 		dict.put("__name__", SString.fromJavaString("sys"));

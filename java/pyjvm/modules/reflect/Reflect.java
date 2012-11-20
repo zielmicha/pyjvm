@@ -138,7 +138,7 @@ public class Reflect { //!export modules.reflect.Reflect
 		}
 	}
 
-	static Obj fromJava(Object obj) {
+	public static Obj fromJava(Object obj) {
 		if(obj == null) return Obj.None;
 		Class clazz = obj.getClass();
 		for(Class c: getClassParents(clazz)) {
@@ -162,7 +162,7 @@ public class Reflect { //!export modules.reflect.Reflect
 		return l;
 	}
 
-	static Object toJava(Obj o) {
+	public static Object toJava(Obj o) {
 		Type t = o.getType();
 		if(toJavaDefaultConverters.containsKey(t)) {
 			return toJavaDefaultConverters.get(t).convert(o, null);
@@ -264,6 +264,12 @@ public class Reflect { //!export modules.reflect.Reflect
 		addFromJavaConverter(Object[].class, new FromJava() {
 			public Obj convert(Object obj) {
 				return new ArrayWrapper((Object[])obj);
+			}
+		});
+
+		addFromJavaConverter(float[].class, new FromJava() {
+			public Obj convert(Object obj) {
+				return new ArrayWrapper.ForFloat((float[])obj);
 			}
 		});
 	}
