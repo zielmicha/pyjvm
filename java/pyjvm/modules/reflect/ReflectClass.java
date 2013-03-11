@@ -9,13 +9,13 @@ public final class ReflectClass extends Type {
 	public static final StringDict dict;
 	public static final ReflectClass instance = new ReflectClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("Reflect".equals("NativeObj") || "Reflect".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("get_class", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {

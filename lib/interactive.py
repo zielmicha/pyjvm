@@ -24,6 +24,6 @@ def compile(data, filename=None):
     f.write(str(len(data)) + '\n')
     f.write(data)
     f.flush()
-    
+
     data = f.read()
     return sys.unserialize(data)

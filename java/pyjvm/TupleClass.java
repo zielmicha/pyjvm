@@ -9,13 +9,13 @@ public final class TupleClass extends Type {
 	public static final StringDict dict;
 	public static final TupleClass instance = new TupleClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("Tuple".equals("NativeObj") || "Tuple".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 	}
 	public final StringDict getDict() {
 		return dict;

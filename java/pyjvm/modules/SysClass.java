@@ -9,13 +9,13 @@ public final class SysClass extends Type {
 	public static final StringDict dict;
 	public static final SysClass instance = new SysClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("Sys".equals("NativeObj") || "Sys".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("unserialize", new Obj() {
 			public Obj call(Obj[] args) {
 				if(args.length != 1) {

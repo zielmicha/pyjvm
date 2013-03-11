@@ -9,13 +9,13 @@ public final class InstrClass extends Type {
 	public static final StringDict dict;
 	public static final InstrClass instance = new InstrClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("Instr".equals("NativeObj") || "Instr".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("run", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 1) {

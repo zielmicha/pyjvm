@@ -9,13 +9,13 @@ public final class TypeClass extends Type {
 	public static final StringDict dict;
 	public static final TypeClass instance = new TypeClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("Type".equals("NativeObj") || "Type".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 	}
 	public final StringDict getDict() {
 		return dict;

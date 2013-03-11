@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@ public class Unserializer {
 		this.in = in;
 		this.pos = 0;
 	}
-	
+
 	private byte readByte() throws IOException {
 		int val = in.read();
 		if(val < 0)
@@ -42,7 +42,7 @@ public class Unserializer {
 		pos++;
 		return (byte) val;
 	}
-	
+
 	public Obj read() {
 		byte type;
 		try {
@@ -109,13 +109,13 @@ public class Unserializer {
 	private StringDict readDict() throws IOException {
 		int length = this.readUInt();
 		StringDict dict = new StringDict(length);
-		
+
 		for(int i=0; i<length; i++) {
 			SString key = readString();
 			Obj val = read();
 			dict.put(key, val);
 		}
-		
+
 		return dict;
 	}
 
@@ -159,7 +159,7 @@ public class Unserializer {
 		else
 			return sign * (rest + (readUInt() << 6));
 	}
-	
+
 	private int readUInt() throws IOException {
 		int shift = 0;
 		int val = 0;
@@ -171,25 +171,25 @@ public class Unserializer {
 		}
 		return val;
 	}
-	
+
 	private Instr readInstrs() throws IOException {
 		readUInt(); // int id=
 		readByte();
 		int length = readUInt();
 		Instr[] instrs = new Instr[length];
 		Tuple[] data = new Tuple[length];
-		
+
 		for(int i=0; i<length; i++) {
 			readInstr(i, instrs, data);
 		}
-		
+
 		for(int i=0; i<length; i++) {
 			instrs[i].setupInstr(i, instrs, data[i]);
 		}
-		
+
 		return instrs[0];
 	}
-	
+
 	private Tuple readSizedIntTuple(int size) throws IOException {
 		Obj[] values = new Obj[size];
 		for(int i=0; i<size; i++) {
@@ -197,7 +197,7 @@ public class Unserializer {
 		}
 		return new Tuple(values);
 	}
-	
+
 	private Tuple readSizedTuple(int size) throws IOException {
 		Obj[] values = new Obj[size];
 		for(int i=0; i<size; i++) {
@@ -205,25 +205,25 @@ public class Unserializer {
 		}
 		return new Tuple(values);
 	}
-	
+
 	private void readInstr(int i, Instr[] instrs, Tuple[] data) throws IOException {
 		int type = readUInt();
-		
+
 		int argsCount = readUInt();
 		int inCount = readUInt();
 		int outCount = readUInt();
-		
+
 		int next1offset = readInt();
 		int next2offset = readInt();
-	
+
 		Tuple args = readSizedTuple(argsCount);
 		Tuple inreg = readSizedIntTuple(inCount);
 		Tuple outreg = readSizedIntTuple(outCount);
 		int lineno = readUInt();
-	
+
 		instrs[i] = Instr.create(type, args);
 		instrs[i].filename = filename;
-		
+
 		data[i] = new Tuple(new Obj[]{
 			args, inreg, outreg,
 			SInt.get(next1offset), SInt.get(next2offset), SInt.get(lineno)

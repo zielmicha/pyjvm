@@ -14,7 +14,7 @@ def build(sources, dest, use_javac=None):
             if is_source_earlier(java_path, class_path):
                 all_files.append(java_path)
     (use_javac or javac)(all_files, sources, dest)
-    
+
 
 def is_source_earlier(src, dest):
     try:

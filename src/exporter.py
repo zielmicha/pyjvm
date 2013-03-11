@@ -1,15 +1,15 @@
 # Copyright (C) 2011 by Michal Zielinski
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,7 +40,7 @@ public final class %(name)sClass extends Type {
 	public static final StringDict dict;
 	public static final %(name)sClass instance = new %(name)sClass();
 	public static final Obj constructor%(constructor)s;
-	
+
 	static {
 		if("%(name)s".equals("NativeObj") || "%(name)s".equals("UserObj"))
 			dict = new StringDict();
@@ -112,12 +112,12 @@ def parse_method(line):
 	if not m:
 		raise ValueError('Invalid method declaration: %s' % line.strip())
 	_, static, _, type, name, args = m.groups()
-	
+
 	if args.strip():
 		arg_list = [ arg.split() for arg in args.split(',') ]
 	else:
 		arg_list = []
-	
+
 	return Method(static=(static=='static'), return_type=type, name=name, args=arg_list)
 
 def backup(fn):
@@ -147,13 +147,13 @@ def format_entry(class_name, entry, is_direct, as_name):
 	else:
 		object = '((%s)self)' % class_name
 		entry_tmpl = method_entry_template
-	
+
 	if not is_direct:
 		results = []
 		for i, (type, name) in enumerate(entry.args):
 			results.append(unconvert(type, arg_template % i ))
 		result = ', '.join(results)
-	
+
 		return entry_tmpl % dict(
 			name=as_name,
 			check=check_count % dict(cnt= len(entry.args)),
@@ -199,7 +199,7 @@ def run(lines):
 		if output:
 			output.write(format(pkg, name, baseclass, data))
 			output.close()
-	
+
 	output = None
 	data = []
 	name = None

@@ -9,13 +9,13 @@ public final class ByteArrayClass extends Type {
 	public static final StringDict dict;
 	public static final ByteArrayClass instance = new ByteArrayClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("ByteArray".equals("NativeObj") || "ByteArray".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("to_string", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 2) {

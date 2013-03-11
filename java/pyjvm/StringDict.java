@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,32 +29,32 @@ public final class StringDict extends Obj {
 			this.key = key;
 			this.val = val;
 		}
-		
+
 		public Entry copy() {
 			Entry copied = new Entry(key, val);
 			if(next != null)
 				copied.next = next.copy();
 			return copied;
 		}
-		
+
 		public int key;
 		public Obj val;
 		private Entry next;
 	}
-	
+
 	private Entry[] entries;
 	private int resizeAt;
 	private int length = 0;
-	
+
 	private static final float scaleFactor = 1.35f;
-	
+
 	public StringDict(int initalCapacity) {
 		if(initalCapacity == 0)
 			initalCapacity = 8;
 		entries = new Entry[(int)(initalCapacity * scaleFactor)];
 		resizeAt = initalCapacity;
 	}
-	
+
 	public StringDict(StringDict original) {
 		Entry[] entries = new Entry[original.entries.length];
 		for(int i=0; i<entries.length; ++i) {
@@ -63,7 +63,7 @@ public final class StringDict extends Obj {
 		}
 		this.entries = entries;
 	}
-	
+
 	public StringDict(Obj original) {
 		this(32);
 		Obj iter = original.getIter();
@@ -73,7 +73,7 @@ public final class StringDict extends Obj {
 			setItem(key, val);
 		}
 	}
-	
+
 	public final void put(int key, Obj val) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
@@ -91,21 +91,21 @@ public final class StringDict extends Obj {
 		length++;
 		if(length >= resizeAt) this.resize();
 	}
-	
+
 	public final void put(SString key, Obj val) {
 		put(key.intern(), val);
 	}
-	
+
 	public final void put(String string, Obj val) {
 		put(SString.fromJavaString(string).intern(), val);
 	}
-	
+
 	private void resize() {
 		Entry[] newEntries = new Entry[this.entries.length * 2];
 		Entry[] oldEntries = this.entries;
 		this.entries = newEntries;
 		this.resizeAt = (int) (scaleFactor * newEntries.length);
-		
+
 		for(int i=0; i<oldEntries.length; i++) {
 			Entry e = oldEntries[i];
 			while(e != null) {
@@ -114,7 +114,7 @@ public final class StringDict extends Obj {
 			}
 		}
 	}
-	
+
 	public final Obj getOrNull(int key) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
@@ -126,7 +126,7 @@ public final class StringDict extends Obj {
 		}
 		return null;
 	}
-	
+
 	public final Obj get(int key) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
@@ -139,7 +139,7 @@ public final class StringDict extends Obj {
 		SString keyString = SString.uninternQuiet(key);
 		throw new ScriptError(ScriptError.AttributeError, "not found: " + keyString);
 	}
-	 
+
 	public final void delete(int key) {
 		int hash = key;
 		int index = Math.abs(hash % entries.length);
@@ -159,27 +159,27 @@ public final class StringDict extends Obj {
 		SString keyString = SString.uninternQuiet(key);
 		throw new ScriptError(ScriptError.AttributeError, "not found: " + keyString);
 	}
-	
+
 	public final Obj get(String s) {
 		return get(SString.intern(s));
 	}
-	
+
 	public Obj getItem(Obj key) {
 		return get(key.stringValue().intern());
-	}	
-	
+	}
+
 	public boolean contains(Obj key) {
 		return getOrNull(key.stringValue().intern()) != null;
 	}
-	
+
 	public void setItem(Obj key, Obj val) {
 		put(key.stringValue().intern(), val);
 	}
-	
+
 	public final StringDict copy() {
 		return new StringDict(this);
 	}
-	
+
 	public StringDict() {
 		this(8);
 	}
@@ -211,8 +211,8 @@ public final class StringDict extends Obj {
 		// TODO: hashCode
 		throw new RuntimeException("Not implemented.");
 	}
-	
-	
+
+
 	public String toString() {
 		DictEntryIterator iterator = new DictEntryIterator();
 		Entry entry;
@@ -227,11 +227,11 @@ public final class StringDict extends Obj {
 		builder.append("}");
 		return builder.toString();
 	}
-	
+
 	public final class DictKeyIterator {
 		private int entryIndex = 0;
 		private Entry entry = null;
-		
+
 		public int next() {
 			while(entry == null) {
 				if(entryIndex == entries.length)
@@ -244,15 +244,15 @@ public final class StringDict extends Obj {
 			return key;
 		}
 	}
-	
+
 	public Obj getIter() {
 		return new ObjKeyIterator();
 	}
-	
+
 	public final class ObjKeyIterator extends Obj {
 		private int entryIndex = 0;
 		private Entry entry = null;
-		
+
 		public Obj next() {
 			while(entry == null) {
 				if(entryIndex == entries.length)
@@ -265,11 +265,11 @@ public final class StringDict extends Obj {
 			return SString.unintern(thisEntry.key);
 		}
 	}
-	
+
 	public final class DictEntryIterator {
 		private int entryIndex = 0;
 		private Entry entry = null;
-		
+
 		public Entry next() {
 			while(entry == null) {
 				if(entryIndex == entries.length)

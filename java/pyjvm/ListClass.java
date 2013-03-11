@@ -9,13 +9,13 @@ public final class ListClass extends Type {
 	public static final StringDict dict;
 	public static final ListClass instance = new ListClass();
 	public static final Obj constructor;
-	
+
 	static {
 		if("List".equals("NativeObj") || "List".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("append", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 1) {
@@ -30,7 +30,7 @@ public final class ListClass extends Type {
 				return List.construct(args);
 			}
 		};
-		
+
 	}
 	public final StringDict getDict() {
 		return dict;

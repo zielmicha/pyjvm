@@ -4,20 +4,20 @@ import pyjvm.build
 
 def main():
     sys.setrecursionlimit(2000)
-    
+
     result = parse_args()
     project_path, cmd, args = result
-    
+
     project = pyjvm.build.Project(project_path)
-    
+
     if not cmd:
         return help(project)
-    
+
     try:
         project.load()
     except Exception as e:
         pass
-    
+
     if cmd == 'run':
         cmd_run(project, args)
     elif cmd == 'clean':
@@ -33,18 +33,18 @@ def main():
 
 def parse_args():
     args = sys.argv[1:]
-    
+
     if len(args) == 0:
         return '.', None, None
-    
+
     project_path = '.'
     if args and args[0] == '-p':
         project_path = args[1]
         args = args[2:]
-    
+
     if len(args) == 0:
         return project_path, None, None
-    
+
     cmd = args[0]
     return project_path, cmd, args[1:]
 
@@ -74,7 +74,7 @@ def cmd_run(proj, args):
         modname, = args
     else:
         modname = None
-    
+
     if modname:
         proj.include_modules.append(modname)
     proj.build()
@@ -83,18 +83,18 @@ def cmd_run(proj, args):
 def cmd_clean(proj, args):
     if args:
         sys.exit("pyjvm clean - not expecting any arguments")
-    
+
     proj.clean()
 
 def cmd_create(proj, args):
     if args:
         sys.exit("pyjvm create - not expecting any arguments")
-    
+
     proj.create()
 
 def cmd_jar(proj, args):
     if args:
         sys.exit("pyjvm jar - not expecting any arguments")
-    
+
     proj.build()
     proj.create_jar()

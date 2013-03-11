@@ -7,13 +7,13 @@ public final class NativeObjClass extends Type {
 	public static final StringDict dict;
 	public static final NativeObjClass instance = new NativeObjClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("NativeObj".equals("NativeObj") || "NativeObj".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("__len__", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 0) {

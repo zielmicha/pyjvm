@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,25 +27,25 @@ public final class Dict extends Obj { //!export Dict
 			this.key = key;
 			this.val = val;
 		}
-		
+
 		public Obj key;
 		public Obj val;
 		Entry next;
 	}
-	
+
 	private Entry[] entries;
 	private int resizeAt;
 	private int length = 0;
-	
+
 	private static final float scaleFactor = 1.35f;
-	
+
 	public Dict(int initalCapacity) {
 		if(initalCapacity == 0)
 			initalCapacity = 8;
 		entries = new Entry[(int)(initalCapacity * scaleFactor)];
 		resizeAt = initalCapacity;
 	}
-	
+
 	public final void put(Obj key, Obj val) {
 		int hash = Math.abs(key == null?0: key.hashCode());
 		int index = hash % entries.length;
@@ -63,13 +63,13 @@ public final class Dict extends Obj { //!export Dict
 		length++;
 		if(length >= resizeAt) this.resize();
 	}
-	
+
 	private void resize() {
 		Entry[] newEntries = new Entry[entries.length * 2];
 		resizeAt *= 2;
 		Entry[] oldEntries = this.entries;
 		this.entries = newEntries;
-		
+
 		for(int i=0; i<oldEntries.length; i++) {
 			Entry e = oldEntries[i];
 			while(e != null) {
@@ -78,7 +78,7 @@ public final class Dict extends Obj { //!export Dict
 			}
 		}
 	}
-	
+
 	public final Obj getOrNull(Obj key) {
 		int hash = Math.abs(key == null?0: key.hashCode());
 		int index = hash % entries.length;
@@ -90,7 +90,7 @@ public final class Dict extends Obj { //!export Dict
 		}
 		return null;
 	}
-	
+
 	public final Obj get(Obj key) {
 		int hash = Math.abs(key == null?0: key.hashCode());
 		int index = hash % entries.length;
@@ -102,23 +102,23 @@ public final class Dict extends Obj { //!export Dict
 		}
 		throw new ScriptError(ScriptError.KeyError, "not found");
 	}
-	
+
 	public Obj getItem(Obj key) {
 		return get(key);
 	}
-	
+
 	public boolean contains(Obj key) {
 		return getOrNull(key) != null;
 	}
-	
+
 	public void setItem(Obj key, Obj val) {
 		put(key, val);
 	}
-	
+
 	public Dict() {
 		this(8);
 	}
-	
+
 	public SBool isEqual(Obj other) {
 		if(other == this)
 			return SBool.True;
@@ -142,12 +142,12 @@ public final class Dict extends Obj { //!export Dict
 			return null;
 		}
 	}
-	
+
 	public int hashCode() {
 		// TODO: implement
 		throw new RuntimeException("Not implemented.");
 	}
-	
+
 	public String toString() {
 		DictEntryIterator iterator = new DictEntryIterator();
 		Entry entry;
@@ -162,15 +162,15 @@ public final class Dict extends Obj { //!export Dict
 		builder.append("}");
 		return builder.toString();
 	}
-	
+
 	public Obj getIter() {
 		return new DictKeyIterator();
 	}
-	
+
 	public final class DictKeyIterator extends Obj {
 		private int entryIndex = 0;
 		private Entry entry = null;
-		
+
 		public Obj next() {
 			while(entry == null) {
 				if(entryIndex == entries.length)
@@ -186,7 +186,7 @@ public final class Dict extends Obj { //!export Dict
 	private final class DictEntryIterator {
 		private int entryIndex = 0;
 		private Entry entry = null;
-		
+
 		public Entry next() {
 			while(entry == null) {
 				if(entryIndex == entries.length)
@@ -199,7 +199,7 @@ public final class Dict extends Obj { //!export Dict
 			return thisEntry;
 		}
 	}
-	
+
 	public Type getType() {
 		return DictClass.instance;
 	}

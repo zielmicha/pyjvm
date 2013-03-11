@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,30 +24,30 @@ package pyjvm;
 public final class List extends NativeObj { //!export List
 	private Obj[] array;
 	private int length;
-	
+
 	/** hack */
 	private List(boolean dontInit) {}
-	
+
 	public List() {
 		this(8);
 	}
-	
+
 	public static List fromArrayUnsafe(Obj[] arr) {
 		List list = new List(true);
 		list.array = arr;
 		list.length = arr.length;
 		return list;
 	}
-	
+
 	public List(int initialCapacity) {
 		this.array = new Obj[initialCapacity];
 		this.length = 0;
 	}
-	
+
 	public final int length() {
 		return this.length;
 	}
-	
+
 	public final void append(Obj obj) { //!export
 		if(length == array.length)
 			reallocate();
@@ -61,7 +61,7 @@ public final class List extends NativeObj { //!export List
 		System.arraycopy(src, 0, dst, 0, src.length);
 		this.array = dst;
 	}
-	
+
 	public Obj getItem(int index) {
 		int nindex = index;
 		if(index < 0)
@@ -70,11 +70,11 @@ public final class List extends NativeObj { //!export List
 			throw new ScriptError(ScriptError.IndexError, "bad index " + index);
 		return array[nindex];
 	}
-	
+
 	public Obj getItem(Obj key) {
 		return getItem(key.intValue());
 	}
-	
+
 	public void setItem(int index, Obj val) {
 		int nindex = index;
 		if(index < 0)
@@ -83,11 +83,11 @@ public final class List extends NativeObj { //!export List
 			throw new ScriptError(ScriptError.IndexError, "bad index " + index);
 		array[nindex] = val;
 	}
-	
+
 	public void setItem(Obj key, Obj val) {
 		setItem(key.intValue(), val);
 	}
-	
+
 	public int[] toInternedStringArray() {
 		int[] dest = new int[length];
 		for(int i=0; i<length; i++) {
@@ -95,7 +95,7 @@ public final class List extends NativeObj { //!export List
 		}
 		return dest;
 	}
-	
+
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append("[");
@@ -106,14 +106,14 @@ public final class List extends NativeObj { //!export List
 		b.append("]");
 		return b.toString();
 	}
-	
+
 	public Obj getIter() {
 		return new ListIterator();
 	}
-	
+
 	public class ListIterator extends Obj {
 		private int index = 0;
-		
+
 		public Obj next() {
 			if(index == length)
 				return null;
@@ -124,7 +124,7 @@ public final class List extends NativeObj { //!export List
 	public Type getType() {
 		return ListClass.instance;
 	}
-	
+
 	public Obj iadd(Obj other) {
 		Obj iter = other.getIter();
 		Obj current;
@@ -133,7 +133,7 @@ public final class List extends NativeObj { //!export List
 		}
 		return this;
 	}
-	
+
 	public Obj mul(Obj other) {
 		List n = new List();
 		int v = other.intValue();
@@ -141,7 +141,7 @@ public final class List extends NativeObj { //!export List
 			n.iadd(this);
 		return n;
 	}
-	
+
 	public Obj getSlice(Obj lower, Obj upper) {
 		int len = this.length();
 		int l = (lower == None)? 0 : lower.intValue();
@@ -166,7 +166,7 @@ public final class List extends NativeObj { //!export List
 		//System.err.println("result: " + list);
 		return list;
 	}
-	
+
 	public static Obj construct(Obj[] args) { //!export direct <new>
 		List l = new List();
 		if(args.length == 1) {
@@ -176,19 +176,19 @@ public final class List extends NativeObj { //!export List
 		}
 		return l;
 	}
-	
+
 	public SBool isEqual(Obj other) {
 		if(other instanceof List) {
 			List l = (List)other;
 			if(l.length != length)
 				return SBool.False;
-			for(int i=0; i<length; i++) 
+			for(int i=0; i<length; i++)
 				if(! l.array[i].equals(array[i]))
 					return SBool.False;
 			return SBool.True;
 		}
 		return null;
 	}
-	
+
 	// TODO: hashCode
 }

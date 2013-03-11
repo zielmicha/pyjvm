@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,19 +23,19 @@ package pyjvm;
 
 public class Tuple extends Obj { //!export Tuple
 	public Obj[] items;
-	
+
 	public Tuple(Obj[] items) {
 		this.items = items;
 	}
-	
+
 	public final Obj get(int i) {
 		return items[i];
 	}
-	
+
 	public final int getInt(int i) {
 		return items[i].intValue();
 	}
-	
+
 	public final int[] toIntArray() {
 		int[] array = new int[this.length()];
 		for(int i=0; i<this.length(); i++) {
@@ -43,7 +43,7 @@ public class Tuple extends Obj { //!export Tuple
 		}
 		return array;
 	}
-	
+
 	public final int[] toInternedStringArray() {
 		int[] array = new int[this.length()];
 		for(int i=0; i<this.length(); i++) {
@@ -51,15 +51,15 @@ public class Tuple extends Obj { //!export Tuple
 		}
 		return array;
 	}
-	
+
 	public final int length() {
 		return this.items.length;
 	}
-	
+
 	public static final Tuple Empty = new Tuple(new Obj[0]);
-	
+
 	// TODO: hashCode
-	
+
 	public SBool isEqual(Obj obj) {
 		if(obj instanceof Tuple) {
 			Tuple t = (Tuple)obj;
@@ -73,7 +73,7 @@ public class Tuple extends Obj { //!export Tuple
 			return null;
 		}
 	}
-	
+
 	public int hashCode() {
 		int code = 0;
 		for(int i=0; i<items.length; i++) {
@@ -82,7 +82,7 @@ public class Tuple extends Obj { //!export Tuple
 		}
 		return code;
 	}
-	
+
 	public final String toString() {
 		StringBuilder builder = new StringBuilder("(");
 		for(int i=0; i<items.length; i++) {
@@ -107,18 +107,18 @@ public class Tuple extends Obj { //!export Tuple
 			arr[i] = SInt.get(in[i]);
 		return new Tuple(arr);
 	}
-	
+
 	public Obj getIter() {
 		return new TupleIter();
 	}
-	
+
 	public Type getType() {
 		return TupleClass.instance;
 	}
-	
+
 	class TupleIter extends Obj {
 		int pos = 0;
-		
+
 		public Obj next() {
 			if(pos == items.length)
 				return null;

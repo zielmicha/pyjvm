@@ -7,13 +7,13 @@ public final class UserObjClass extends Type {
 	public static final StringDict dict;
 	public static final UserObjClass instance = new UserObjClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("UserObj".equals("NativeObj") || "UserObj".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		dict.put("__init__", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				// direct

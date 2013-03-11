@@ -9,13 +9,13 @@ public final class SStringClass extends Type {
 	public static final StringDict dict;
 	public static final SStringClass instance = new SStringClass();
 	public static final Obj constructor;
-	
+
 	static {
 		if("SString".equals("NativeObj") || "SString".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = BaseStringClass.dict.copy();
-		
+
 		dict.put("repr_bytes", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 0) {
@@ -40,7 +40,7 @@ public final class SStringClass extends Type {
 				return SString.construct(args[0]);
 			}
 		};
-		
+
 		dict.put("strip", new Method() {
 			public Obj callMethod(Obj self, Obj[] args) {
 				if(args.length != 0) {

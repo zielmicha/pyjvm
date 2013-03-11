@@ -6,11 +6,11 @@ def _complain_ifclosed(closed):
 
 class StringIO:
 	"""class StringIO([buffer])
-	
+
 	When a StringIO object is created, it can be initialized to an existing
 	string by passing the string to the constructor. If no string is given,
 	the StringIO will start empty.
-	
+
 	The StringIO object can accept either Unicode or 8-bit strings, but
 	mixing the two may take some care. If both are used, 8-bit strings that
 	cannot be interpreted as 7-bit ASCII (that use the 8th bit) will cause
@@ -26,10 +26,10 @@ class StringIO:
 		self.pos = 0
 		self.closed = False
 		self.softspace = 0
-	
+
 	def __iter__(self):
 		return self
-	
+
 	def next(self):
 		"""A file object is its own iterator, for example iter(f) returns f
 		(unless f is closed). When a file is used as an iterator, typically
@@ -42,7 +42,7 @@ class StringIO:
 		if not r:
 			raise StopIteration
 		return r
-	
+
 	def close(self):
 		"""Free the memory buffer.
 		"""
@@ -50,21 +50,21 @@ class StringIO:
 			self.closed = True
 			del self.buf
 			del self.pos
-	
+
 	def isatty(self):
 		"""Returns False because StringIO objects are not connected to a
 		tty-like device.
 		"""
 		_complain_ifclosed(self.closed)
 		return False
-	
+
 	def seek(self, pos, mode = 0):
 		"""Set the file's current position.
-	
+
 		The mode argument is optional and defaults to 0 (absolute file
 		positioning); other values are 1 (seek relative to the current
 		position) and 2 (seek relative to the file's end).
-	
+
 		There is no return value.
 		"""
 		_complain_ifclosed(self.closed)
@@ -76,16 +76,16 @@ class StringIO:
 		elif mode == 2:
 			pos += self.len
 		self.pos = max(0, pos)
-	
+
 	def tell(self):
 		"""Return the file's current position."""
 		_complain_ifclosed(self.closed)
 		return self.pos
-	
+
 	def read(self, n = -1):
 		"""Read at most size bytes from the file
 		(less if the read hits EOF before obtaining size bytes).
-	
+
 		If the size argument is negative or omitted, read all data until EOF
 		is reached. The bytes are returned as a string object. An empty
 		string is returned when EOF is encountered immediately.
@@ -101,17 +101,17 @@ class StringIO:
 		r = self.buf[self.pos:newpos]
 		self.pos = newpos
 		return r
-	
+
 	def readline(self, length=None):
 		r"""Read one entire line from the file.
-	
+
 		A trailing newline character is kept in the string (but may be absent
 		when a file ends with an incomplete line). If the size argument is
 		present and non-negative, it is a maximum byte count (including the
 		trailing newline) and an incomplete line may be returned.
-	
+
 		An empty string is returned only when EOF is encountered immediately.
-	
+
 		Note: Unlike stdio's fgets(), the returned string contains null
 		characters ('\0') if they occurred in the input.
 		"""
@@ -130,11 +130,11 @@ class StringIO:
 		r = self.buf[self.pos:newpos]
 		self.pos = newpos
 		return r
-	
+
 	def readlines(self, sizehint = 0):
 		"""Read until EOF using readline() and return a list containing the
 		lines thus read.
-	
+
 		If the optional sizehint argument is present, instead of reading up
 		to EOF, whole lines totalling approximately sizehint bytes (or more
 		to accommodate a final whole line).
@@ -149,15 +149,15 @@ class StringIO:
 				break
 			line = self.readline()
 		return lines
-	
+
 	def truncate(self, size=None):
 		"""Truncate the file's size.
-	
+
 		If the optional size argument is present, the file is truncated to
 		(at most) that size. The size defaults to the current position.
 		The current file position is not changed unless the position
 		is beyond the new file size.
-	
+
 		If the specified size exceeds the file's current size, the
 		file remains unchanged.
 		"""
@@ -170,10 +170,10 @@ class StringIO:
 			self.pos = size
 		self.buf = self.getvalue()[:size]
 		self.len = size
-	
+
 	def write(self, s):
 		"""Write a string to the file.
-		
+
 		There is no return value.
 		"""
 		_complain_ifclosed(self.closed)
@@ -203,29 +203,29 @@ class StringIO:
 			slen = newpos
 		self.len = slen
 		self.pos = newpos
-	
+
 	def writelines(self, iterable):
 		"""Write a sequence of strings to the file. The sequence can be any
 		iterable object producing strings, typically a list of strings. There
 		is no return value.
-	
+
 		(The name is intended to match readlines(); writelines() does not add
 		line separators.)
 		"""
 		write = self.write
 		for line in iterable:
 			write(line)
-	
+
 	def flush(self):
 		"""Flush the internal buffer
 		"""
 		_complain_ifclosed(self.closed)
-	
+
 	def getvalue(self):
 		"""
 		Retrieve the entire contents of the "file" at any time before
 		the StringIO object's close() method is called.
-	
+
 		The StringIO object can accept either Unicode or 8-bit strings,
 		but mixing the two may take some care. If both are used, 8-bit
 		strings that cannot be interpreted as 7-bit ASCII (that use the

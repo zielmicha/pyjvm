@@ -7,13 +7,13 @@ public final class BaseStringClass extends Type {
 	public static final StringDict dict;
 	public static final BaseStringClass instance = new BaseStringClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("BaseString".equals("NativeObj") || "BaseString".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 	}
 	public final StringDict getDict() {
 		return dict;

@@ -7,13 +7,13 @@ public final class SExceptionClass extends Type {
 	public static final StringDict dict;
 	public static final SExceptionClass instance = new SExceptionClass();
 	public static final Obj constructor;
-	
+
 	static {
 		if("SException".equals("NativeObj") || "SException".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 		constructor = new Obj() {
 			public Obj call(Obj[] args)  {
 				if(args.length != 1) {
@@ -22,7 +22,7 @@ public final class SExceptionClass extends Type {
 				return SException.create(args[0]);
 			}
 		};
-		
+
 	}
 	public final StringDict getDict() {
 		return dict;

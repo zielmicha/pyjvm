@@ -215,9 +215,9 @@ public final class BinOpInstrs {
 	public static abstract class BinOpFactory extends Obj {
 		public abstract GenericInstrs.BinOp create();
 	}
-	
+
 	public static final StringDict binOpTypes = new StringDict();
-	
+
 	static {
 
 		binOpTypes.put("add", new BinOpFactory(){

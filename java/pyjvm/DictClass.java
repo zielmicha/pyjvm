@@ -9,7 +9,7 @@ public final class DictClass extends Type {
 	public static final StringDict dict;
 	public static final DictClass instance = new DictClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("Dict".equals("NativeObj") || "Dict".equals("UserObj"))
 			dict = new StringDict();

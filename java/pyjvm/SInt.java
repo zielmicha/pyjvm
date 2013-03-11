@@ -1,15 +1,15 @@
 // Copyright (C) 2011 by Michal Zielinski
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,18 +31,18 @@ public final class SInt extends Obj { //!export SInt
 	private SInt(long i) {
 		this.value = i;
 	}
-	
+
 	public int hashCode() {
 		return (int)this.value;
 	}
-	
+
 	public final int intValue() {
 		int val = (int)this.value;
 		if(val != this.value)
 			throw new ScriptError(ScriptError.TypeError, "number to large to convert to integer");
 		return val;
 	}
-	
+
 	public SBool isEqual(Obj other) {
 		if(other == this)
 			return SBool.True;
@@ -54,19 +54,19 @@ public final class SInt extends Obj { //!export SInt
 	public static SInt get(int num) {
 		return new SInt(num);
 	}
-	
+
 	public static Obj get(long num) {
 		return new SInt(num);
 	}
-	
+
 	public String toString() {
 		return this.value + "";
 	}
-	
+
 	public boolean boolValue() {
 		return this.value != 0;
 	}
-	
+
 	public Obj add(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -75,7 +75,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj radd(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -84,7 +84,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj sub(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -93,7 +93,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj rsub(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -102,7 +102,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj mul(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -111,7 +111,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj rmul(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -120,7 +120,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj rfloordiv(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -129,7 +129,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj floordiv(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -138,7 +138,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj rdiv(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -147,7 +147,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj div(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -156,7 +156,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj truediv(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -165,7 +165,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj rtruediv(Obj other) {
 		if(other instanceof SInt) {
 			long otherValue = ((SInt)other).value;
@@ -174,7 +174,7 @@ public final class SInt extends Obj { //!export SInt
 			return NotImplemented;
 		}
 	}
-	
+
 	public Obj compare(Obj other) {
 		if(!(other instanceof SInt)) return NotImplemented;
 		int otherVal = other.intValue();
@@ -185,11 +185,11 @@ public final class SInt extends Obj { //!export SInt
 		else
 			return ONE;
 	}
-	
+
 	public Obj unarySub() {
 		return SInt.get(-value);
 	}
-	
+
 	public Type getType() {
 		return SIntClass.instance;
 	}

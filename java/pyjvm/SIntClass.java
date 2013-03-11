@@ -9,13 +9,13 @@ public final class SIntClass extends Type {
 	public static final StringDict dict;
 	public static final SIntClass instance = new SIntClass();
 	public static final Obj constructor = null;
-	
+
 	static {
 		if("SInt".equals("NativeObj") || "SInt".equals("UserObj"))
 			dict = new StringDict();
 		else
 			dict = NativeObjClass.dict.copy();
-		
+
 	}
 	public final StringDict getDict() {
 		return dict;
