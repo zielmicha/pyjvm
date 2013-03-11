@@ -70,7 +70,7 @@ def _install_apk():
 
 def assert_exists(path):
     if not os.path.exists(path):
-        sys.exit('File %s does not exists - update your Android SDK and install %s platform' % (path, target_namex))
+        sys.exit('File %s does not exists - update your Android SDK and install %s platform' % (path, target_name))
 
 def init():
     global sdk_dir, config
